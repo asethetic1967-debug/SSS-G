@@ -683,6 +683,210 @@ const server = http.createServer(async (req, res) => {
     }
 
     // ==========================================
+    // 3.3 动态反差萌伙伴生成与同步路由 (Dynamic Companion Engine)
+    // ==========================================
+    if (pathname === '/api/companion/generate' && req.method === 'POST') {
+        try {
+            const body = await parseJsonBody(req);
+            const { genre = 'Post-Apocalyptic', characterDesc = '', language = 'zh-TW', apiKey, model } = body;
+
+            const activeKey = (apiKey || dbCache.settings.global_api_key || process.env.GEMINI_API_KEY || '').trim();
+            const activeModel = model || dbCache.settings.default_model || 'gemini-2.5-flash';
+
+            const companionPrompt = `You are an expert game narrative designer specialized in creating endearing, comedic, and charming "Gap-Moe" (反差萌) travel companions for a story-rich Road Trip adventure.
+Genre: ${genre}
+Player Character: ${characterDesc || 'A wandering traveler'}
+Language: ${language === 'zh-TW' ? '繁體中文' : (language === 'ja' ? '日本語' : (language === 'zh-CN' ? '简体中文' : 'English'))}
+
+Generate ONE unique companion who accompanies the player on their journey.
+Requirements:
+1. **Name**: Memorable nickname/name (e.g. 洛夏, 林檬, 灰羽, 珀莉, 艾可).
+2. **Archetype**: Anime/RPG gap-moe archetype (e.g., 搞笑脱线工匠 / 三无冷面近卫 / 傲娇毒舌学者 / 元气治愈游侠 / 贪吃胆小向导).
+3. **Visual**: 1 representative Emoji + brief visual signature (e.g., "🎒 大号护目镜与宽大工装短裤").
+4. **Personality**: Core traits + 1 distinct everyday slice-of-life gap-moe quirk (e.g., "外冷内热，重度甜食控且极度害怕毛毛虫", "自称机械天才，却经常把扳手当点心咬").
+5. **Dialogue Quirk**: Distinctive speaking habit/quirk (e.g., 习惯用数据概率说话、元气满满但经常口误、傲娇吐槽).
+6. **Meet Scene**: A comical or warm slice-of-life opening encounter (e.g., 头卡在废弃自动贩卖机里拔不出来、偷偷烤红薯烤焦了在吹气、跟一只机械松鼠认真对峙).
+7. **Perk**: { "name": "特技名称", "description": "探索/生活/营地增益效果（如：野炊料理回复翻倍、废墟搜刮额外小玩意、被偷袭概率归零）" }.
+8. **Affinity**: Initial value 20.
+
+Respond strictly with valid JSON conforming to this schema (no extra explanation):
+\`\`\`json
+{
+  "name": "string",
+  "archetype": "string",
+  "visual": "string",
+  "personality": "string",
+  "dialogue_quirk": "string",
+  "meet_scene": "string",
+  "perk": {
+    "name": "string",
+    "description": "string"
+  },
+  "affinity": 20
+}
+\`\`\``;
+
+            let companionResult = null;
+
+            if (activeKey) {
+                try {
+                    let aiText = '';
+                    if (activeKey.startsWith('AIzaSy')) {
+                        const targetUrl = `https://generativelanguage.googleapis.com/v1beta/models/${activeModel}:generateContent?key=${activeKey}`;
+                        const response = await fetch(targetUrl, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ contents: [{ parts: [{ text: companionPrompt }] }] })
+                        });
+                        if (response.ok) {
+                            const result = await response.json();
+                            aiText = result.candidates?.[0]?.content?.parts?.[0]?.text || '';
+                        }
+                    } else {
+                        const directUrl = `https://generativelanguage.googleapis.com/v1beta/models/${activeModel}:generateContent`;
+                        const res = await fetch(directUrl, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json', 'x-goog-api-key': activeKey },
+                            body: JSON.stringify({ contents: [{ parts: [{ text: companionPrompt }] }] })
+                        });
+                        if (res.ok) {
+                            const result = await res.json();
+                            aiText = result.candidates?.[0]?.content?.parts?.[0]?.text || '';
+                        }
+                    }
+
+                    if (aiText) {
+                        const match = aiText.match(/```json\s*([\s\S]*?)\s*```/) || aiText.match(/\{[\s\S]*\}/);
+                        if (match) {
+                            companionResult = JSON.parse(match[1] || match[0]);
+                        }
+                    }
+                } catch (err) {
+                    console.warn('[Backend] AI companion generation error, using fallback template:', err.message);
+                }
+            }
+
+            // Fallback templates with rich gap-moe personalities
+            if (!companionResult || !companionResult.name) {
+                const pool = [
+                    {
+                        name: "洛夏 (Luoxia)",
+                        archetype: "搞笑脱线工匠",
+                        visual: "🎒 大号护目镜与工装短裤",
+                        personality: "自称万能机械天才，但重度甜食控且极度怕毛毛虫",
+                        dialogue_quirk: "每说三句话就要加上「根据本天才的精密测算！」",
+                        meet_scene: "脑袋卡在废弃自动贩卖机取物口里正在手忙脚乱地拔不出来，嘴里还咬着半块饼干",
+                        perk: { name: "野炊暴击", description: "营地烹饪效果提升50%，搜刮时有概率捡到旧时代的奇妙小玩意" },
+                        affinity: 20
+                    },
+                    {
+                        name: "林檬 (Lin Meng)",
+                        archetype: "三无冷面近卫",
+                        visual: "🗡️ 黑色兜帽与破旧毛绒围巾",
+                        personality: "外表冷漠惜字如金，实则是重度毛茸茸控，私底下会对着机械小鸟傻笑",
+                        dialogue_quirk: "说话极简短，偶尔认真地蹦出一句完全不好笑的冷笑话",
+                        meet_scene: "为了把一只被困在路灯顶端的电子小猫救下来，自己反而挂在半空中进退两难",
+                        perk: { name: "警戒雷达", description: "营地休息被夜袭概率降为0，危机时必定替玩家格挡一次关键伤害" },
+                        affinity: 20
+                    },
+                    {
+                        name: "灰羽 (Huiyu)",
+                        archetype: "傲娇毒舌学者",
+                        visual: "📜 金丝单片眼镜与沾满墨水的皮手套",
+                        personality: "嘴上喋喋不休抱怨旅途环境糟糕，但每次风吹草动都会第一时间施加防护",
+                        dialogue_quirk: "口癖：「真是愚蠢的决定……不过本学者勉为其难原谅你一次」",
+                        meet_scene: "为了辨识一株发光的野外奇异蘑菇，以身试毒结果自己舌头麻痹说不出完整的话",
+                        perk: { name: "古籍破译", description: "古老遗迹与机械解谜DC判定直接降低3点，能解读古代失落文本" },
+                        affinity: 20
+                    },
+                    {
+                        name: "珀莉 (Polly)",
+                        archetype: "元气治愈游侠",
+                        visual: "🌿 挂满干花的大草帽与旧药箱",
+                        personality: "充满无限干劲与乐观，但做饭经常变成充满爆炸声的黑暗料理",
+                        dialogue_quirk: "充满朝气的「今天也是闪闪发光的大冒险呢！」",
+                        meet_scene: "正在路边跟一只抢走了她烤红薯的变异松鼠进行严肃的“物权归属谈判”",
+                        perk: { name: "草药嗅觉", description: "每次野外探索采集到的野果、草药与泉水数量翻倍" },
+                        affinity: 20
+                    }
+                ];
+                const selected = pool[Math.floor(Math.random() * pool.length)];
+                companionResult = selected;
+            }
+
+            // If user has token, auto-persist to user profile
+            const authHeader = req.headers['authorization'];
+            const token = authHeader && authHeader.startsWith('Bearer ') ? authHeader.slice(7) : '';
+            if (token) {
+                const session = dbCache.sessions[token];
+                if (session && session.type === 'user') {
+                    const user = dbCache.users.find(u => u.id === session.userId);
+                    if (user) {
+                        user.active_companion = companionResult;
+                        saveDb();
+                    }
+                } else {
+                    if (!dbCache.guest_companions) dbCache.guest_companions = {};
+                    dbCache.guest_companions[token] = companionResult;
+                    saveDb();
+                }
+            }
+
+            return sendJson(res, 200, { success: true, companion: companionResult });
+        } catch (e) {
+            return sendError(res, 500, e.message);
+        }
+    }
+
+    if (pathname === '/api/companion/sync' && req.method === 'POST') {
+        try {
+            const authHeader = req.headers['authorization'];
+            const token = authHeader && authHeader.startsWith('Bearer ') ? authHeader.slice(7) : '';
+            const body = await parseJsonBody(req);
+            const { active_companion } = body;
+            
+            if (token) {
+                const session = dbCache.sessions[token];
+                if (session && session.type === 'user') {
+                    const user = dbCache.users.find(u => u.id === session.userId);
+                    if (user) {
+                        user.active_companion = active_companion;
+                        saveDb();
+                        return sendJson(res, 200, { success: true, active_companion: user.active_companion });
+                    }
+                }
+                if (!dbCache.guest_companions) dbCache.guest_companions = {};
+                dbCache.guest_companions[token] = active_companion;
+                saveDb();
+            }
+            return sendJson(res, 200, { success: true, active_companion });
+        } catch (e) {
+            return sendError(res, 500, e.message);
+        }
+    }
+
+    if (pathname === '/api/companion/sync' && req.method === 'GET') {
+        try {
+            const authHeader = req.headers['authorization'];
+            const token = authHeader && authHeader.startsWith('Bearer ') ? authHeader.slice(7) : '';
+            if (token) {
+                const session = dbCache.sessions[token];
+                if (session && session.type === 'user') {
+                    const user = dbCache.users.find(u => u.id === session.userId);
+                    if (user) {
+                        return sendJson(res, 200, { success: true, active_companion: user.active_companion || null });
+                    }
+                }
+                const guestComp = dbCache.guest_companions ? dbCache.guest_companions[token] : null;
+                return sendJson(res, 200, { success: true, active_companion: guestComp || null });
+            }
+            return sendJson(res, 200, { success: true, active_companion: null });
+        } catch (e) {
+            return sendError(res, 500, e.message);
+        }
+    }
+
+    // ==========================================
     // 3.5 密碼解鎖校驗 (Minigame Verification)
     // ==========================================
     if (pathname === '/api/minigame/verify' && req.method === 'POST') {
@@ -1948,7 +2152,40 @@ Your JSON fields "status_updates", "new_items", "removed_items", "start_combat",
 `;
                 }
 
+                let companionPrompt = "";
+                if (playerState.active_companion) {
+                    const comp = playerState.active_companion;
+                    companionPrompt = `
+--- ACTIVE TRAVEL COMPANION (随行反差萌同伴) ---
+- Name: "${comp.name}"
+- Visual & Appearance: "${comp.visual || '🎒 随行伙伴'}"
+- Archetype: "${comp.archetype || '萌系旅伴'}"
+- Personality & Gap-Moe: "${comp.personality || '外冷内热，重度甜食控'}"
+- Dialogue Quirk / Speaking Style: "${comp.dialogue_quirk || '口癖鲜明'}"
+- Perk / Special Trait: "${comp.perk ? `${comp.perk.name} - ${comp.perk.description}` : '旅途互助'}"
+- Affinity (好感度): ${comp.affinity || 20}/100
+
+* COMPANION INTEGRATION RULES:
+1. Integrate ${comp.name} naturally into the scene descriptions, dialogue banter, travel observations, or humorous reactions!
+2. Reflect their unique dialogue quirk ("${comp.dialogue_quirk}") and gap-moe trait ("${comp.personality}").
+3. In choices, provide at least one option that involves ${comp.name} (e.g., "[听听${comp.name}的看法]", "[与${comp.name}一起探索]", or companion-assisted action).
+4. If the player interacts with or helps ${comp.name}, describe a cute/heartwarming moment.
+`;
+                }
+
+                const narrativeTonePrompt = `
+--- NARRATIVE TONE & PACING RULES (公路漫游与日常生活化叙事) ---
+CRITICAL: Move away from pure high-anxiety survival disaster. Embrace a charming, atmospheric "Road Trip & Slice-of-Life" tone!
+Target narrative focus balance:
+1. [40% 探索发现与风土人情]: Depict the quiet beauty of ruins, golden sunset, gentle breeze, forgotten old-world relics, quirky landmarks, and cozy shelters.
+2. [30% 营地日常与伙伴互动]: Depict camp life, brewing hot tea/coffee over a fire, sharing rations, comedic cooking attempts, traveling banter, and small comforting moments.
+3. [20% 探索解谜与趣味互动]: Light scavenging, tinkering with eccentric broken machines, discovering old music players, chatting with neutral harmless wanderers.
+4. [10% 遭遇战/危机]: Combat is NOT grinding or punishing; it serves only as a spice and a test of teamwork with the companion. NEVER trigger continuous malicious combat.
+`;
+
                 let historyPrompt = `
+${narrativeTonePrompt}
+${companionPrompt}
 --- CAMP & PROGRESS WORLD STATE (CRITICAL CONTEXT) ---
 - Current Mode: "${playerState.world_state.mode || "自由"}" (剧情/自由/过渡)
 - Base Camp Status:
@@ -1979,7 +2216,7 @@ ${Object.entries(flags).map(([f, val]) => `  * Flag [${f}]: ${val}`).join('\n') 
 
 ${actionPrompt}
 
-Please reflect the player's Chapter Progress, Weapon/Armor tier, Active Blessings, and NPC relationship levels directly in the narrative events, dialogue variations, merchant pricing offers, and challenge outcomes!
+Please reflect the player's Chapter Progress, Weapon/Armor tier, Active Blessings, Companion bond, and NPC relationship levels directly in the narrative events, dialogue variations, merchant pricing offers, and challenge outcomes!
 --------------------------------------------
 `;
                 // E. Intercept Minigame Finished prompts to enforce authoritative outcomes!
