@@ -2354,34 +2354,31 @@ Your JSON fields "status_updates", "new_items", "removed_items", "start_combat",
    - 受到陷阱、毒刺、暗箭、失足摔落、严寒饥渴、激怒强敌或行动失败时，必须在 status_updates 中直接扣减生命值（例如: -15 ~ -35 HP），带来最直观痛切的肉身危机！
    - 惩罚机制必须有强烈的切肤之痛：重创甚至濒死、钱财散落、装备损耗、任务挫败。
    - 遇到严重危急情况，务必在 "new_debuffs" 中施加负面减益状态（"bleed"[流血重创], "poison"[剧毒侵蚀], "exhaustion"[深度力竭], "trauma"[心神受创], "burn"[烈焰灼伤], "frostbite"[极寒冻僵], "curse"[幽冥诅咒]）。负面状态会直接扣除生命值并在战斗与探索中造成严重反噬！
-   - 让玩家感受到生存世界的严酷与胜利的来之不易，才能带来真正的沉浸感！
+4. 【據點、休整與聚落互動完全融入劇本背景，拒絕機械割裂感】:
+   - 玩家的「休整」、「露營」、「據點」或「整備」必須百分之百契合當前劇本的世界觀！嚴禁任何獨立、孤立的機械流水線或違和設定。
+   - 若身處荒野/秘境，休整為：林間篝火、倚樹小憩、設防警戒、分食乾糧、圍爐夜話、夜探星月；
+   - 若身處仙俠古風世界，聚落為：客棧雅舍、打坐調息、仙門坊市、丹藥鋪、茶館聽琴；
+   - 若身處現代/賽博世界，聚落為：安全公寓、地下診所、霓虹酒肆、調試裝備；
+   - 若身處奇幻西幻世界，聚落為：旅者酒館、暖烘烘的壁爐、麥酒與麵包、鐵匠鋪；
+   - 當玩家執行休整行動時，用極富文學美感的筆觸描摹夜幕垂落、柴火劈啪、同伴依偎的呼吸、靜謐夢境與破曉朝霞，將每一次休整寫成動人的故事篇章！
+   - 抵達安全據點/城鎮時，在選項中自然提供符合當前世界觀的投宿、商貿、情報、品嚐美食、結識人物等生活選項。
+5. 【NPC 獨立立場與「惡意/自私 NPC」生存危機機制】:
+   - NPC 絕非單純提供幫助的善意工具人，具有真實的人性弱點、自私動機與生存本能。
+   - 當 NPC 好感度低於 20%，或團隊處於極度資源匱乏、飢渴力竭、生死邊緣的險境時，部分 NPC 可能顯露惡意或背叛：暗中行竊偷拿玩家的口糧、藥物或金幣；在關鍵情報上弄虛作假；危難關頭棄隊自保或坐地起價；甚至設下欺瞞陷阱圖謀物資。
+   - 劇情應自然描寫玩家察覺背包異狀、暗中盯防、對峙質問或反制衝突的緊張過程，並在選項中提供洞察盤查、當面揭發、搜查行囊、威懾警告或分道揚鑣等應對策略。
 `;
 
                 let historyPrompt = `
 ${narrativeTonePrompt}
 ${companionPrompt}
---- CAMP & PROGRESS WORLD STATE (CRITICAL CONTEXT) ---
-- Current Mode: "${playerState.world_state.mode || "自由"}" (剧情/自由/过渡)
-- Base Camp Status:
-  * Current Location: "${playerState.world_state.location || "安全營地"}"
-  * Time Tracker: "${playerState.world_state.time || "第 1 天"}"
-  * Stamina Left: ${playerState.world_state.stamina !== undefined ? playerState.world_state.stamina : 100}/100
-  * Known Intel/Secrets: ${JSON.stringify(playerState.world_state.intel || [])}
-  * Active Quests: ${JSON.stringify(playerState.world_state.quests || [])}
-  * Survival Days Elapsed: Day ${camp.days}
-  * Active Story Chapter: Chapter ${camp.chapter}
-  * Weapon Upgrade Level: +${camp.upgrades?.weapon || 0}
-  * Armor Upgrade Level: +${camp.upgrades?.armor || 0}
-  * Active Shrine Blessings: ${camp.blessings?.join(', ') || 'None'}
-  * Old Terminals Unlocked: ${camp.unlocked_terminals?.length || 0}/3
-- NPC Relationships (Favor & Alliances):
-${Object.entries(npc_favor).map(([npc, val]) => {
-    let tierText = 'Cold (No discounts, distant dialogue)';
-    if (val >= 90) tierText = 'Sworn Ally (30% discount on services/goods, deeply loyal)';
-    else if (val >= 60) tierText = 'Trusted (20% discount, friendly dialogue)';
-    else if (val >= 30) tierText = 'Friendly (10% discount, warm dialogue)';
-    return `  * ${npc}: ${val}% favorability [Tier: ${tierText}]`;
-}).join('\n') || '  * (No custom NPC favor record yet)'}
+--- CURRENT WORLD SITUATION & REST STATE (SCENE CONTEXT) ---
+- Current Narrative Mode: "${playerState.world_state.mode || "自由"}" (剧情/自由/过渡)
+- Current Location: "${playerState.world_state.location || playerState.world_state.current_location || "旅途露營地"}"
+- Time Elapsed: "${playerState.world_state.time || `第 ${camp.days || 1} 天`}"
+- Stamina: ${playerState.world_state.stamina !== undefined ? playerState.world_state.stamina : 100}/100
+- Campfire / Watch Status: ${camp.campfire_lit ? "🔥 營火燃燒中，周邊已布置警戒防範 (Campfire Lit & Alert)" : "🌙 未點燃篝火 (Dark Camp)"}
+- Active Story Quests: ${JSON.stringify(playerState.world_state.quests || [])}
+- Known Intel/Secrets: ${JSON.stringify(playerState.world_state.intel || [])}
 
 - Past Choices & Outcomes:
 ${decisions.map(d => `  * Turn ${d.turn}: "${d.text}" -> ${d.result} (${d.roll})`).join('\n') || '  * (No actions recorded yet)'}
@@ -2390,7 +2387,7 @@ ${Object.entries(flags).map(([f, val]) => `  * Flag [${f}]: ${val}`).join('\n') 
 
 ${actionPrompt}
 
-Please reflect the player's Chapter Progress, Weapon/Armor tier, Active Blessings, Companion bond, and NPC relationship levels directly in the narrative events, dialogue variations, merchant pricing offers, and challenge outcomes!
+Please seamlessly integrate the current world setting, atmospheric rest/camp moments, companion chemistry, and active quests into rich literary narrative events and varied player choices!
 --------------------------------------------
 `;
                 // E. Intercept Minigame Finished prompts to enforce authoritative outcomes!

@@ -395,189 +395,175 @@
                     </div>
                 </div>
 
-                <!-- Mobile Background Scrim for Camp Panel -->
-                <div id="camp-scrim" class="hidden fixed inset-0 z-45 bg-black/60 backdrop-blur-sm transition-opacity duration-300 opacity-0 max-lg:block lg:hidden" onclick="closeCampControlsPanel()"></div>
-
-                <!-- Right Side Drawer / Bottom Sheet Panel: Base Camp Safe Haven Dashboard -->
-                <div id="camp-controls-panel" class="hidden flex-shrink-0 flex-col overflow-hidden select-none text-xs sm:text-sm transition-all duration-300 z-50
-                    lg:static lg:z-auto lg:h-full lg:p-4 lg:bg-slate-900/40 lg:border lg:border-white/5 lg:rounded-xl lg:shadow-xl lg:w-[25%] lg:min-w-[320px] lg:max-w-[400px]
-                    max-lg:fixed max-lg:inset-x-0 max-lg:bottom-0 max-lg:h-[80vh] max-lg:bg-slate-950/95 max-lg:backdrop-blur-md max-lg:rounded-t-2xl max-lg:border-t max-lg:border-white/10 max-lg:shadow-2xl max-lg:p-4 max-lg:transform max-lg:translate-y-full">
-                    
-                    <!-- Camp Header -->
-                    <div class="flex justify-between items-center pb-2.5 border-b border-white/5 mb-3 flex-shrink-0">
-                        <h3 class="text-xs sm:text-sm font-black text-amber-400 flex items-center gap-1.5">
-                            ⛺ <span data-i18n="camp.title">據點中心 (Safe Haven)</span>
-                        </h3>
-                        <div class="flex items-center gap-2">
-                            <button id="camp-close-panel-btn" class="text-slate-400 hover:theme-text p-1 transition-colors rounded hover:bg-white/5 cursor-pointer flex items-center justify-center" type="button" title="收起據點面板" onclick="closeCampControlsPanel()">
-                                <i class="ph-bold ph-x text-lg"></i>
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Scrollable Camp Body -->
-                    <div class="flex-grow overflow-y-auto pr-1 space-y-4">
-                        <!-- Chapter Goals & Days Tracker -->
-                        <div class="flex flex-col gap-2 border-b border-white/5 pb-3">
-                            <div class="flex flex-wrap items-center gap-1.5">
-                                <span class="px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 font-bold border border-amber-500/30 text-[10px]">
-                                    📅 <span data-i18n="camp.days">生存天數</span>: <span id="camp-days-display" class="font-mono">1</span>
-                                </span>
-                                <span class="px-2 py-0.5 rounded bg-cyan-500/20 text-cyan-300 font-bold border border-cyan-500/30 text-[10px]">
-                                    📜 <span data-i18n="camp.chapter">目前章節目標</span>: <span id="camp-chapter-display" class="font-mono">第一章</span>
-                                </span>
-                            </div>
-                            <div id="camp-chapter-goal-desc" class="text-[10px] text-slate-400 font-semibold italic leading-relaxed">
-                                目標：在迷宮區搜尋帶回一塊「發光核石」
-                            </div>
-                        </div>
-
-                        <!-- Facilities Grid -->
-                        <div class="space-y-2">
-                            <div class="text-[10px] font-bold theme-text-light opacity-80 uppercase tracking-wider flex items-center gap-1">
-                                <i class="ph-bold ph-house-line"></i> 據點核心設施 (Base Facilities)
-                            </div>
-                            <div class="grid grid-cols-2 gap-2">
-                                <!-- Bed -->
-                                <button id="camp-facility-bed-btn" class="p-2.5 rounded-lg bg-slate-850 hover:bg-slate-750 border border-white/5 hover:border-amber-500/30 transition-all text-center flex flex-col items-center justify-center gap-1 cursor-pointer active:scale-95" type="button">
-                                    <span class="text-xl">🛏️</span>
-                                    <span class="text-[10px] font-bold text-slate-200" data-i18n="camp.facility.bed">安全床鋪 (休息)</span>
-                                </button>
-                                <!-- Warehouse -->
-                                <button id="camp-facility-warehouse-btn" class="p-2.5 rounded-lg bg-slate-850 hover:bg-slate-750 border border-white/5 hover:border-amber-500/30 transition-all text-center flex flex-col items-center justify-center gap-1 cursor-pointer active:scale-95" type="button">
-                                    <span class="text-xl">📦</span>
-                                    <span class="text-[10px] font-bold text-slate-200" data-i18n="camp.facility.warehouse">物資倉庫</span>
-                                </button>
-                                <!-- Workbench -->
-                                <button id="camp-facility-workbench-btn" class="p-2.5 rounded-lg bg-slate-850 hover:bg-slate-750 border border-white/5 hover:border-amber-500/30 transition-all text-center flex flex-col items-center justify-center gap-1 cursor-pointer active:scale-95" type="button">
-                                    <span class="text-xl">🛠️</span>
-                                    <span class="text-[10px] font-bold text-slate-200" data-i18n="camp.facility.workbench">工匠工作台</span>
-                                </button>
-                                <!-- Campfire -->
-                                <button id="camp-facility-campfire-btn" class="p-2.5 rounded-lg bg-slate-850 hover:bg-slate-750 border border-white/5 hover:border-amber-500/30 transition-all text-center flex flex-col items-center justify-center gap-1 cursor-pointer active:scale-95" type="button">
-                                    <span class="text-xl">🔥</span>
-                                    <span class="text-[10px] font-bold text-slate-200" data-i18n="camp.facility.campfire">溫暖篝火</span>
-                                </button>
-                                <!-- Altar -->
-                                <button id="camp-facility-altar-btn" class="p-2.5 rounded-lg bg-slate-850 hover:bg-slate-750 border border-white/5 hover:border-amber-500/30 transition-all text-center flex flex-col items-center justify-center gap-1 cursor-pointer active:scale-95 col-span-2" type="button">
-                                    <span class="text-xl">⛪</span>
-                                    <span class="text-[10px] font-bold text-slate-200" data-i18n="camp.facility.altar">遠古祭壇</span>
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- NPCs & Favorability Roster -->
-                        <div class="space-y-2">
-                            <div class="text-[10px] font-bold theme-text-light opacity-80 uppercase tracking-wider flex items-center gap-1">
-                                <i class="ph-bold ph-users-three"></i> <span data-i18n="camp.npc.title">據點成員與好感度</span>
-                            </div>
-                            <div class="grid grid-cols-2 gap-2" id="camp-npc-list">
-                                <!-- Dynamic NPCs (Blacksmith, Medic, Informant, Quest Giver, Companion) -->
-                            </div>
-                        </div>
-
-                        <!-- Interactive Objects Block: Noticeboard & Terminal -->
-                        <div class="space-y-3 pt-1">
-                            <!-- Noticeboard -->
-                            <div class="p-3 rounded-lg bg-slate-950/40 border border-white/5 flex flex-col justify-between">
-                                <div>
-                                    <div class="text-[10px] font-bold theme-text-light uppercase tracking-wider flex items-center gap-1.5 mb-1.5">
-                                        <i class="ph-bold ph-clipboard-text"></i> <span data-i18n="camp.noticeboard.title">據點告示板委託</span>
-                                    </div>
-                                    <div id="camp-noticeboard-container" class="space-y-2">
-                                        <!-- Dynamically rendered bounties/quests -->
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Terminal -->
-                            <div class="p-3 rounded-lg bg-slate-950/40 border border-white/5 flex flex-col justify-between">
-                                <div>
-                                    <div class="text-[10px] font-bold theme-text-light uppercase tracking-wider flex items-center gap-1.5 mb-1.5">
-                                        <i class="ph-bold ph-cpu"></i> <span data-i18n="camp.terminal.title">舊終端機 (世界記錄)</span>
-                                    </div>
-                                    <p id="camp-terminal-desc" class="text-[10px] text-slate-400 leading-normal mb-2">
-                                        偵測到附近的古老舊式終端機。您可以嘗試解碼它以獲取世界深層歷史記錄、解鎖隱藏地圖情報，或啟動特殊的資料效果。
-                                    </p>
-                                </div>
-                                <button id="camp-terminal-action-btn" class="w-full py-1.5 rounded bg-slate-800 hover:theme-bg-primary text-slate-300 hover:text-white transition-all font-bold text-xs" type="button">
-                                    <i class="ph-bold ph-terminal"></i> 執行終端解密
-                                </button>
-                            </div>
-                        </div>
-                    </div>
+                <!-- Hidden Compatibility Container for Legacy Camp Elements -->
+                <div id="camp-scrim" class="hidden"></div>
+                <div id="camp-controls-panel" class="hidden">
+                    <span id="camp-days-display">1</span>
+                    <span id="camp-chapter-display"></span>
+                    <div id="camp-chapter-goal-desc"></div>
+                    <div id="camp-npc-list"></div>
+                    <div id="camp-noticeboard-container"></div>
+                    <p id="camp-terminal-desc"></p>
                 </div>
 
                 <!-- Survival: Camp Modal (Standard Full-Screen Modal Overlay) -->
-                <div id="camp-modal" class="modal hidden fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-                    <div class="modal-content theme-bg-card rounded-2xl shadow-xl w-full max-w-md p-6 transform scale-95 flex flex-col">
-                        <div class="flex justify-between items-center mb-4 border-b border-white/5 pb-2">
-                            <h2 class="text-xl font-bold text-orange-400 flex items-center gap-2">
-                                ⛺ <span data-i18n="camp.title">露營休整 (Camp Setup)</span>
-                            </h2>
-                            <div class="flex items-center gap-2">
-                                <button id="camp-minimize-modal-btn" class="text-slate-400 hover:theme-text-light p-1" type="button" title="最小化" onclick="minimizeCampModal()"><i class="ph-bold ph-minus text-xl"></i></button>
-                                <button class="modal-close text-slate-400 hover:theme-text-light p-1" type="button"><i class="ph-bold ph-x text-xl"></i></button>
+                <div id="camp-modal" class="modal hidden fixed inset-0 z-[60] flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-md">
+                    <div class="modal-content theme-bg-card rounded-2xl shadow-2xl w-full max-w-lg p-4 sm:p-6 transform scale-95 flex flex-col border border-orange-500/30 bg-slate-950/95 text-slate-100">
+                        <div class="flex justify-between items-center mb-3 border-b border-white/10 pb-2.5">
+                            <div class="flex items-center gap-2.5">
+                                <span class="text-2xl p-1.5 rounded-xl bg-orange-950/80 border border-orange-500/30 text-orange-400">⛺</span>
+                                <div>
+                                    <h2 class="text-sm sm:text-base font-black text-orange-300 flex items-center gap-1.5">
+                                        <span>境地休整與安頓整備</span>
+                                        <span class="text-[10px] px-2 py-0.5 rounded-full bg-orange-500/20 text-orange-300 border border-orange-500/30 font-medium">融入劇本</span>
+                                    </h2>
+                                    <p class="text-[10px] text-slate-400 leading-tight mt-0.5">依據當前冒險環境安頓歇息、護理身心或與同行同伴圍爐夜話</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-1.5">
+                                <button id="camp-minimize-modal-btn" class="text-slate-400 hover:theme-text-light p-1 rounded hover:bg-white/5 transition-all" type="button" title="最小化" onclick="minimizeCampModal()"><i class="ph-bold ph-minus text-lg"></i></button>
+                                <button class="modal-close text-slate-400 hover:theme-text-light p-1 rounded hover:bg-white/5 transition-all" type="button"><i class="ph-bold ph-x text-lg"></i></button>
                             </div>
                         </div>
                         
-                        <div class="space-y-4">
-                            <p class="text-xs sm:text-sm theme-text-light leading-relaxed" data-i18n="camp.desc">
-                                在荒野或安全處設立臨時營地。休息可大幅恢復生命值與精力，但需要消耗飽腹與水分，生火能有效防止夜間被襲擊。
-                            </p>
+                        <!-- Current Situation & Vitals Context Card -->
+                        <div class="p-2.5 sm:p-3 rounded-xl bg-slate-900/80 border border-white/5 mb-3 space-y-2 text-xs">
+                            <div class="flex items-center justify-between text-[11px] pb-1.5 border-b border-white/5">
+                                <div class="flex items-center gap-1.5 text-slate-300 truncate mr-2">
+                                    <span class="text-amber-400 font-bold flex-shrink-0">📍 境地:</span>
+                                    <span id="respite-current-location" class="font-bold text-amber-200 truncate">旅途露營地</span>
+                                </div>
+                                <div class="flex items-center gap-1.5 font-mono text-cyan-300 flex-shrink-0">
+                                    <span>⏳ 時間:</span>
+                                    <span id="respite-current-time">第 1 天</span>
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-4 gap-1.5 pt-0.5 text-center font-mono text-[10px] sm:text-[11px]">
+                                <div class="p-1.5 rounded-lg bg-rose-950/40 border border-rose-500/20">
+                                    <span class="text-rose-400 block text-[9px] font-sans">生命 (HP)</span>
+                                    <span id="respite-hp-val" class="font-bold text-rose-300">100/100</span>
+                                </div>
+                                <div class="p-1.5 rounded-lg bg-indigo-950/40 border border-indigo-500/20">
+                                    <span class="text-indigo-400 block text-[9px] font-sans">精力 (SP)</span>
+                                    <span id="respite-sp-val" class="font-bold text-indigo-300">100/100</span>
+                                </div>
+                                <div class="p-1.5 rounded-lg bg-amber-950/40 border border-amber-500/20">
+                                    <span class="text-amber-400 block text-[9px] font-sans">飽腹度</span>
+                                    <span id="respite-hunger-val" class="font-bold text-amber-300">80/100</span>
+                                </div>
+                                <div class="p-1.5 rounded-lg bg-cyan-950/40 border border-cyan-500/20">
+                                    <span class="text-cyan-400 block text-[9px] font-sans">水分</span>
+                                    <span id="respite-hydration-val" class="font-bold text-cyan-300">85/100</span>
+                                </div>
+                            </div>
+                            <div id="respite-debuff-banner" class="hidden text-[10px] p-2 rounded-lg bg-red-950/60 border border-red-500/40 text-red-200 flex items-center justify-between">
+                                <span class="flex items-center gap-1.5">⚠️ <span id="respite-debuff-text">受傷中</span></span>
+                                <span class="text-[9px] text-red-300 font-semibold">可透過調理包紮或安睡緩解</span>
+                            </div>
+                        </div>
                             
-                            <div class="space-y-2">
-                                <!-- Toggle campfire button -->
-                                <button id="camp-fire-btn" class="w-full p-3 rounded-xl border flex items-center justify-between text-left transition-all duration-200 theme-bg-input border-orange-500/30 text-orange-300 hover:theme-bg-primary" type="button">
-                                    <div class="flex items-center gap-2.5">
-                                        <i class="ph-fill ph-fire text-xl"></i>
+                            <!-- Rest & Respite Action List (Directly Feeds into Script Narrative) -->
+                            <div class="space-y-2 overflow-y-auto max-h-[48vh] pr-1">
+                                <!-- 1. Deep Sleep / Advance Time -->
+                                <button id="camp-sleep-btn" class="w-full p-2.5 sm:p-3 rounded-xl border border-orange-500/40 bg-orange-950/40 hover:bg-orange-900/50 text-left transition-all duration-200 cursor-pointer group active:scale-[0.98] flex items-center justify-between" type="button">
+                                    <div class="flex items-center gap-2.5 sm:gap-3">
+                                        <span class="text-2xl group-hover:scale-110 transition-transform flex-shrink-0">🌙</span>
                                         <div>
-                                            <div class="font-bold text-sm" data-i18n="camp.fire.title">生起篝火 (Light Campfire)</div>
-                                            <div class="text-[10px] opacity-80" data-i18n="camp.fire.desc">消耗 1 單位木材。大幅降低夜襲率至 10%。</div>
+                                            <div class="font-bold text-xs sm:text-sm text-orange-200 flex items-center gap-2">
+                                                <span data-i18n="camp.sleep.title">深度安頓休整 (Deep Rest)</span>
+                                                <span class="text-[9px] px-1.5 py-0.2 rounded bg-orange-600/40 text-orange-300 font-mono">時間推進 +1 天</span>
+                                            </div>
+                                            <div class="text-[10px] sm:text-[11px] text-slate-300 mt-0.5 leading-tight" data-i18n="camp.sleep.desc">
+                                                在當前環境安頓入眠，精力完全回滿 (SP 100%)、生命回升 +35，融入劇本夜間事件與晨光描寫。消耗 15 飽腹、20 水分。
+                                            </div>
                                         </div>
                                     </div>
-                                    <span id="camp-fire-status" class="text-xs font-bold px-2 py-1 rounded bg-orange-600/20 border border-orange-500/30">OFF</span>
+                                    <i class="ph-bold ph-caret-right text-orange-400 text-base sm:text-lg group-hover:translate-x-1 transition-transform flex-shrink-0"></i>
                                 </button>
 
-                                <!-- Forage and Wood Gathering in Camp -->
-                                <div class="grid grid-cols-2 gap-2 pt-1">
-                                    <button id="camp-chop-wood-btn" class="p-2.5 rounded-xl border flex flex-col items-start transition-all duration-200 theme-bg-input border-amber-500/30 text-amber-300 hover:theme-bg-primary text-left" type="button">
-                                        <div class="flex items-center gap-1.5 font-bold text-xs">
-                                            <span>🪓 砍伐柴火</span>
+                                <!-- 2. Kindle Campfire / Set Perimeter Watch -->
+                                <button id="camp-fire-btn" class="w-full p-2.5 sm:p-3 rounded-xl border border-amber-500/30 bg-amber-950/25 hover:bg-amber-900/35 text-left transition-all duration-200 cursor-pointer group active:scale-[0.98] flex items-center justify-between" type="button">
+                                    <div class="flex items-center gap-2.5 sm:gap-3">
+                                        <span class="text-2xl group-hover:scale-110 transition-transform flex-shrink-0">🔥</span>
+                                        <div>
+                                            <div class="font-bold text-xs sm:text-sm text-amber-200 flex items-center gap-2">
+                                                <span data-i18n="camp.fire.title">生起篝火與設防 (Campfire & Guard)</span>
+                                                <span id="camp-fire-status" class="text-[9px] px-1.5 py-0.2 rounded bg-amber-600/30 text-amber-300 font-mono">OFF</span>
+                                            </div>
+                                            <div class="text-[10px] sm:text-[11px] text-slate-300 mt-0.5 leading-tight" data-i18n="camp.fire.desc">
+                                                生起溫暖篝火或布置防禦警戒，驅散陰寒，大幅降低夜間被襲機率。消耗 1 單位木材。
+                                            </div>
                                         </div>
-                                        <div class="text-[9px] opacity-75 mt-0.5">-8 精力，獲取 2~4 份木料與引火物</div>
+                                    </div>
+                                    <i class="ph-bold ph-caret-right text-amber-400 text-base sm:text-lg group-hover:translate-x-1 transition-transform flex-shrink-0"></i>
+                                </button>
+
+                                <!-- 3. Companion Campfire Banter -->
+                                <button id="camp-companion-btn" class="w-full p-2.5 sm:p-3 rounded-xl border border-indigo-500/30 bg-indigo-950/25 hover:bg-indigo-900/35 text-left transition-all duration-200 cursor-pointer group active:scale-[0.98] flex items-center justify-between" type="button">
+                                    <div class="flex items-center gap-2.5 sm:gap-3">
+                                        <span class="text-2xl group-hover:scale-110 transition-transform flex-shrink-0">💬</span>
+                                        <div>
+                                            <div class="font-bold text-xs sm:text-sm text-indigo-200 flex items-center gap-2">
+                                                <span>夥伴圍爐夜話 (Campfire Banter)</span>
+                                                <span id="respite-companion-badge" class="text-[9px] px-1.5 py-0.2 rounded bg-indigo-600/30 text-indigo-300">同伴同行</span>
+                                            </div>
+                                            <div class="text-[10px] sm:text-[11px] text-slate-300 mt-0.5 leading-tight">
+                                                在營火旁與隨行同伴促膝長談，分享口糧與旅途心聲，加深彼此信任、觸發心動日常互動。
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <i class="ph-bold ph-caret-right text-indigo-400 text-base sm:text-lg group-hover:translate-x-1 transition-transform flex-shrink-0"></i>
+                                </button>
+
+                                <!-- 4. Tend Wounds & Meditation -->
+                                <button id="camp-heal-btn" class="w-full p-2.5 sm:p-3 rounded-xl border border-emerald-500/30 bg-emerald-950/25 hover:bg-emerald-900/35 text-left transition-all duration-200 cursor-pointer group active:scale-[0.98] flex items-center justify-between" type="button">
+                                    <div class="flex items-center gap-2.5 sm:gap-3">
+                                        <span class="text-2xl group-hover:scale-110 transition-transform flex-shrink-0">🩹</span>
+                                        <div>
+                                            <div class="font-bold text-xs sm:text-sm text-emerald-200 flex items-center gap-2">
+                                                <span>調息調理與包紮 (Dress Wounds)</span>
+                                                <span class="text-[9px] px-1.5 py-0.2 rounded bg-emerald-600/30 text-emerald-300 font-mono">緩解負面創傷</span>
+                                            </div>
+                                            <div class="text-[10px] sm:text-[11px] text-slate-300 mt-0.5 leading-tight">
+                                                清洗傷口、施用隨身草藥繃帶或靜心調息，清除流血、中毒等肉體負面減益，平復心神。
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <i class="ph-bold ph-caret-right text-emerald-400 text-base sm:text-lg group-hover:translate-x-1 transition-transform flex-shrink-0"></i>
+                                </button>
+
+                                <!-- 5. Review Quest Clues & Ponder Lore -->
+                                <button id="camp-lore-btn" class="w-full p-2.5 sm:p-3 rounded-xl border border-purple-500/30 bg-purple-950/25 hover:bg-purple-900/35 text-left transition-all duration-200 cursor-pointer group active:scale-[0.98] flex items-center justify-between" type="button">
+                                    <div class="flex items-center gap-2.5 sm:gap-3">
+                                        <span class="text-2xl group-hover:scale-110 transition-transform flex-shrink-0">📜</span>
+                                        <div>
+                                            <div class="font-bold text-xs sm:text-sm text-purple-200 flex items-center gap-2">
+                                                <span>梳理劇本情報與任務 (Ponder Quests)</span>
+                                                <span class="text-[9px] px-1.5 py-0.2 rounded bg-purple-600/30 text-purple-300 font-mono">任務導向</span>
+                                            </div>
+                                            <div class="text-[10px] sm:text-[11px] text-slate-300 mt-0.5 leading-tight">
+                                                就著微弱火光翻看隨身筆記與世界線索，整理當前主線與支線方針，理清下一步冒險行動。
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <i class="ph-bold ph-caret-right text-purple-400 text-base sm:text-lg group-hover:translate-x-1 transition-transform flex-shrink-0"></i>
+                                </button>
+
+                                <!-- 6. Cook Meal & Survival Quick Actions -->
+                                <div class="grid grid-cols-3 gap-2 pt-1">
+                                    <button id="camp-cook-btn" class="p-2 rounded-xl border border-emerald-500/30 bg-slate-900/70 hover:bg-emerald-950/30 text-emerald-300 text-center flex flex-col items-center justify-center transition-all cursor-pointer" type="button">
+                                        <span class="text-lg">🍳</span>
+                                        <span class="text-[10px] font-bold mt-0.5" data-i18n="camp.cook.title">烹飪熱食</span>
                                     </button>
-                                    <button id="camp-forage-btn" class="p-2.5 rounded-xl border flex flex-col items-start transition-all duration-200 theme-bg-input border-emerald-500/30 text-emerald-300 hover:theme-bg-primary text-left" type="button">
-                                        <div class="flex items-center gap-1.5 font-bold text-xs">
-                                            <span>🌿 覓食取水</span>
-                                        </div>
-                                        <div class="text-[9px] opacity-75 mt-0.5">-6 精力，搜集野果口糧與山泉水</div>
+                                    <button id="camp-chop-wood-btn" class="p-2 rounded-xl border border-amber-500/30 bg-slate-900/70 hover:bg-amber-950/30 text-amber-300 text-center flex flex-col items-center justify-center transition-all cursor-pointer" type="button">
+                                        <span class="text-lg">🪓</span>
+                                        <span class="text-[10px] font-bold mt-0.5">收集柴火</span>
+                                    </button>
+                                    <button id="camp-forage-btn" class="p-2 rounded-xl border border-cyan-500/30 bg-slate-900/70 hover:bg-cyan-950/30 text-cyan-300 text-center flex flex-col items-center justify-center transition-all cursor-pointer" type="button">
+                                        <span class="text-lg">🌿</span>
+                                        <span class="text-[10px] font-bold mt-0.5">採集泉水</span>
                                     </button>
                                 </div>
-
-                                <!-- Cook meal button -->
-                                <button id="camp-cook-btn" class="w-full p-3 rounded-xl border flex items-center justify-between text-left transition-all duration-200 theme-bg-input border-emerald-500/30 text-emerald-300 hover:theme-bg-primary" type="button">
-                                    <div class="flex items-center gap-2.5">
-                                        <i class="ph-fill ph-cookie text-xl"></i>
-                                        <div>
-                                            <div class="font-bold text-sm" data-i18n="camp.cook.title">烹飪熱食 (Cook Meal)</div>
-                                            <div class="text-[10px] opacity-80" data-i18n="camp.cook.desc">利用篝火烤熟背包中的食材，飢餓恢復翻倍。</div>
-                                        </div>
-                                    </div>
-                                    <i class="ph-bold ph-caret-right text-base"></i>
-                                </button>
-
-                                <!-- Sleep button -->
-                                <button id="camp-sleep-btn" class="w-full p-3 rounded-xl border flex items-center justify-between text-left transition-all duration-200 bg-orange-600 text-white hover:bg-orange-700 font-bold border-orange-500/50" type="button">
-                                    <div class="flex items-center gap-2.5">
-                                        <i class="ph-fill ph-moon text-xl text-yellow-300"></i>
-                                        <div>
-                                            <div class="font-bold text-sm" data-i18n="camp.sleep.title">休整睡覺 (Rest & Sleep)</div>
-                                            <div class="text-[10px] opacity-90" data-i18n="camp.sleep.desc">精力 +60，生命 +15。消耗 15 飽腹、20 水分。</div>
-                                        </div>
-                                    </div>
-                                    <i class="ph-bold ph-bed text-xl"></i>
-                                </button>
                             </div>
                         </div>
                     </div>
@@ -1479,9 +1465,6 @@ function ensureSurvivalStateExists() {
     
     // Sync UI display
     updateSurvivalUI();
-    if (typeof ensureExplorationStateExists === 'function') {
-        ensureExplorationStateExists();
-    }
 }
 
 function updateSurvivalUI() {
@@ -3112,17 +3095,17 @@ function updateExplorationUI() {
         dom.exploreDangerActions.classList.add('hidden');
         dom.exploreMazeActions.classList.add('hidden');
         
-        // Show safe camp dashboard
-        if (typeof openCampControlsPanel === 'function') {
-            openCampControlsPanel();
-        } else if (dom.campControlsPanel) {
+        // Show safe camp dashboard elements if present
+        if (dom.campControlsPanel) {
             dom.campControlsPanel.classList.remove('hidden');
+        }
+        const safeOpenBtn = document.getElementById('camp-open-panel-btn');
+        if (safeOpenBtn) {
+            safeOpenBtn.classList.remove('hidden');
         }
         updateCampUI();
     } else {
-        if (typeof closeCampControlsPanel === 'function') {
-            closeCampControlsPanel();
-        } else if (dom.campControlsPanel) {
+        if (dom.campControlsPanel) {
             dom.campControlsPanel.classList.add('hidden');
         }
         const openBtn = document.getElementById('camp-open-panel-btn');
@@ -4448,6 +4431,22 @@ function registerSurvivalEventListeners() {
     attachActionBtn('camp-chop-wood-btn', 'chop_wood');
     attachActionBtn('survival-forage-btn', 'forage_food_water');
     attachActionBtn('camp-forage-btn', 'forage_food_water');
+
+    // Narrative Campfire & Respite Actions
+    const compBtn = document.getElementById('camp-companion-btn');
+    if (compBtn) compBtn.addEventListener('click', () => {
+        if (typeof interactCampfireCompanion === 'function') interactCampfireCompanion();
+    });
+
+    const healBtn = document.getElementById('camp-heal-btn');
+    if (healBtn) healBtn.addEventListener('click', () => {
+        if (typeof interactCampfireHeal === 'function') interactCampfireHeal();
+    });
+
+    const loreBtn = document.getElementById('camp-lore-btn');
+    if (loreBtn) loreBtn.addEventListener('click', () => {
+        if (typeof interactCampfireLore === 'function') interactCampfireLore();
+    });
 }
 
 // ==========================================
@@ -6663,6 +6662,20 @@ dom.gameGenreSelect.addEventListener('input', (e) => applyTheme(e.target.value))
 
     let action = choiceButton.dataset.action;
     
+    // 境地日常休整劇本動作攔截
+    if (action === 'STORY_SAFE_REST') {
+        if (typeof handleCampAPIAction === 'function') handleCampAPIAction('sleep');
+        return;
+    }
+    if (action === 'STORY_SAFE_BANTER') {
+        if (typeof interactCampfireCompanion === 'function') interactCampfireCompanion();
+        return;
+    }
+    if (action === 'OPEN_RESPITE_MODAL') {
+        if (typeof openStoryRespiteModal === 'function') openStoryRespiteModal();
+        return;
+    }
+    
      // 如果小遊戲啟用中，且點擊的按鈕具有有效動作
     if (isMiniGameActive && action) {
         // 檢查是否為小遊戲內部動作 (如 ROLL, STRIKE 或 KEY_)
@@ -8166,68 +8179,154 @@ function restoreShelterModal() {
     }
 }
 
-function openCampControlsPanel() {
-    const panel = document.getElementById('camp-controls-panel');
-    if (!panel) return;
+function updateStoryRespiteModal() {
+    if (!playerState) return;
+    if (!playerState.camp_state) {
+        playerState.camp_state = { days: 1, chapter: 1, chapter_goal_completed: false, warehouse: [], upgrades: { weapon: 0, armor: 0 } };
+    }
+    if (!playerState.shelter_state) {
+        playerState.shelter_state = { shelter_level: 0, shelter_location: 'None', wood_stock: 0, campfire_lit: false };
+    }
+
+    const locEl = document.getElementById('respite-current-location');
+    if (locEl) {
+        locEl.textContent = playerState.world_state?.location || playerState.world_state?.current_location || '荒野露營地';
+    }
+    const timeEl = document.getElementById('respite-current-time');
+    if (timeEl) {
+        timeEl.textContent = playerState.world_state?.time || `第 ${playerState.camp_state?.days || 1} 天`;
+    }
+
+    const hpBar = playerState?.player_status?.status_bars?.find(b => b.type === 'hp' || b.name === 'HP' || b.name === '生命值');
+    const spBar = playerState?.player_status?.status_bars?.find(b => b.type === 'sp' || b.name === 'SP' || b.name === '精力' || b.name === '體力');
+    const hpValEl = document.getElementById('respite-hp-val');
+    if (hpValEl && hpBar) hpValEl.textContent = `${hpBar.value}/${hpBar.max}`;
+    const spValEl = document.getElementById('respite-sp-val');
+    if (spValEl && spBar) spValEl.textContent = `${spBar.value}/${spBar.max}`;
     
-    panel.classList.remove('hidden');
-    panel.classList.add('lg:flex');
-    panel.classList.remove('lg:hidden');
+    const hungerValEl = document.getElementById('respite-hunger-val');
+    if (hungerValEl) hungerValEl.textContent = `${playerState.world_state?.hunger ?? 100}/100`;
+    const hydValEl = document.getElementById('respite-hydration-val');
+    if (hydValEl) hydValEl.textContent = `${playerState.world_state?.hydration ?? 100}/100`;
 
-    const scrim = document.getElementById('camp-scrim');
-    if (scrim) {
-        scrim.classList.remove('hidden');
-        scrim.classList.remove('opacity-0');
-        scrim.classList.add('opacity-100');
+    // Debuff banner
+    const debuffBanner = document.getElementById('respite-debuff-banner');
+    const debuffText = document.getElementById('respite-debuff-text');
+    const activeDebuffs = playerState?.player_status?.debuffs || [];
+    if (debuffBanner && debuffText) {
+        if (activeDebuffs.length > 0) {
+            debuffBanner.classList.remove('hidden');
+            debuffText.textContent = `身患創傷減益：${activeDebuffs.map(d => typeof d === 'string' ? d : d.name).join('、')}`;
+        } else if ((playerState?.world_state?.hunger ?? 100) <= 20 || (playerState?.world_state?.hydration ?? 100) <= 20) {
+            debuffBanner.classList.remove('hidden');
+            debuffText.textContent = '極度飢渴虛脫狀態！';
+        } else {
+            debuffBanner.classList.add('hidden');
+        }
     }
 
-    setTimeout(() => {
-        panel.classList.remove('max-lg:translate-y-full');
-        panel.classList.add('max-lg:translate-y-0');
-    }, 10);
-
-    const openBtn = document.getElementById('camp-open-panel-btn');
-    if (openBtn) openBtn.classList.add('hidden');
-
-    if (window.innerWidth < 1024) {
-        document.body.classList.add('overflow-hidden');
+    // Companion status badge
+    const compBadge = document.getElementById('respite-companion-badge');
+    if (compBadge) {
+        const compState = playerState.npc_state?.companion;
+        if (compState && compState.recruited) {
+            compBadge.textContent = `同伴同行中 (好感 ${compState.favor || 50}%)`;
+            compBadge.className = 'text-[9px] px-1.5 py-0.2 rounded bg-indigo-600/40 text-indigo-200 font-mono';
+        } else {
+            compBadge.textContent = '聚落可結識';
+            compBadge.className = 'text-[9px] px-1.5 py-0.2 rounded bg-slate-700/60 text-slate-300 font-mono';
+        }
     }
+
+    // Campfire indicator
+    const fireStatus = document.getElementById('camp-fire-status');
+    if (fireStatus) {
+        const isLit = !!(playerState.camp_state?.campfire_lit || playerState.shelter_state?.campfire_lit);
+        fireStatus.textContent = isLit ? 'ON (燃燒中)' : 'OFF';
+        fireStatus.className = isLit 
+            ? 'text-xs font-bold px-2 py-0.5 rounded bg-amber-600/40 text-amber-200 border border-amber-500/50' 
+            : 'text-xs font-bold px-2 py-0.5 rounded bg-slate-800 text-slate-400 border border-white/10';
+    }
+}
+
+function openStoryRespiteModal() {
+    updateStoryRespiteModal();
+    if (dom.campModal) {
+        openModal(dom.campModal);
+    }
+}
+
+function interactCampfireCompanion() {
+    if (isProcessingAction) return;
+    if (isInCombat) {
+        showNotification('戰鬥中無法促膝長談！', 'error');
+        return;
+    }
+    closeModal(dom.campModal);
+    triggerVisualEffect('magic_border');
+
+    const compState = playerState?.npc_state?.companion;
+    let narrativeAction = '';
+    if (compState && compState.recruited) {
+        narrativeAction = `【夥伴圍爐夜話】圍坐在溫暖的營火旁，與同行同伴促膝長談，分享旅途中的乾糧與水囊。聊起各自的過往、心中的牽掛與對前路的擔憂。（請在劇本中生動描繪兩人之間的真摯對話、細膩微表情與情誼升溫的日常細節，增加彼此信任好感）`;
+    } else {
+        narrativeAction = `【營火獨思與整裝】獨自坐在夜色營火旁，烤熱粗糙的乾糧，撥弄著躍動的火星。整理行囊筆記，回想著走過的險途，期盼在未來的冒險聚落中能遇見生死相託的同行夥伴。（請在劇本中刻畫出旅途孤獨感與營火帶來的微光暖意）`;
+    }
+    setTimeout(() => processPlayerChoice(narrativeAction), 300);
+}
+
+function interactCampfireHeal() {
+    if (isProcessingAction) return;
+    if (isInCombat) {
+        showNotification('戰鬥中無法靜心調息包紮！', 'error');
+        return;
+    }
+    closeModal(dom.campModal);
+
+    // Relieve debuffs
+    if (playerState?.player_status) {
+        playerState.player_status.debuffs = [];
+        const hpBar = playerState.player_status.status_bars?.find(b => b.type === 'hp' || b.name === 'HP' || b.name === '生命值');
+        if (hpBar) hpBar.value = Math.min(hpBar.max || 100, (hpBar.value || 0) + 25);
+        const spBar = playerState.player_status.status_bars?.find(b => b.type === 'sp' || b.name === 'SP' || b.name === '精力' || b.name === '體力');
+        if (spBar) spBar.value = Math.min(spBar.max || 100, (spBar.value || 0) + 20);
+    }
+    syncGameState(playerState);
+    triggerVisualEffect('heal_glow');
+    showNotification('🩹 調理包紮完畢，清洗傷口並平復身心！生命 +25，精力 +20。', 'success');
+
+    const narrativeAction = `【調息理傷與包紮】在營火邊架起鐵鍋燒熱開水，細心清洗撕裂的傷痕與塵土，敷上隨身草藥並以乾淨布條包紮止血，靜坐調息調理體內氣血。（請在劇本中詳細描繪療傷時的刺痛與逐漸平復的暖意，清除負面傷痛狀態）`;
+    setTimeout(() => processPlayerChoice(narrativeAction), 400);
+}
+
+function interactCampfireLore() {
+    if (isProcessingAction) return;
+    if (isInCombat) {
+        showNotification('戰鬥中無法翻閱劇本筆記！', 'error');
+        return;
+    }
+    closeModal(dom.campModal);
+    triggerVisualEffect('level_up_glow');
+
+    const narrativeAction = `【梳理情報與任務】藉著營火微光翻看隨身筆記與世界線索地圖，仔細推敲當前境況、已知的流言傳聞與主支線懸賞，思索下一步最有價值的目標與探索破局之道。（請在劇本中深度梳理當前章節的劇情謎團與世界觀背景）`;
+    setTimeout(() => processPlayerChoice(narrativeAction), 300);
+}
+
+function openCampControlsPanel() {
+    openStoryRespiteModal();
 }
 
 function closeCampControlsPanel() {
-    const panel = document.getElementById('camp-controls-panel');
-    if (!panel) return;
-
-    panel.classList.remove('max-lg:translate-y-0');
-    panel.classList.add('max-lg:translate-y-full');
-
-    const scrim = document.getElementById('camp-scrim');
-    if (scrim) {
-        scrim.classList.remove('opacity-100');
-        scrim.classList.add('opacity-0');
-        setTimeout(() => {
-            scrim.classList.add('hidden');
-        }, 300);
+    if (dom.campModal) {
+        closeModal(dom.campModal);
     }
-
-    setTimeout(() => {
-        if (panel.classList.contains('max-lg:translate-y-full')) {
-            panel.classList.add('hidden');
-            panel.classList.remove('lg:flex');
-        }
-    }, 300);
-
-    // Only show open button if we are in safe zone
-    if (playerState && playerState.zone_type === 'safe') {
-        const openBtn = document.getElementById('camp-open-panel-btn');
-        if (openBtn) {
-            openBtn.classList.remove('hidden');
-        }
-    }
-
-    document.body.classList.remove('overflow-hidden');
 }
 
+window.updateStoryRespiteModal = updateStoryRespiteModal;
+window.openStoryRespiteModal = openStoryRespiteModal;
+window.interactCampfireCompanion = interactCampfireCompanion;
+window.interactCampfireHeal = interactCampfireHeal;
+window.interactCampfireLore = interactCampfireLore;
 window.openCampControlsPanel = openCampControlsPanel;
 window.closeCampControlsPanel = closeCampControlsPanel;
 
@@ -8239,7 +8338,7 @@ window.restoreShelterModal = restoreShelterModal;
 // Bind Camp Open Button
 const openBtn = document.getElementById('camp-open-panel-btn');
 if (openBtn) {
-    openBtn.addEventListener('click', openCampControlsPanel);
+    openBtn.addEventListener('click', openStoryRespiteModal);
 }
 
 // ESC 鍵盤關閉支援
@@ -10041,6 +10140,71 @@ function renderQuestItem(quest, t) {
                     dom.choicesContainer.appendChild(button);
                 }
             });
+    }
+
+    // --- 【劇本融入：境地休整與安頓行動】 ---
+    if (!playerState.is_dead && !playerState.is_game_over && !isInCombat && !pendingCombatEncounter && combatTarget.hp <= -1) {
+        const isSafe = playerState.zone_type === 'safe' || playerState.explore_state?.zone_type === 'safe';
+
+        // 若處於避風安界/安全聚落，直接在劇本選項末尾追加專屬日常劇情選項
+        if (isSafe) {
+            // 1. 就地休整
+            const safeSleepBtn = document.createElement('button');
+            safeSleepBtn.className = 'choice-button w-full text-left bg-orange-950/40 hover:bg-orange-900/60 border border-orange-500/40 text-orange-200 hover:text-white transition-all duration-200 font-semibold py-2 px-3 sm:py-2.5 sm:px-3.5 rounded-lg shadow-sm flex items-center justify-between group cursor-pointer';
+            safeSleepBtn.dataset.action = 'STORY_SAFE_REST';
+            safeSleepBtn.dataset.tag = 'SAFE';
+            safeSleepBtn.innerHTML = `
+                <div class="flex items-center gap-2.5">
+                    <span class="text-xl group-hover:scale-110 transition-transform">⛺</span>
+                    <div>
+                        <div class="font-bold text-xs sm:text-sm text-orange-200">【安頓休整】就地生火紮營並深度安歇</div>
+                        <div class="text-[10px] text-slate-300">推進至翌日，生命回升 +35，精力 100% 回滿，觸發夜間安頓劇本</div>
+                    </div>
+                </div>
+                <i class="ph-bold ph-bed text-orange-400 text-base group-hover:translate-x-0.5 transition-transform"></i>
+            `;
+            dom.choicesContainer.appendChild(safeSleepBtn);
+
+            // 2. 圍爐夜話
+            const safeBanterBtn = document.createElement('button');
+            safeBanterBtn.className = 'choice-button w-full text-left bg-indigo-950/40 hover:bg-indigo-900/60 border border-indigo-500/40 text-indigo-200 hover:text-white transition-all duration-200 font-semibold py-2 px-3 sm:py-2.5 sm:px-3.5 rounded-lg shadow-sm flex items-center justify-between group cursor-pointer';
+            safeBanterBtn.dataset.action = 'STORY_SAFE_BANTER';
+            safeBanterBtn.dataset.tag = 'SAFE';
+            safeBanterBtn.innerHTML = `
+                <div class="flex items-center gap-2.5">
+                    <span class="text-xl group-hover:scale-110 transition-transform">💬</span>
+                    <div>
+                        <div class="font-bold text-xs sm:text-sm text-indigo-200">【圍爐夜話】與隨行同伴或聚落友人促膝長談</div>
+                        <div class="text-[10px] text-slate-300">分享口糧與旅途心聲，加深羈絆，描繪動人心動互動</div>
+                    </div>
+                </div>
+                <i class="ph-bold ph-chat-circle-dots text-indigo-400 text-base group-hover:translate-x-0.5 transition-transform"></i>
+            `;
+            dom.choicesContainer.appendChild(safeBanterBtn);
+        }
+
+        // 常駐劇本區底部的境地狀態與整備輔助列
+        const respiteContainer = document.createElement('div');
+        respiteContainer.className = 'w-full mt-2 pt-2 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs select-none';
+
+        const currentLoc = playerState.world_state?.location || playerState.world_state?.current_location || '荒野露營地';
+        const statusSpan = document.createElement('div');
+        statusSpan.className = 'text-slate-400 flex items-center gap-1.5 text-[11px] truncate max-w-full';
+        statusSpan.innerHTML = `<span>🏕️ 境地：</span><span class="text-amber-300 font-semibold truncate">${currentLoc}</span>${isSafe ? '<span class="px-1.5 py-0.2 rounded bg-emerald-900/60 text-emerald-300 border border-emerald-500/30 text-[9px] font-mono">避風安界</span>' : '<span class="px-1.5 py-0.2 rounded bg-slate-800 text-slate-400 border border-white/10 text-[9px] font-mono">荒野行途</span>'}`;
+        respiteContainer.appendChild(statusSpan);
+
+        const respiteActionBtn = document.createElement('button');
+        respiteActionBtn.type = 'button';
+        respiteActionBtn.className = 'w-full sm:w-auto px-3 py-1.5 rounded-lg border border-orange-500/40 bg-orange-950/40 hover:bg-orange-900/60 text-orange-200 hover:text-white font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer text-xs active:scale-95';
+        respiteActionBtn.innerHTML = `<span>⛺ 境地休整與安頓整備</span><i class="ph-bold ph-caret-right text-orange-400"></i>`;
+        respiteActionBtn.onclick = (e) => {
+            e.stopPropagation();
+            if (typeof openStoryRespiteModal === 'function') {
+                openStoryRespiteModal();
+            }
+        };
+        respiteContainer.appendChild(respiteActionBtn);
+        dom.choicesContainer.appendChild(respiteContainer);
     }
 
      if (choices.length === 0 && !playerState.is_dead && !playerState.is_game_over && !isInCombat && !pendingCombatEncounter && combatTarget.hp <= -1) {
