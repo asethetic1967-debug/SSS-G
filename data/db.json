@@ -1,0 +1,73 @@
+{
+  "users": [
+    {
+      "id": "usr_c12703daea2fa4a6",
+      "email": "player1@test.com",
+      "nickname": "勇敢的冒险者",
+      "sponsorEmail": "",
+      "salt": "415b4128f4937fe909bd07e80d2b1258",
+      "password_hash": "a8dfbef2997b456e477f76d48dcebe433ac5707144de1b7c5098311df8915d9d3d7be43f0bf7f5974bcf02813ae875ea0d6ce1466ce2b91dd900e3e264b05a46",
+      "membershipTier": "sponsor",
+      "maxActions": null,
+      "actionsUsed": 0,
+      "dlc_custom_action": true,
+      "dlc_cartridge": true,
+      "created_at": "2026-09-15T08:10:12.353Z"
+    }
+  ],
+  "orders": [
+    {
+      "id": "ord_3680d83ac993",
+      "user_id": "usr_c12703daea2fa4a6",
+      "user_email": "player1@test.com",
+      "user_nickname": "勇敢的冒险者",
+      "sponsor_email": "sponsor@paypal.com",
+      "transaction_id": "BMC123456789012345678901234",
+      "dlc_type": "sponsor_membership",
+      "amount": 5,
+      "status": "approved",
+      "created_at": "2026-09-15T08:10:12.398Z",
+      "reviewed_at": "2026-09-15T08:10:12.453Z"
+    }
+  ],
+  "admins": [
+    {
+      "id": "admin_1",
+      "username": "admin",
+      "email": "admin@rpg.local",
+      "salt": "296d2537a6f20d9549f3bcc0626a3da1",
+      "password_hash": "a45d0bc8db4a33cfd198db3607c3ef74a6cc6985c48c7d6668315bcf131b93d6e324c62abbad72a0f16c9a2a32e0e8704de914f9bae0224208d7f90fd13b83bc",
+      "created_at": "2026-09-15T08:07:56.925Z"
+    }
+  ],
+  "settings": {
+    "default_visitor_actions": 15,
+    "default_general_actions": 25,
+    "global_api_key": "",
+    "default_model": "gemini-2.5-flash",
+    "custom_proxy_url": "",
+    "site_notice": "欢迎游玩 AI 文字冒险游戏产生器！新玩家注册即赠送 25 次行动。"
+  },
+  "sessions": {
+    "adm_20576cf0ee25ccd4bfdc5986f8eecaccda7e0ec6eccfbdf4262854eae01edde0": {
+      "type": "admin",
+      "adminId": "admin_1",
+      "created_at": 1789459732692
+    },
+    "ae67f418a299110e655d18a0eddae3266d63040135cf1384876dd124608475e9": {
+      "type": "user",
+      "userId": "usr_c12703daea2fa4a6",
+      "created_at": 1789459812353
+    },
+    "adm_1e6530544774dc26fdb2228a5e27bd2fbdd500e718c7f02c15d681ea9bbee7c1": {
+      "type": "admin",
+      "adminId": "admin_1",
+      "created_at": 1789459812405
+    },
+    "adm_e8e1a16188a93a55bb6cba4d733883e013433ae23eef9e1f4344fc2d7e13c626": {
+      "type": "admin",
+      "adminId": "admin_1",
+      "created_at": 1789459986532
+    }
+  }
+}

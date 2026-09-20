@@ -1,0 +1,6 @@
+{
+  "name": "Text RPG Generator",
+  "description": "AI-driven Text RPG Generator with 18 Themes, Deterministic Combat, Mini-games, and Admin Dashboard",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

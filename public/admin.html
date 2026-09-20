@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI 文字冒险游戏产生器 - 运营管理后台</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <style>
+        body { font-family: 'Poppins', 'Noto Sans SC', sans-serif; }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col">
+
+    <!-- 顶部导航栏 -->
+    <header class="bg-slate-900 border-b border-slate-800 sticky top-0 z-30 px-6 py-4 flex items-center justify-between shadow-lg">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-amber-500 to-yellow-300 flex items-center justify-center text-slate-950 font-black text-xl shadow-md shadow-amber-500/20">
+                <i class="ph-bold ph-shield-star text-2xl"></i>
+            </div>
+            <div>
+                <h1 class="text-lg font-bold tracking-wide">文字冒险游戏管理后台</h1>
+                <p class="text-xs text-slate-400">RPG Generator Operations & Sponsor Center</p>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-4">
+            <a href="/" target="_blank" class="text-xs font-semibold text-slate-400 hover:text-amber-400 flex items-center gap-1 transition-colors px-3 py-1.5 rounded-lg bg-slate-800/80 hover:bg-slate-800 border border-slate-700">
+                <i class="ph-bold ph-game-controller text-sm"></i> 前往游戏前台
+            </a>
+            <div id="admin-user-info" class="flex items-center gap-2 text-sm text-slate-300">
+                <span class="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span>
+                <span id="admin-name">Admin</span>
+                <button id="logout-btn" class="ml-2 text-xs text-red-400 hover:text-red-300 underline">登出</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- 主体容器 -->
+    <main class="flex-grow p-6 sm:p-8 max-w-7xl w-full mx-auto space-y-8">
+        
+        <!-- 数据指标卡片 -->
+        <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-5 shadow-sm flex items-center justify-between">
+                <div>
+                    <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">总注册玩家</p>
+                    <h3 id="stat-total-users" class="text-3xl font-extrabold text-white mt-1">0</h3>
+                </div>
+                <div class="w-12 h-12 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-400 flex items-center justify-center text-2xl">
+                    <i class="ph-bold ph-users"></i>
+                </div>
+            </div>
+
+            <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-5 shadow-sm flex items-center justify-between">
+                <div>
+                    <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">赞助会员数</p>
+                    <h3 id="stat-total-sponsors" class="text-3xl font-extrabold text-amber-400 mt-1">0</h3>
+                </div>
+                <div class="w-12 h-12 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-400 flex items-center justify-center text-2xl">
+                    <i class="ph-fill ph-star"></i>
+                </div>
+            </div>
+
+            <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-5 shadow-sm flex items-center justify-between">
+                <div>
+                    <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">待审核赞助工单</p>
+                    <h3 id="stat-pending-orders" class="text-3xl font-extrabold text-rose-400 mt-1">0</h3>
+                </div>
+                <div class="w-12 h-12 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-400 flex items-center justify-center text-2xl">
+                    <i class="ph-bold ph-hourglass-high"></i>
+                </div>
+            </div>
+
+            <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-5 shadow-sm flex items-center justify-between">
+                <div>
+                    <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">总游玩行动次数</p>
+                    <h3 id="stat-total-actions" class="text-3xl font-extrabold text-emerald-400 mt-1">0</h3>
+                </div>
+                <div class="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center text-2xl">
+                    <i class="ph-bold ph-activity"></i>
+                </div>
+            </div>
+        </section>
+
+        <!-- 赞助核销中心 (核心业务) -->
+        <section class="bg-slate-900/90 border border-slate-800 rounded-2xl overflow-hidden shadow-sm">
+            <div class="px-6 py-4 border-b border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-slate-900/50">
+                <div class="flex items-center gap-2">
+                    <i class="ph-fill ph-coffee text-amber-400 text-xl"></i>
+                    <h2 class="text-base font-bold text-white">赞助订单核销中心 (BuyMeACoffee / 赞助审核)</h2>
+                    <span id="pending-badge" class="ml-2 px-2.5 py-0.5 text-xs font-semibold rounded-full bg-rose-500/20 text-rose-400 border border-rose-500/30">0 待处理</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button onclick="loadOrders('pending')" class="filter-order-btn px-3 py-1 rounded-lg text-xs font-semibold bg-amber-500/20 text-amber-300 border border-amber-500/30" data-status="pending">待审核</button>
+                    <button onclick="loadOrders('approved')" class="filter-order-btn px-3 py-1 rounded-lg text-xs font-semibold bg-slate-800 text-slate-400 hover:text-white" data-status="approved">已通过</button>
+                    <button onclick="loadOrders('all')" class="filter-order-btn px-3 py-1 rounded-lg text-xs font-semibold bg-slate-800 text-slate-400 hover:text-white" data-status="all">全部</button>
+                    <button onclick="loadDashboard()" class="p-1 text-slate-400 hover:text-white ml-2" title="刷新"><i class="ph-bold ph-arrows-clockwise text-base"></i></button>
+                </div>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse text-sm">
+                    <thead>
+                        <tr class="border-b border-slate-800 text-slate-400 text-xs uppercase bg-slate-950/40">
+                            <th class="py-3.5 px-6">订单号 / 用户</th>
+                            <th class="py-3.5 px-6">赞助邮箱</th>
+                            <th class="py-3.5 px-6">27位交易单号 (Transaction ID)</th>
+                            <th class="py-3.5 px-6">赞助目标 / 金额</th>
+                            <th class="py-3.5 px-6">状态</th>
+                            <th class="py-3.5 px-6 text-right">审核操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="orders-tbody" class="divide-y divide-slate-800 text-slate-300">
+                        <tr>
+                            <td colspan="6" class="py-8 text-center text-slate-500">正在加载赞助订单...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- 玩家与用户管理 -->
+        <section class="bg-slate-900/90 border border-slate-800 rounded-2xl overflow-hidden shadow-sm">
+            <div class="px-6 py-4 border-b border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-slate-900/50">
+                <div class="flex items-center gap-2">
+                    <i class="ph-bold ph-users-three text-indigo-400 text-xl"></i>
+                    <h2 class="text-base font-bold text-white">玩家账户与权限管理</h2>
+                </div>
+                <div class="flex items-center gap-3">
+                    <div class="relative w-full sm:w-64">
+                        <i class="ph-bold ph-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-sm"></i>
+                        <input type="text" id="search-user-input" placeholder="搜索邮箱或昵称..." class="w-full bg-slate-950 border border-slate-800 text-xs rounded-lg pl-8 pr-3 py-2 text-slate-200 focus:outline-none focus:border-indigo-500">
+                    </div>
+                </div>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse text-sm">
+                    <thead>
+                        <tr class="border-b border-slate-800 text-slate-400 text-xs uppercase bg-slate-950/40">
+                            <th class="py-3.5 px-6">玩家昵称 / 邮箱</th>
+                            <th class="py-3.5 px-6">会员等级</th>
+                            <th class="py-3.5 px-6">行动步数限制</th>
+                            <th class="py-3.5 px-6">自订动作 DLC</th>
+                            <th class="py-3.5 px-6">卡带库 DLC</th>
+                            <th class="py-3.5 px-6 text-right">快速操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="users-tbody" class="divide-y divide-slate-800 text-slate-300">
+                        <tr>
+                            <td colspan="6" class="py-8 text-center text-slate-500">正在加载玩家列表...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- 全局系统配置 -->
+        <section class="bg-slate-900/90 border border-slate-800 rounded-2xl p-6 shadow-sm">
+            <div class="flex items-center gap-2 mb-6 border-b border-slate-800 pb-3">
+                <i class="ph-bold ph-gear-six text-amber-400 text-xl"></i>
+                <h2 class="text-base font-bold text-white">系统核心与 AI 网关配置</h2>
+            </div>
+
+            <form id="settings-form" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">全局统一 API Key (可选)</label>
+                    <input type="password" id="cfg-global-api-key" placeholder="填写后全站玩家可免填 Key 直接游玩" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-sm text-slate-200 focus:outline-none focus:border-amber-500">
+                    <p class="text-xs text-slate-500 mt-1">留空则要求玩家在前端个人设置中自行填入 Key。</p>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">第三方代理网关 Base URL (可选)</label>
+                    <input type="text" id="cfg-proxy-url" placeholder="如: https://api.openai.com/v1 或中转域名" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-sm text-slate-200 focus:outline-none focus:border-amber-500">
+                    <p class="text-xs text-slate-500 mt-1">若使用 OpenAI / DeepSeek / 聚合中转格式的 Key，填入对应端点。</p>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">默认 AI 驱动模型</label>
+                    <select id="cfg-default-model" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-sm text-slate-200 focus:outline-none focus:border-amber-500">
+                        <option value="gemini-2.5-flash">gemini-2.5-flash (推荐)</option>
+                        <option value="gemini-3.1-flash-lite">gemini-3.1-flash-lite</option>
+                        <option value="gemini-3.5-flash">gemini-3.5-flash</option>
+                        <option value="gpt-4o-mini">gpt-4o-mini</option>
+                        <option value="deepseek-chat">deepseek-chat</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">普通注册会员赠送步数</label>
+                    <input type="number" id="cfg-general-actions" value="25" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-sm text-slate-200 focus:outline-none focus:border-amber-500">
+                </div>
+
+                <div class="md:col-span-2">
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">全站滚动公告</label>
+                    <input type="text" id="cfg-site-notice" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-sm text-slate-200 focus:outline-none focus:border-amber-500">
+                </div>
+
+                <div class="md:col-span-2 text-right">
+                    <button type="submit" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold px-6 py-2.5 rounded-lg shadow-lg shadow-amber-500/20 transition-all">保存配置</button>
+                </div>
+            </form>
+        </section>
+
+    </main>
+
+    <!-- 管理员登录弹窗 -->
+    <div id="login-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-sm p-6 shadow-2xl">
+            <div class="text-center mb-6">
+                <div class="w-12 h-12 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-400 mx-auto flex items-center justify-center text-3xl mb-3">
+                    <i class="ph-bold ph-lock-key"></i>
+                </div>
+                <h3 class="text-xl font-bold text-white">管理员后台登录</h3>
+                <p class="text-xs text-slate-400 mt-1">默认账号: admin / 密码: admin123456</p>
+            </div>
+
+            <form id="admin-login-form" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">管理员用户名 / 邮箱</label>
+                    <input type="text" id="admin-username" value="admin" required class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-amber-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">密码</label>
+                    <input type="password" id="admin-password" value="admin123456" required class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-amber-500">
+                </div>
+                <button type="submit" class="w-full bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold py-2.5 rounded-lg transition-all mt-2">确认登入</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- 用户编辑弹窗 -->
+    <div id="edit-user-modal" class="hidden fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-md p-6 shadow-2xl">
+            <div class="flex items-center justify-between mb-4 border-b border-slate-800 pb-3">
+                <h3 class="font-bold text-white">编辑玩家权限</h3>
+                <button onclick="closeEditModal()" class="text-slate-400 hover:text-white"><i class="ph-bold ph-x text-xl"></i></button>
+            </div>
+            <form id="edit-user-form" class="space-y-4">
+                <input type="hidden" id="edit-user-id">
+                <div>
+                    <label class="block text-xs text-slate-400 mb-1">玩家邮箱</label>
+                    <input type="text" id="edit-user-email" disabled class="w-full bg-slate-950/60 border border-slate-800 rounded-lg p-2 text-xs text-slate-400">
+                </div>
+                <div>
+                    <label class="block text-xs text-slate-400 mb-1">会员等级</label>
+                    <select id="edit-user-tier" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-sm text-white">
+                        <option value="general">普通会员 (General)</option>
+                        <option value="sponsor">赞助会员 (Sponsor - 无限步数)</option>
+                        <option value="visitor">游客限制 (Visitor)</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs text-slate-400 mb-1">行动步数限制 (输入 Infinity 为无限)</label>
+                    <input type="text" id="edit-user-actions" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-sm text-white">
+                </div>
+                <div class="space-y-2 pt-2 border-t border-slate-800">
+                    <label class="flex items-center gap-2 text-sm text-slate-300">
+                        <input type="checkbox" id="edit-user-dlc-action" class="rounded bg-slate-950 border-slate-800 text-amber-500 focus:ring-0 w-4 h-4">
+                        <span>解锁「自订动作」DLC</span>
+                    </label>
+                    <label class="flex items-center gap-2 text-sm text-slate-300">
+                        <input type="checkbox" id="edit-user-dlc-cartridge" class="rounded bg-slate-950 border-slate-800 text-amber-500 focus:ring-0 w-4 h-4">
+                        <span>解锁「游戏卡带库」DLC</span>
+                    </label>
+                </div>
+                <div class="flex justify-end gap-3 mt-4 pt-3 border-t border-slate-800">
+                    <button type="button" onclick="closeEditModal()" class="px-4 py-2 text-xs font-semibold text-slate-400 hover:text-white">取消</button>
+                    <button type="submit" class="px-5 py-2 text-xs font-bold bg-amber-500 hover:bg-amber-600 text-slate-950 rounded-lg">保存更改</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 弹窗通知 -->
+    <div id="toast" class="fixed bottom-5 right-5 z-50 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none bg-slate-900 border border-slate-700 text-white text-sm px-4 py-3 rounded-xl shadow-2xl flex items-center gap-2">
+        <i id="toast-icon" class="ph-bold ph-check-circle text-green-400 text-lg"></i>
+        <span id="toast-msg">通知内容</span>
+    </div>
+
+    <script>
+        let adminToken = localStorage.getItem('adminToken') || '';
+        let currentUsers = [];
+
+        function showToast(msg, isError = false) {
+            const toast = document.getElementById('toast');
+            const icon = document.getElementById('toast-icon');
+            const toastMsg = document.getElementById('toast-msg');
+
+            toastMsg.textContent = msg;
+            icon.className = isError ? 'ph-bold ph-warning text-rose-400 text-lg' : 'ph-bold ph-check-circle text-green-400 text-lg';
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+
+            setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0');
+                toast.classList.remove('translate-y-0', 'opacity-100');
+            }, 3000);
+        }
+
+        async function fetchAdmin(endpoint, options = {}) {
+            options.headers = options.headers || {};
+            options.headers['Authorization'] = `Bearer ${adminToken}`;
+            const res = await fetch(endpoint, options);
+            if (res.status === 401 || res.status === 403) {
+                document.getElementById('login-modal').classList.remove('hidden');
+                throw new Error('未授权');
+            }
+            return await res.json();
+        }
+
+        // 登录处理器
+        document.getElementById('admin-login-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const u = document.getElementById('admin-username').value.trim();
+            const p = document.getElementById('admin-password').value.trim();
+
+            try {
+                const res = await fetch('/api/admin/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username: u, password: p })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    adminToken = data.token;
+                    localStorage.setItem('adminToken', adminToken);
+                    document.getElementById('login-modal').classList.add('hidden');
+                    document.getElementById('admin-name').textContent = data.admin.username;
+                    showToast('登录成功');
+                    loadDashboard();
+                } else {
+                    alert(data.error || '登录失败');
+                }
+            } catch (e) {
+                alert('网络连接错误: ' + e.message);
+            }
+        });
+
+        document.getElementById('logout-btn').addEventListener('click', () => {
+            adminToken = '';
+            localStorage.removeItem('adminToken');
+            document.getElementById('login-modal').classList.remove('hidden');
+        });
+
+        async function loadDashboard() {
+            if (!adminToken) {
+                document.getElementById('login-modal').classList.remove('hidden');
+                return;
+            }
+
+            try {
+                // 1. 加载统计
+                const statsData = await fetchAdmin('/api/admin/stats');
+                if (statsData.success) {
+                    document.getElementById('stat-total-users').textContent = statsData.stats.totalUsers;
+                    document.getElementById('stat-total-sponsors').textContent = statsData.stats.totalSponsors;
+                    document.getElementById('stat-pending-orders').textContent = statsData.stats.pendingOrders;
+                    document.getElementById('pending-badge').textContent = `${statsData.stats.pendingOrders} 待处理`;
+                    document.getElementById('stat-total-actions').textContent = statsData.stats.totalActions;
+                }
+
+                // 2. 加载待审核工单
+                loadOrders('pending');
+
+                // 3. 加载用户列表
+                loadUsers();
+
+                // 4. 加载系统配置
+                const settingsData = await fetchAdmin('/api/admin/settings');
+                if (settingsData.success) {
+                    const s = settingsData.settings;
+                    document.getElementById('cfg-global-api-key').value = s.global_api_key || '';
+                    document.getElementById('cfg-proxy-url').value = s.custom_proxy_url || '';
+                    document.getElementById('cfg-default-model').value = s.default_model || 'gemini-2.5-flash';
+                    document.getElementById('cfg-general-actions').value = s.default_general_actions || 25;
+                    document.getElementById('cfg-site-notice').value = s.site_notice || '';
+                }
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        // 加载订单
+        async function loadOrders(status = 'pending') {
+            document.querySelectorAll('.filter-order-btn').forEach(btn => {
+                if (btn.dataset.status === status) {
+                    btn.className = 'filter-order-btn px-3 py-1 rounded-lg text-xs font-semibold bg-amber-500/20 text-amber-300 border border-amber-500/30';
+                } else {
+                    btn.className = 'filter-order-btn px-3 py-1 rounded-lg text-xs font-semibold bg-slate-800 text-slate-400 hover:text-white';
+                }
+            });
+
+            const data = await fetchAdmin(`/api/admin/orders?status=${status}`);
+            const tbody = document.getElementById('orders-tbody');
+            tbody.innerHTML = '';
+
+            if (!data.orders || data.orders.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="py-8 text-center text-slate-500">暂无相关赞助订单记录</td></tr>`;
+                return;
+            }
+
+            data.orders.forEach(o => {
+                const tr = document.createElement('tr');
+                const isPending = o.status === 'pending';
+                const statusBadge = o.status === 'approved' ? 
+                    `<span class="px-2 py-0.5 rounded text-[11px] bg-green-500/10 text-green-400 border border-green-500/20">已审核开通</span>` :
+                    (o.status === 'rejected' ? 
+                        `<span class="px-2 py-0.5 rounded text-[11px] bg-rose-500/10 text-rose-400 border border-rose-500/20">已驳回</span>` :
+                        `<span class="px-2 py-0.5 rounded text-[11px] bg-amber-500/10 text-amber-400 border border-amber-500/20">待审核</span>`
+                    );
+
+                tr.innerHTML = `
+                    <td class="py-4 px-6">
+                        <div class="font-bold text-white">${o.user_nickname}</div>
+                        <div class="text-xs text-slate-400">${o.user_email}</div>
+                    </td>
+                    <td class="py-4 px-6 text-slate-300 font-mono text-xs">${o.sponsor_email || '-'}</td>
+                    <td class="py-4 px-6 text-amber-300 font-mono text-xs font-bold select-all">${o.transaction_id}</td>
+                    <td class="py-4 px-6">
+                        <div class="font-semibold text-white">$${o.amount} USD</div>
+                        <div class="text-xs text-slate-400">${o.dlc_type}</div>
+                    </td>
+                    <td class="py-4 px-6">${statusBadge}</td>
+                    <td class="py-4 px-6 text-right space-x-2">
+                        ${isPending ? `
+                            <button onclick="reviewOrder('${o.id}', 'approve', true, false)" class="bg-green-600 hover:bg-green-500 text-white text-xs font-bold px-2.5 py-1.5 rounded transition-all">通过($5会员)</button>
+                            <button onclick="reviewOrder('${o.id}', 'approve', true, true)" class="bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-bold px-2.5 py-1.5 rounded transition-all">通过+全DLC($15)</button>
+                            <button onclick="reviewOrder('${o.id}', 'reject')" class="bg-rose-600/30 hover:bg-rose-600 text-rose-300 hover:text-white text-xs font-bold px-2.5 py-1.5 rounded transition-all">驳回</button>
+                        ` : `<span class="text-xs text-slate-500">已处理</span>`}
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        async function reviewOrder(orderId, action, grantCustom = false, grantCartridge = false) {
+            try {
+                const res = await fetchAdmin('/api/admin/orders/review', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        orderId,
+                        action,
+                        grantTier: 'sponsor',
+                        grantCustomActionDlc: grantCustom,
+                        grantCartridgeDlc: grantCartridge
+                    })
+                });
+                if (res.success) {
+                    showToast(action === 'approve' ? '已成功审核开通赞助会员！' : '已驳回该订单');
+                    loadDashboard();
+                }
+            } catch (e) {
+                showToast(e.message, true);
+            }
+        }
+
+        // 加载用户
+        async function loadUsers(query = '') {
+            const data = await fetchAdmin(`/api/admin/users?q=${encodeURIComponent(query)}`);
+            const tbody = document.getElementById('users-tbody');
+            tbody.innerHTML = '';
+            currentUsers = data.users || [];
+
+            if (currentUsers.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="py-8 text-center text-slate-500">未找到玩家记录</td></tr>`;
+                return;
+            }
+
+            currentUsers.forEach(u => {
+                const tr = document.createElement('tr');
+                const isSponsor = u.membershipTier === 'sponsor';
+                const tierBadge = isSponsor ?
+                    `<span class="px-2 py-0.5 rounded text-xs font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">赞助会员 ⭐</span>` :
+                    (u.membershipTier === 'general' ?
+                        `<span class="px-2 py-0.5 rounded text-xs bg-blue-500/10 text-blue-400 border border-blue-500/20">普通会员</span>` :
+                        `<span class="px-2 py-0.5 rounded text-xs bg-slate-800 text-slate-400">游客</span>`
+                    );
+
+                const actionsDisplay = u.maxActions === null || u.maxActions === Infinity ? 
+                    `<span class="text-amber-400 font-bold">无限 (∞)</span>` : 
+                    `${u.actionsUsed || 0} / ${u.maxActions}`;
+
+                tr.innerHTML = `
+                    <td class="py-3.5 px-6">
+                        <div class="font-bold text-white">${u.nickname}</div>
+                        <div class="text-xs text-slate-400">${u.email}</div>
+                    </td>
+                    <td class="py-3.5 px-6">${tierBadge}</td>
+                    <td class="py-3.5 px-6 font-mono text-xs">${actionsDisplay}</td>
+                    <td class="py-3.5 px-6">
+                        ${u.dlc_custom_action ? '<span class="text-green-400 text-xs font-bold">✓ 已开通</span>' : '<span class="text-slate-600 text-xs">未开通</span>'}
+                    </td>
+                    <td class="py-3.5 px-6">
+                        ${u.dlc_cartridge ? '<span class="text-green-400 text-xs font-bold">✓ 已开通</span>' : '<span class="text-slate-600 text-xs">未开通</span>'}
+                    </td>
+                    <td class="py-3.5 px-6 text-right">
+                        <button onclick="openEditUser('${u.id}')" class="text-xs font-bold bg-slate-800 hover:bg-slate-700 text-slate-200 px-3 py-1.5 rounded-lg border border-slate-700 transition-all">编辑权限</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        document.getElementById('search-user-input').addEventListener('input', (e) => {
+            loadUsers(e.target.value.trim());
+        });
+
+        function openEditUser(id) {
+            const u = currentUsers.find(x => x.id === id);
+            if (!u) return;
+
+            document.getElementById('edit-user-id').value = u.id;
+            document.getElementById('edit-user-email').value = `${u.nickname} (${u.email})`;
+            document.getElementById('edit-user-tier').value = u.membershipTier;
+            document.getElementById('edit-user-actions').value = u.maxActions === null || u.maxActions === Infinity ? 'Infinity' : u.maxActions;
+            document.getElementById('edit-user-dlc-action').checked = !!u.dlc_custom_action;
+            document.getElementById('edit-user-dlc-cartridge').checked = !!u.dlc_cartridge;
+
+            document.getElementById('edit-user-modal').classList.remove('hidden');
+        }
+
+        function closeEditModal() {
+            document.getElementById('edit-user-modal').classList.add('hidden');
+        }
+
+        document.getElementById('edit-user-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const id = document.getElementById('edit-user-id').value;
+            const tier = document.getElementById('edit-user-tier').value;
+            const actions = document.getElementById('edit-user-actions').value.trim();
+            const dlcAction = document.getElementById('edit-user-dlc-action').checked;
+            const dlcCartridge = document.getElementById('edit-user-dlc-cartridge').checked;
+
+            try {
+                const res = await fetchAdmin('/api/admin/users/update', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        userId: id,
+                        membershipTier: tier,
+                        maxActions: actions === 'Infinity' ? 'Infinity' : parseInt(actions, 10),
+                        dlc_custom_action: dlcAction,
+                        dlc_cartridge: dlcCartridge
+                    })
+                });
+                if (res.success) {
+                    showToast('玩家权限已更新！');
+                    closeEditModal();
+                    loadDashboard();
+                }
+            } catch (e) {
+                showToast(e.message, true);
+            }
+        });
+
+        // 保存系统配置
+        document.getElementById('settings-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const global_api_key = document.getElementById('cfg-global-api-key').value.trim();
+            const custom_proxy_url = document.getElementById('cfg-proxy-url').value.trim();
+            const default_model = document.getElementById('cfg-default-model').value;
+            const default_general_actions = parseInt(document.getElementById('cfg-general-actions').value, 10) || 25;
+            const site_notice = document.getElementById('cfg-site-notice').value.trim();
+
+            try {
+                const res = await fetchAdmin('/api/admin/settings', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        global_api_key,
+                        custom_proxy_url,
+                        default_model,
+                        default_general_actions,
+                        site_notice
+                    })
+                });
+                if (res.success) {
+                    showToast('系统设置已保存生效！');
+                }
+            } catch (e) {
+                showToast(e.message, true);
+            }
+        });
+
+        // 启动时初始化
+        if (adminToken) {
+            document.getElementById('login-modal').classList.add('hidden');
+            loadDashboard();
+        }
+    </script>
+</body>
+</html>

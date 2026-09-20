@@ -1,0 +1,428 @@
+:root {
+    --primary-color: #22c55e;
+    --primary-color-hover: #16a34a;
+    --text-color: #f3e9dc;
+    --text-light-color: #a3b18a;
+    --bg-color: #291d0f;
+    --card-bg-color: #452f19;
+    --input-bg-color: #5a3e2b;
+    --button-text-color: #ffffff;
+    --border-color: #16a34a;
+    --danger-color: #ef4444;
+    --success-color: #22c55e;
+}
+body {
+    font-family: 'Poppins', 'Noto Sans TC', sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    transition: background-color 0.5s ease;
+}
+.theme-primary { color: var(--primary-color); }
+.theme-bg-primary { background-color: var(--primary-color); }
+.theme-bg-primary-hover:hover { background-color: var(--primary-color-hover); }
+.theme-text { color: var(--text-color); }
+.theme-text-light { color: var(--text-light-color); }
+.theme-bg-card { background-color: var(--card-bg-color); }
+.theme-bg-input { background-color: var(--input-bg-color); }
+.theme-border { border-color: var(--border-color); }
+.theme-ring-focus:focus { --tw-ring-color: var(--primary-color); }
+.theme-text-button { color: var(--button-text-color); }
+.text-danger { color: var(--danger-color); }
+.text-success { color: var(--success-color); }
+.modal { transition: opacity 0.3s ease-in-out; }
+.modal-content { transition: transform 0.3s ease-in-out; }
+.loader-spinner { border-top-color: var(--primary-color); }
+@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+.animate-spin-fast { animation: spin 0.8s linear infinite; }
+.notification { transition: opacity 0.3s, transform 0.3s; }
+
+.adventure-entry {
+    border-left: 3px solid var(--primary-color);
+    padding-left: 1rem;
+    margin-bottom: 1.5rem;
+    opacity: 0;
+    transform: translateX(-20px);
+    animation: fadeInEntry 0.5s forwards;
+}
+@keyframes fadeInEntry { to { opacity: 1; transform: translateX(0); } }
+.tab-button.active { background-color: var(--primary-color); color: var(--button-text-color); }
+.iti { width: 100%; }
+.iti__country-list { background-color: var(--card-bg-color); color: var(--text-color); }
+.history-item {
+    background-color: var(--input-bg-color);
+    border: 1px solid var(--border-color);
+    border-radius: 0.75rem;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    transition: all 0.2s ease-in-out;
+}
+.history-item:hover {
+    box-shadow: 0 0 15px 0 var(--primary-color-hover);
+    transform: translateY(-2px);
+}
+.history-elements { font-size: 0.875rem; opacity: 0.8; word-break: break-all; }
+.history-actions button {
+    background-color: transparent; border: 1px solid var(--text-light-color); color: var(--text-light-color);
+    border-radius: 9999px; padding: 0.25rem 0.75rem; font-size: 0.75rem; transition: all 0.2s;
+}
+.history-actions button:hover { background-color: var(--primary-color); border-color: var(--primary-color); color: white; }
+.shop-item-card {
+    background-color: var(--input-bg-color);
+    border: 1px solid var(--border-color);
+    border-radius: 0.5rem;
+    padding: 0.75rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: all 0.2s;
+}
+.shop-item-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    border-color: var(--primary-color);
+}
+.shop-price-tag {
+    font-weight: bold;
+    color: #facc15;
+    background-color: rgba(0, 0, 0, 0.3);
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
+    white-space: nowrap;
+}
+
+/* 1. 定義動畫效果 (Keyframes) */
+
+/* 升級光暈動畫 */
+@keyframes glow-animation {
+    0% { box-shadow: 0 0 5px 0px rgba(250, 204, 21, 0.7); }
+    50% { box-shadow: 0 0 35px 18px rgba(250, 204, 21, 0.9); }
+    100% { box-shadow: 0 0 5px 0px rgba(250, 204, 21, 0.7); }
+}
+
+/* 危險閃爍動畫 (紅色外框 + 背景閃光) */
+@keyframes danger-flash-animation {
+    0%, 100% { border-color: transparent; background-color: transparent; }
+    50% { border-color: var(--danger-color); background-color: rgba(239, 68, 68, 0.15); }
+}
+
+/* 治療波紋動畫 (綠色光暈) */
+@keyframes healing-wave-animation {
+    from { box-shadow: 0 0 0px 0px var(--success-color); }
+    to { box-shadow: 0 0 0px 40px rgba(34, 197, 94, 0); }
+}
+
+/* 魔法邊框動畫 (主色調邊框) */
+@keyframes magic-border-animation {
+    from, to { border-color: transparent; }
+    50% { border-color: var(--primary-color); }
+}
+
+/* 4. 必殺技/爆擊特效 (強烈震動 + 紅光閃爍) */
+@keyframes critical-hit-animation {
+    0% { transform: scale(1); box-shadow: 0 0 0 transparent; }
+    25% { transform: scale(1.1) rotate(2deg); box-shadow: 0 0 30px rgba(220, 38, 38, 0.8); }
+    50% { transform: scale(1.1) rotate(-2deg); box-shadow: 0 0 50px rgba(255, 0, 0, 1); border-color: red; }
+    75% { transform: scale(1.05) rotate(1deg); }
+    100% { transform: scale(1); }
+}
+
+.vfx-active.vfx-critical_hit {
+    animation: critical-hit-animation 0.6s ease-in-out;
+    border: 2px solid #ef4444;
+    z-index: 100;
+}
+
+/* 2. 將動畫應用到對應的 Class 上 */
+
+/* 當 .vfx-level_up_glow 和 .vfx-active 同時存在時，應用此動畫 */
+.vfx-active.vfx-level_up_glow {
+    animation: glow-animation 1.5s ease-in-out;
+}
+
+.vfx-active.vfx-danger_flash {
+    border-width: 3px;
+    animation: danger-flash-animation 0.4s 2; /* 閃爍2次 */
+}
+
+.vfx-active.vfx-healing_wave {
+    animation: healing-wave-animation 1s ease-out;
+}
+
+.vfx-active.vfx-magic_border {
+    border-width: 3px;
+    animation: magic-border-animation 1.2s ease-in-out;
+}
+/* =================== AI 客服功能 CSS - 開始 =================== */
+.assistant-message {
+    background-color: var(--input-bg-color);
+    padding: 0.75rem;
+    border-radius: 0.75rem;
+    max-width: 90%;
+    align-self: flex-start;
+    word-break: break-word;
+}
+.user-message {
+    background-color: var(--primary-color);
+    color: var(--button-text-color);
+    padding: 0.75rem;
+    border-radius: 0.75rem;
+    max-width: 90%;
+    align-self: flex-end; /* 靠右對齊 */
+    word-break: break-word;
+}
+
+display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+/* =================== AI 客服功能 CSS - 結束 =================== */
+/* SEO: Visually hidden text for search engines */
+.seo-hidden-text {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* =================== 嵌入式小遊戲系統 CSS (極致緊湊版) =================== */
+.mg-inline-card {
+    background: rgba(0, 0, 0, 0.4) !important;
+    border: 1px solid var(--primary-color) !important;
+    border-radius: 0.5rem !important;
+    padding: 0.5rem !important; /* 極小內距 */
+    margin: 0.5rem 0 !important; /* 極小外距 */
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    animation: fadeInEntry 0.3s forwards;
+    font-size: 0.85rem !important; /* 字體縮小 */
+}
+
+.mg-header {
+    font-size: 0.95rem !important;
+    font-weight: bold;
+    margin-bottom: 0.25rem !important;
+    color: #facc15;
+    display: block;
+}
+
+/* 模組一：骰子 (縮小) */
+.mg-value-display {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem !important;
+    margin: 0.25rem 0 !important;
+}
+.mg-dice-box {
+    width: 36px !important; height: 36px !important; /* 縮小 */
+    border: 1px solid var(--text-light-color);
+    border-radius: 6px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.2rem !important;
+    font-weight: bold;
+    color: var(--text-color);
+    background: rgba(255,255,255,0.05);
+}
+.mg-dice-box.rolling { animation: spin 0.3s infinite linear; }
+.mg-vs { font-size: 0.8rem !important; color: var(--danger-color); font-style: italic; }
+
+/* 模組二：密碼鎖 (緊湊鍵盤) */
+.mg-code-screen {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    letter-spacing: 0.15rem;
+    background: rgba(0, 0, 0, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 8px;
+    min-height: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.25s ease;
+}
+
+.mg-key-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2px !important; /* 按鈕間距極小 */
+    max-width: 150px !important;
+    margin: 0 auto 0.25rem auto !important;
+}
+.mg-key-btn {
+    padding: 0.25rem 0 !important; /* 按鈕變扁 */
+    font-size: 0.9rem !important;
+    font-weight: bold;
+    background: var(--input-bg-color);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    color: var(--text-color);
+}
+.mg-key-btn:active { background: var(--primary-color) !important; color: white !important; transform: scale(0.95); }
+
+/* 模組三：反應條 (變細) */
+.mg-reflex-track {
+    width: 100%;
+    height: 16px !important; /* 極細條 */
+    background: #1f2937;
+    border: 1px solid #374151;
+    border-radius: 8px;
+    position: relative;
+    overflow: hidden;
+    margin: 0.5rem 0 !important;
+}
+.mg-reflex-zone {
+    position: absolute; top: 0; bottom: 0;
+    background: rgba(34, 197, 94, 0.7);
+}
+.mg-reflex-cursor {
+    position: absolute; top: 0; bottom: 0;
+    width: 4px;
+    background: #facc15;
+    z-index: 10;
+}
+/* 模組四：戰術三剋 (Tactical RPS) */
+.mg-rps-display {
+    display: flex; justify-content: center; gap: 1rem; margin: 0.5rem 0;
+}
+.mg-rps-icon {
+    font-size: 2.5rem; width: 60px; height: 60px;
+    background: rgba(255,255,255,0.05); border-radius: 50%;
+    display: flex; justify-content: center; align-items: center;
+    border: 2px solid var(--text-light-color); transition: all 0.3s;
+}
+.mg-rps-icon.winner { border-color: #4ade80; color: #4ade80; box-shadow: 0 0 15px #4ade80; transform: scale(1.1); }
+.mg-rps-icon.loser { border-color: #ef4444; color: #ef4444; opacity: 0.5; transform: scale(0.9); }
+
+/* 模組五：險中求勝 (Push Your Luck) */
+.mg-push-track {
+    width: 100%; height: 20px; background: #374151;
+    border-radius: 10px; margin: 1rem 0; position: relative; overflow: hidden;
+}
+.mg-push-target {
+    position: absolute; top: 0; bottom: 0; background: rgba(250, 204, 21, 0.3); /* Yellow Target */
+    border-left: 2px dashed #facc15; border-right: 2px dashed #facc15;
+}
+.mg-push-bar {
+    height: 100%; background: #60a5fa; width: 0%; transition: width 0.3s ease-out;
+}
+.mg-push-bar.bust { background: #ef4444; } /* 爆掉變紅 */
+.mg-push-bar.success { background: #4ade80; } /* 成功變綠 */
+.mg-push-val { font-size: 2rem; font-weight: bold; font-family: monospace; line-height: 1; }
+
+/* =================== [新增] 角色確認卡與技能樣式 =================== */
+.skill-badge {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: bold;
+    text-transform: uppercase; letter-spacing: 0.05em; margin-right: 6px;
+    vertical-align: middle;
+}
+.skill-badge.active { background: rgba(220, 38, 38, 0.2); color: #fca5a5; border: 1px solid rgba(220, 38, 38, 0.5); }
+.skill-badge.passive { background: rgba(59, 130, 246, 0.2); color: #93c5fd; border: 1px solid rgba(59, 130, 246, 0.5); }
+
+/* ================= [修改] 增強對比度的預覽樣式 ================= */
+
+/* 1. 屬性框：改用深黑色半透明，確保在白底上也看得見 */
+.stat-box {
+    background: rgba(0, 0, 0, 0.6); /* 從原本的 0.05 改為 0.6 (更黑) */
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 8px;
+    padding: 10px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    backdrop-filter: blur(4px); /* 加入模糊讓文字更清楚 */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+}
+
+.stat-label {
+    font-size: 0.75rem;
+    color: #d6d3d1; /* stone-300: 淺灰而非純白，減少刺眼 */
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 4px;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.8); /* 文字陰影 */
+}
+
+.stat-value {
+    font-family: 'Courier New', monospace;
+    font-size: 1.5rem;
+    font-weight: 700;
+    line-height: 1;
+    text-shadow: 0 2px 4px rgba(0,0,0,1); /* 強烈陰影，確保數值跳出來 */
+}
+
+/* 2. 技能標籤：加深背景 */
+.skill-badge {
+    font-size: 10px;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-weight: bold;
+    margin-right: 6px;
+    text-transform: uppercase;
+    text-shadow: 0 1px 1px rgba(0,0,0,0.5);
+}
+/* 主動技能：深紅底 */
+.skill-badge.active {
+    background: rgba(153, 27, 27, 0.6);
+    color: #fecaca;
+    border: 1px solid rgba(248, 113, 113, 0.4);
+}
+/* 被動技能：深藍底 */
+.skill-badge.passive {
+
+background: rgba(30, 64, 175, 0.6);
+    color: #bfdbfe;
+    border: 1px solid rgba(96, 165, 250, 0.4);
+}
+
+/* 3. 輸入框增強：讓輸入名字的地方在亮色背景也清楚 */
+.input-high-contrast {
+    background-color: rgba(0, 0, 0, 0.5) !important;
+    color: white !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.8);
+}
+
+/* 4. 密碼輸入錯誤晃動動畫 */
+.animate-shake {
+    animation: shake 0.5s ease-in-out;
+}
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    10%, 30%, 50%, 70%, 90% { transform: translateX(-4px); }
+    20%, 40%, 60%, 80% { transform: translateX(4px); }
+}
+
+/* 5. 磨砂玻璃 / 玻璃擬態質感 */
+.frosted-theme-card {
+    background-color: rgba(0, 0, 0, 0.35);
+    backdrop-filter: blur(12px) saturate(120%);
+    -webkit-backdrop-filter: blur(12px) saturate(120%);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37), inset 0 1px 1px 0 rgba(255, 255, 255, 0.15);
+}
+
+.frosted-theme-input {
+    background-color: rgba(0, 0, 0, 0.5) !important;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+    color: #f3e9dc !important;
+}
+
+.frosted-theme-input:focus {
+    border-color: var(--primary-color) !important;
+    box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.2) !important;
+    outline: none;
+}
+
