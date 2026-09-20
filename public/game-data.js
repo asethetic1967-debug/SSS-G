@@ -238,22 +238,26 @@ export const genreIcons = {
 // 4. 屬性標籤設定 (不同世界觀的 STR/DEX 顯示名稱)
 export const genreConfig = {
     'default': {
-        labels: { str: '力量', dex: '敏捷', vit: '體質', atk: '攻擊力', def: '防禦力' },
+        labels: { str: '力量', dex: '敏捷', vit: '体质', atk: '攻击力', def: '防御力' },
+        labels_tw: { str: '力量', dex: '敏捷', vit: '體質', atk: '攻擊力', def: '防禦力' },
         labels_en: { str: 'STR', dex: 'DEX', vit: 'VIT', atk: 'ATK', def: 'DEF' },
         icons: { atk: 'ph-sword', def: 'ph-shield', str: 'ph-barbell', dex: 'ph-person-simple-run', vit: 'ph-heart' }
     },
     'tech': {
-        labels: { str: '武裝', dex: '技術', vit: '適性', atk: '火力', def: '裝甲' },
+        labels: { str: '武装', dex: '技术', vit: '适性', atk: '火力', def: '装甲' },
+        labels_tw: { str: '武裝', dex: '技術', vit: '適性', atk: '火力', def: '裝甲' },
         labels_en: { str: 'Loadout', dex: 'Tech', vit: 'Adapt', atk: 'Firepower', def: 'Armor' },
         icons: { atk: 'ph-crosshair', def: 'ph-shield-check', str: 'ph-wrench', dex: 'ph-code', vit: 'ph-first-aid' }
     },
     'social': {
-        labels: { str: '魅力', dex: '心機', vit: '氣運', atk: '影響力', def: '城府' },
+        labels: { str: '魅力', dex: '心机', vit: '气运', atk: '影响力', def: '城府' },
+        labels_tw: { str: '魅力', dex: '心機', vit: '氣運', atk: '影響力', def: '城府' },
         labels_en: { str: 'Charm', dex: 'Tactics', vit: 'Fate', atk: 'Influence', def: 'Guile' },
         icons: { atk: 'ph-chat-circle-text', def: 'ph-lock-key', str: 'ph-sparkle', dex: 'ph-brain', vit: 'ph-clover' }
     },
     'mystery': {
-        labels: { str: '行動', dex: '觀察', vit: '靈感', atk: '推理', def: '理智' },
+        labels: { str: '行动', dex: '观察', vit: '灵感', atk: '推理', def: '理智' },
+        labels_tw: { str: '行動', dex: '觀察', vit: '靈感', atk: '推理', def: '理智' },
         labels_en: { str: 'Action', dex: 'Observe', vit: 'Intuition', atk: 'Logic', def: 'Sanity' },
         icons: { atk: 'ph-magnifying-glass', def: 'ph-brain', str: 'ph-footprints', dex: 'ph-eye', vit: 'ph-lightbulb' }
     }
@@ -261,10 +265,10 @@ export const genreConfig = {
 
 // 5. 怪物階級設定 (平衡調整：提升挑戰難度與威脅度，大幅降低升級速度，戰鬥具備真實致命風險)
 export const MONSTER_RANKS = {
-    'MINION': { ttk: 2.2, threat: 0.16, xpMult: 0.35, critChance: 0.10, name: '雜魚' },
-    'NORMAL': { ttk: 4.5, threat: 0.28, xpMult: 0.60, critChance: 0.18, name: '一般' },
-    'ELITE':  { ttk: 8.5, threat: 0.45, xpMult: 1.50, critChance: 0.25, name: '菁英' },
-    'BOSS':   { ttk: 15.0, threat: 0.60, xpMult: 3.20, critChance: 0.32, name: '首領' }
+    'MINION': { ttk: 2.2, threat: 0.16, xpMult: 0.35, critChance: 0.10, name: '杂兵', name_tw: '雜魚' },
+    'NORMAL': { ttk: 4.5, threat: 0.28, xpMult: 0.60, critChance: 0.18, name: '普通', name_tw: '一般' },
+    'ELITE':  { ttk: 8.5, threat: 0.45, xpMult: 1.50, critChance: 0.25, name: '精英', name_tw: '菁英' },
+    'BOSS':   { ttk: 15.0, threat: 0.60, xpMult: 3.20, critChance: 0.32, name: '头目', name_tw: '首領' }
 };
 
 

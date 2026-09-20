@@ -688,7 +688,7 @@ const server = http.createServer(async (req, res) => {
     if (pathname === '/api/companion/generate' && req.method === 'POST') {
         try {
             const body = await parseJsonBody(req);
-            const { genre = 'Post-Apocalyptic', characterDesc = '', language = 'zh-TW', apiKey, model } = body;
+            const { genre = 'Post-Apocalyptic', characterDesc = '', language = 'zh-CN', apiKey, model } = body;
 
             const activeKey = (apiKey || dbCache.settings.global_api_key || process.env.GEMINI_API_KEY || '').trim();
             const activeModel = model || dbCache.settings.default_model || 'gemini-2.5-flash';
@@ -696,7 +696,7 @@ const server = http.createServer(async (req, res) => {
             const companionPrompt = `You are an expert game narrative and character designer specialized in creating captivating, charming, and memorable "Bishoujo & Gap-Moe Heroines" (高魅力美少女/反差萌女伴) for a story-rich adventure RPG.
 Genre: ${genre}
 Player Character: ${characterDesc || 'A wandering traveler'}
-Language: ${language === 'zh-TW' ? '繁體中文' : (language === 'ja' ? '日本語' : (language === 'zh-CN' ? '简体中文' : 'English'))}
+Language: ${language === 'zh-TW' ? '繁體中文' : (language === 'ja' ? '日本語' : (language === 'en' ? 'English' : '简体中文'))}
 
 Generate ONE distinctive, attractive heroine companion who encounters and accompanies the player on their journey.
 Requirements:
@@ -939,11 +939,12 @@ Respond strictly with valid JSON conforming to this schema (no extra explanation
             ensureFullWorldState(playerState);
             const ws = playerState.world_state;
             const resData = ws.resources;
-            const lang = (language || playerState.language || 'zh-TW').toLowerCase();
+            const lang = (language || playerState.language || 'zh-CN').toLowerCase();
 
             let logMessage = '';
             const isEn = lang.includes('en');
             const isJa = lang.includes('ja') || lang.includes('jp');
+            const isTw = lang.includes('tw') || lang.includes('hant');
 
             // Find HP bar if present
             let hpBar = playerState.player_status?.status_bars?.find(b => b.type === 'hp' || b.name === 'HP' || b.name === '生命值');
@@ -951,38 +952,42 @@ Respond strictly with valid JSON conforming to this schema (no extra explanation
 
             if (action === 'eat') {
                 if ((resData.food || 0) <= 0) {
-                    return sendError(res, 400, isEn ? 'No food rations left!' : isJa ? '食料がありません！' : '沒有可用的食物口糧！');
+                    return sendError(res, 400, isEn ? 'No food rations left!' : isJa ? '食料がありません！' : isTw ? '沒有可用的食物口糧！' : '没有可用的食物口粮！');
                 }
                 resData.food -= 1;
                 ws.hunger = Math.min(100, (ws.hunger || 0) + 35);
                 ws.stamina = Math.min(ws.max_stamina || 100, (ws.stamina || 0) + 25);
                 playerState.stamina = ws.stamina;
-                const spBar = playerState.player_status?.status_bars?.find(b => b.type === 'sp' || b.name === '精力' || b.name === '體力');
+                const spBar = playerState.player_status?.status_bars?.find(b => b.type === 'sp' || b.name === '精力' || b.name === '體力' || b.name === '体力');
                 if (spBar) spBar.value = ws.stamina;
                 if (hpBar) hpBar.value = Math.min(maxHp, (hpBar.value || 0) + 10);
                 logMessage = isEn 
                     ? '🍖 Consumed 1 Food Ration (+35 Hunger, +25 Stamina, +10 HP).'
                     : isJa
                     ? '🍖 食料を1個消費しました（空腹度+35、スタミナ+25、HP+10）。'
-                    : '🍖 食用了 1 份食物口糧（飽腹度 +35，精力 +25，生命值 +10）。';
+                    : isTw
+                    ? '🍖 食用了 1 份食物口糧（飽腹度 +35，精力 +25，生命值 +10）。'
+                    : '🍖 食用了 1 份食物口粮（饱腹度 +35，精力 +25，生命值 +10）。';
             } else if (action === 'drink') {
                 if ((resData.water || 0) <= 0) {
-                    return sendError(res, 400, isEn ? 'No clean water left!' : isJa ? 'きれいな水がありません！' : '沒有可用的純淨水！');
+                    return sendError(res, 400, isEn ? 'No clean water left!' : isJa ? 'きれいな水がありません！' : isTw ? '沒有可用的純淨水！' : '没有可用的纯净水！');
                 }
                 resData.water -= 1;
                 ws.hydration = Math.min(100, (ws.hydration || 0) + 40);
                 ws.stamina = Math.min(ws.max_stamina || 100, (ws.stamina || 0) + 15);
                 playerState.stamina = ws.stamina;
-                const spBar = playerState.player_status?.status_bars?.find(b => b.type === 'sp' || b.name === '精力' || b.name === '體力');
+                const spBar = playerState.player_status?.status_bars?.find(b => b.type === 'sp' || b.name === '精力' || b.name === '體力' || b.name === '体力');
                 if (spBar) spBar.value = ws.stamina;
                 logMessage = isEn 
                     ? '💧 Drank 1 Pure Water (+40 Hydration, +15 Stamina).'
                     : isJa
                     ? '💧 純水を1個消費しました（水分+40、スタミナ+15）。'
-                    : '💧 飲用了 1 份純淨水（水分 +40，精力 +15）。';
+                    : isTw
+                    ? '💧 飲用了 1 份純淨水（水分 +40，精力 +15）。'
+                    : '💧 饮用了 1 份纯净水（水分 +40，精力 +15）。';
             } else if (action === 'medicine') {
                 if ((resData.medicine || 0) <= 0) {
-                    return sendError(res, 400, isEn ? 'No medical supplies left!' : isJa ? '医薬品がありません！' : '沒有可用的急救藥品！');
+                    return sendError(res, 400, isEn ? 'No medical supplies left!' : isJa ? '医薬品がありません！' : isTw ? '沒有可用的急救藥品！' : '没有可用的急救药品！');
                 }
                 resData.medicine -= 1;
                 if (hpBar) hpBar.value = Math.min(maxHp, (hpBar.value || 0) + 45);
@@ -991,7 +996,9 @@ Respond strictly with valid JSON conforming to this schema (no extra explanation
                     ? '💊 Used 1 Medical Kit (+45 HP, cleared negative status).'
                     : isJa
                     ? '💊 応急キットを使用しました（HP+45、状態異常解除）。'
-                    : '💊 使用了 1 份急救藥品（生命值 +45，清除了負面異常狀態！）。';
+                    : isTw
+                    ? '💊 使用了 1 份急救藥品（生命值 +45，清除了負面異常狀態！）。'
+                    : '💊 使用了 1 份急救药品（生命值 +45，清除了负面异常状态！）。';
             } else {
                 return sendError(res, 400, 'Invalid resource action');
             }
@@ -1030,7 +1037,7 @@ Respond strictly with valid JSON conforming to this schema (no extra explanation
             const ws = playerState.world_state;
             const camp = playerState.camp_state;
             const resData = ws.resources;
-            const lang = (language || playerState.language || 'zh-TW').toLowerCase();
+            const lang = (language || playerState.language || 'zh-CN').toLowerCase();
             const isEn = lang.includes('en');
             const isJa = lang.includes('ja') || lang.includes('jp');
 
@@ -1354,7 +1361,7 @@ Respond strictly with valid JSON conforming to this schema (no extra explanation
         try {
             const body = await parseJsonBody(req);
             const { playerState, language } = body;
-            const lang = language || playerState?.language || 'zh-TW';
+            const lang = language || playerState?.language || 'zh-CN';
             const isEn = lang.toLowerCase().includes('en');
             const isJa = lang.toLowerCase().includes('ja') || lang.toLowerCase().includes('jp');
 
@@ -1476,7 +1483,7 @@ Respond strictly with valid JSON conforming to this schema (no extra explanation
         try {
             const body = await parseJsonBody(req);
             const { poi, scratchPercent, depthScratched, playerState, language, currentRisk } = body;
-            const lang = language || playerState?.language || 'zh-TW';
+            const lang = language || playerState?.language || 'zh-CN';
             const isEn = lang.toLowerCase().includes('en');
             const isJa = lang.toLowerCase().includes('ja') || lang.toLowerCase().includes('jp');
 
@@ -1648,7 +1655,7 @@ Respond strictly with valid JSON conforming to this schema (no extra explanation
         try {
             const body = await parseJsonBody(req);
             const { scavengedLoot, playerState, language, forcedEscape } = body;
-            const lang = language || playerState?.language || 'zh-TW';
+            const lang = language || playerState?.language || 'zh-CN';
             const isEn = lang.toLowerCase().includes('en');
             const isJa = lang.toLowerCase().includes('ja') || lang.toLowerCase().includes('jp');
 
@@ -1743,7 +1750,7 @@ Respond strictly with valid JSON conforming to this schema (no extra explanation
         try {
             const body = await parseJsonBody(req);
             const { direction, mazeState, playerState, language } = body;
-            const lang = language || playerState?.language || 'zh-TW';
+            const lang = language || playerState?.language || 'zh-CN';
             const isEn = lang.toLowerCase().includes('en');
             const isJa = lang.toLowerCase().includes('ja') || lang.toLowerCase().includes('jp');
 
@@ -1932,8 +1939,10 @@ Respond strictly with valid JSON conforming to this schema (no extra explanation
                     );
 
                     if (isCombat) {
-                        const lang = playerState.language || body.language || 'zh-TW';
-                        let errMsg = "❌ 戰鬥中或處於危險時，無法推進主線！請先脫離危險。";
+                        const lang = playerState.language || body.language || 'zh-CN';
+                        let errMsg = (lang.toLowerCase().includes('tw') || lang.toLowerCase().includes('hant')) 
+                            ? "❌ 戰鬥中或處於危險時，無法推進主線！請先脫離危險。" 
+                            : "❌ 战斗中或处于危险时，无法推进主线！请先脱离危险。";
                         if (lang.toLowerCase().includes('en')) {
                             errMsg = "❌ Cannot advance campaign while in danger or combat! Please escape first.";
                         } else if (lang.toLowerCase().includes('ja') || lang.toLowerCase().includes('jp')) {
@@ -1963,12 +1972,35 @@ Respond strictly with valid JSON conforming to this schema (no extra explanation
                     playerState.world_state.mode = "过渡";
                 }
 
+                // ★ 日常安全行为白名单：医疗救治、包扎伤口、赠送礼物、日常对话、普通移动与常规琐事，绝对不进行 DC 判定！
+                function isRoutineSafeAction(text) {
+                    if (!text || typeof text !== 'string') return false;
+                    const t = text.trim().toLowerCase();
+                    // 1. 医疗救护、敷药包扎、伤口处理、服药、休息恢复等常态行为，绝对不进行 DC 判定！
+                    if (/(?:包扎|包紮|止血|伤口|傷口|绷带|繃帶|敷药|敷藥|上药|上藥|服药|服藥|吃药|吃藥|喝药|喝藥|药水|藥水|草药|草藥|药剂|藥劑|治疗|治療|疗伤|療傷|救治|恢复|恢復|回血|休息|休整|睡眠|睡觉|睡覺|入睡|打坐|调息|調息|闭目)/.test(t)) {
+                        return true;
+                    }
+                    // 2. 社交互动、赠送礼物、日常对话、道谢、询问打听、购买交易，绝对不进行 DC 判定！
+                    if (/(?:送礼|送禮|赠礼|贈禮|送个|送個|送件|赠送|贈送|赠予|贈予|送给|送給|给npc|給npc|礼物|禮物|交谈|交談|聊天|说话|說話|对话|對話|询问|詢問|打听|打聽|请教|請教|问候|問候|寒暄|道谢|道謝|感谢|感謝|安慰|道歉|买|買|购买|購買|交易|付钱|付錢|结账|結賬|支付|打赏|賞金)/.test(t)) {
+                        return true;
+                    }
+                    // 3. 常规移动、探索、观察与离开
+                    if (/(?:观察|觀察|查看|打量|环顾|環顧|四处看|四處看|四处张望|四處張望|环视|環視|寻找|尋找|调查|調查|前进|前進|向前走|走近|走去|走向|回营|回營|回城|回去|返回|离开|離開|赶路|趕路|继续前行|繼續前行|敲门|敲門|推开门|推開門|进门|進門|出门|出門|坐下|起立|驻足|駐足)/.test(t)) {
+                        return true;
+                    }
+                    // 4. 日常生活琐事、进食、整理背包
+                    if (/(?:吃|喝|饮|飲|进食|進食|干粮|乾糧|水壶|水壺|饮水|飲水|生火|烤火|生起篝火|烹饪|烤肉|整理|放入|拿出|取出|背包|行囊|拾取|拾起|捡起|撿起|采摘|採摘)/.test(t)) {
+                        return true;
+                    }
+                    return false;
+                }
+
                 // B. 主動判定與選擇後果系統 (Authoritative Consequence Determination)
-                // ★ 僅在關鍵時刻判定：戰鬥比拼、偷竊潛行、運氣賭博、絕境避險，或選項明確要求 check 時才觸發！
+                // ★ 仅在关键生死/重大危机时刻判定：拼死搏杀、极度危险潜行盗窃、绝命豪赌、拆除致命陷阱，普通交互绝不判定！
                 let isChecking = false;
                 let checkType = 'normal'; // 'aggressive', 'cautious', 'smart', 'social'
                 let attrName = 'strength';
-                let checkTitle = '關鍵屬性判定';
+                let checkTitle = '关键属性判定';
                 let DC = 10;
                 let requiredItem = null;
                 let requiredNPC = null;
@@ -2016,7 +2048,7 @@ Respond strictly with valid JSON conforming to this schema (no extra explanation
                             checkTitle = '行動挑戰判定';
                         }
                         const chapter = playerState.camp_state?.chapter || 1;
-                        DC = 10 + (chapter * 2);
+                        DC = Math.min(14, 9 + chapter);
                     } else {
                         isChecking = false;
                     }
@@ -2024,7 +2056,10 @@ Respond strictly with valid JSON conforming to this schema (no extra explanation
                     checkAction = selectedChoice.action || 'SelectedChoice';
                     checkText = selectedChoice.text || 'Selected Option';
 
-                    if (selectedChoice.check) {
+                    // 严格白名单防护：日常救治、包扎伤口、送礼交谈、常规探索等绝不判定！
+                    const isSafeAction = isRoutineSafeAction(checkText);
+
+                    if (selectedChoice.check && !isSafeAction) {
                         isChecking = true;
                         const check = selectedChoice.check;
                         attrName = check.attribute || 'strength';
@@ -2033,49 +2068,53 @@ Respond strictly with valid JSON conforming to this schema (no extra explanation
                         requiredNPC = check.required_favor_npc;
                         requiredNPCVal = parseInt(check.required_favor_value || '0', 10);
                         checkType = selectedChoice.type || 'normal';
-                        checkTitle = check.title || (selectedChoice.type === 'aggressive' ? '戰鬥比拼判定' : '關鍵屬性判定');
-                    } else {
-                        // 僅在選項文字包含高風險關鍵字（戰鬥對決、偷竊撬鎖、賭博運氣、拆除陷阱）時才觸發判定
+                        checkTitle = check.title || (selectedChoice.type === 'aggressive' ? '生死搏杀判定' : '关键属性判定');
+                    } else if (!isSafeAction) {
+                        // 仅在明确标记为高风险(RISKY/BAD)，且包含明确生死关头/极度危险关键词时才触发判定！
                         const t = checkText;
                         const textLower = t.toLowerCase();
+                        const isRisky = selectedChoice.tag === 'RISKY' || selectedChoice.tag === 'BAD';
                         
-                        const isCombatClash = /[拼死搏殺|強行突圍|破陣斬首|絕命反擊|生死決鬥|蓄力一擊|致命一擊|近身搏鬥|正面硬拼|拔刀相向]/.test(t) || /duel|deathmatch|desperate strike|breakthrough|assassinate/i.test(textLower);
-                        const isSteal = /[偷竊|竊取|扒竊|撬鎖|潛入|竊聽|摸索口袋|暗中順走]/.test(t) || /steal|pickpocket|lockpick|sneak|infiltrate/i.test(textLower);
-                        const isLuckGamble = /[賭博|擲骰賭命|孤注一擲|生死一抽|運氣比拼|命運博弈|以命相搏|全押]/.test(t) || /gamble|bet all|luck duel|fate gamble/i.test(textLower);
-                        const isHazard = /[拆除陷阱|解除機關|驚險飛躍|抵抗致命劇毒|躲避致命陷阱]/.test(t) || /disarm trap|defuse|resist lethal poison/i.test(textLower);
+                        // 正确使用捕获组/非捕获组 (?:...)，杜绝 [...] 单字符误匹配！
+                        const isCombatClash = /(?:拼死搏殺|拼死搏杀|拼死一搏|拼死突圍|拼死突围|強行突圍|强行突围|破陣斬首|破阵斩首|絕命反擊|绝命反击|生死決鬥|生死决斗|拔刀死戰|拔刀死战)/.test(t) || /(?:duel to death|desperate strike|breakthrough assault|assassinate boss)/i.test(textLower);
+                        const isSteal = /(?:暗中行竊|暗中行窃|暗中扒竊|暗中扒窃|撬開金庫|撬开金库|撬開寶箱|撬开宝箱|潛入敵營|潜入敌营)/.test(t) || /(?:pickpocket guard|lockpick safe|sneak past guard)/i.test(textLower);
+                        const isLuckGamble = /(?:生死豪賭|生死豪赌|命運對決|命运对决|押上性命|赌命一搏|賭命一搏)/.test(t) || /(?:gamble life|bet everything|russian roulette)/i.test(textLower);
+                        const isHazard = /(?:拆除致命陷阱|解除致命機關|解除致命机关|飛躍萬丈深淵|飞跃万丈深渊|抵禦致死劇毒|抵御致死剧毒)/.test(t) || /(?:disarm lethal trap|leap across abyss|resist deadly poison)/i.test(textLower);
 
-                        if (isCombatClash) {
+                        const chapter = playerState.camp_state?.chapter || 1;
+                        const balancedDC = Math.min(14, 9 + chapter);
+
+                        if (isCombatClash && (isRisky || t.includes('拼死') || t.includes('生死'))) {
                             isChecking = true;
                             checkType = 'aggressive';
                             attrName = 'strength';
-                            checkTitle = '戰鬥比拼判定';
-                            const chapter = playerState.camp_state?.chapter || 1;
-                            DC = 10 + (chapter * 2);
-                        } else if (isSteal) {
+                            checkTitle = '生死搏杀判定';
+                            DC = balancedDC;
+                        } else if (isSteal && (isRisky || t.includes('暗中') || t.includes('潜入'))) {
                             isChecking = true;
                             checkType = 'smart';
                             attrName = 'dexterity';
-                            checkTitle = '偷竊潛行判定';
-                            const chapter = playerState.camp_state?.chapter || 1;
-                            DC = 10 + (chapter * 2);
-                        } else if (isLuckGamble) {
+                            checkTitle = '高危潜行判定';
+                            DC = balancedDC;
+                        } else if (isLuckGamble && (isRisky || t.includes('豪赌') || t.includes('押上'))) {
                             isChecking = true;
                             checkType = 'cautious';
                             attrName = 'vitality';
-                            checkTitle = '運氣比拼判定';
-                            const chapter = playerState.camp_state?.chapter || 1;
-                            DC = 10 + (chapter * 2);
-                        } else if (isHazard) {
+                            checkTitle = '绝命豪赌判定';
+                            DC = balancedDC;
+                        } else if (isHazard && (isRisky || t.includes('致命') || t.includes('深渊'))) {
                             isChecking = true;
                             checkType = 'smart';
                             attrName = 'dexterity';
-                            checkTitle = '絕境避險判定';
-                            const chapter = playerState.camp_state?.chapter || 1;
-                            DC = 10 + (chapter * 2);
+                            checkTitle = '绝境避险判定';
+                            DC = balancedDC;
                         } else {
-                            // 普通對話、普通抉擇、探索交流——不進行強制判定！
+                            // 普通对话、日常送礼、包扎治疗、普通探索、正常选择——一律不进行判定！
                             isChecking = false;
                         }
+                    } else {
+                        // 日常安全行为一律不进行判定
+                        isChecking = false;
                     }
                 }
 
@@ -2139,16 +2178,16 @@ Respond strictly with valid JSON conforming to this schema (no extra explanation
                         tierZh = '大成功 (Critical Success)';
                     } else if (roll === 1 || score < DC - 7) {
                         tier = 'CriticalFailure';
-                        tierZh = '大失敗 (Critical Failure)';
+                        tierZh = '大失败 (Critical Failure)';
                     } else if (score >= DC) {
                         tier = 'Success';
                         tierZh = '成功 (Success)';
                     } else if (score >= DC - 3) {
                         tier = 'BarelySuccess';
-                        tierZh = '勉強成功 (Barely Success)';
+                        tierZh = '勉强成功 (Barely Success)';
                     } else {
                         tier = 'Failure';
-                        tierZh = '失敗 (Failure)';
+                        tierZh = '失败 (Failure)';
                     }
 
                     // 6. Update NPC Favors
@@ -2174,7 +2213,7 @@ Respond strictly with valid JSON conforming to this schema (no extra explanation
                     });
 
                     // 8. Construct Authoritative Prompts
-                    const typeLabels = { aggressive: '激進 (Aggressive)', cautious: '謹慎 (Cautious)', smart: '智慧 (Intelligent)', social: '社交 (Social)' };
+                    const typeLabels = { aggressive: '激进决对 (Aggressive)', cautious: '谨慎周旋 (Cautious)', smart: '机智应对 (Intelligent)', social: '交涉斡旋 (Social)' };
                     const typeLabel = typeLabels[checkType] || checkType;
 
                     sysMessage = `
@@ -2193,9 +2232,9 @@ The backend has run the dice roll challenge with the following authoritative res
 You MUST strictly adapt the narrative to conform to this outcome "**${tier}**" and update the JSON structure according to these rules:
 1. **CriticalSuccess (大成功)**: Absolute perfect success. Highlight their expertise, describe a flawless outcome, provide a bonus item in "new_items" or high gold gain, and favorable NPC attitude.
 2. **Success (成功)**: Clean standard success. They get exactly what they intended safely.
-3. **BarelySuccess (勉強成功)**: Narrow escape. They achieve the goal, but pay a price. You MUST deduct 5-10 HP, SP, or MP in "status_updates" (e.g. { "name": "生命力", "change": -8 }) and describe their struggle.
-4. **Failure (失敗)**: They fail. The situation worsens significantly. Deduct 15-20 HP or resources in "status_updates". Describe the painful setback, damage to gear, NPC hostility, or loss of items.
-5. **CriticalFailure (大失敗)**: Utter disaster. Deduct 25-35 HP or trigger immediate combat with rank "Elite" or "Boss". Describe a serious injury, a major structural cave-in, gear breakage, or trap explosion.
+3. **BarelySuccess (勉强成功)**: Narrow escape. They achieve the goal, but pay a modest price. Deduct 3-6 HP, SP, or MP in "status_updates" (e.g. { "name": "生命力", "change": -4 }) and describe their struggle.
+4. **Failure (失败)**: They fail. Deduct 6-10 HP or resources in "status_updates". Describe the setback, obstacle, or minor loss, without causing instant player death.
+5. **CriticalFailure (大失败)**: Serious setback. Deduct 12-16 HP or trigger a combat encounter. Describe a dangerous complication or trap springing.
 
 Your JSON fields "status_updates", "new_items", "removed_items", "start_combat", etc., MUST match this outcome. Do NOT contradict this result in your story!
 `;
@@ -2209,7 +2248,7 @@ Your JSON fields "status_updates", "new_items", "removed_items", "start_combat",
                         tierZh,
                         checkType,
                         attrName,
-                        checkTitle: checkTitle || '關鍵判定'
+                        checkTitle: checkTitle || '关键判定'
                     };
 
                     // Put the metadata in world_state so the client can display the dice outcome perfectly!
@@ -2457,8 +2496,10 @@ Add the earned rewards or items into "new_items" or "status_updates" (e.g. addin
                 }
 
                 if (isUnintelligible && playerState) {
-                    const lang = playerState.language || body.language || 'zh-TW';
-                    let errorMsg = "🧐 無法理解您的冒險意圖，請試著換種說法或嘗試其他動作。";
+                    const lang = playerState.language || body.language || 'zh-CN';
+                    let errorMsg = (lang.toLowerCase().includes('tw') || lang.toLowerCase().includes('hant'))
+                        ? "🧐 無法理解您的冒險意圖，請試著換種說法或嘗試其他動作。"
+                        : "🧐 无法理解您的冒险意图，请试着换种说法或尝试其他动作。";
                     if (lang.toLowerCase().includes('en')) {
                         errorMsg = "🧐 Could not understand your action. Please try rephrasing or choose a different action.";
                     } else if (lang.toLowerCase().includes('ja') || lang.toLowerCase().includes('jp')) {

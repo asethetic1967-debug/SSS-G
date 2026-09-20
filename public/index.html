@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-Hant">
+<html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -14,6 +14,7 @@
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.13/css/intlTelInput.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.13/js/intlTelInput.min.js"></script>
+    <script src="t2cn.js"></script>
 <meta property="og:title" content="Text RPG Generator | Story-Driven AI Adventure">
 <meta property="og:description" content="An infinite story-driven text adventure RPG. Customize your protagonist, choose from 18 world themes, and enter a world dynamically sculpted by Gemini AI.">
 <meta property="og:type" content="website">
@@ -178,9 +179,10 @@
                 <div>
                     <label for="language-selector-modal" class="block mb-2 text-sm font-medium theme-text" data-i18n="settings.language">介面語言</label>
                     <select id="language-selector-modal" class="theme-bg-input theme-border theme-text text-base rounded-lg focus:ring-2 theme-ring-focus focus:border-transparent block w-full p-3">
+                        <option value="zh-CN" selected>简体中文</option>
                         <option value="zh-TW">繁體中文</option>
-<option value="en">English</option>
-<option value="ja">日本語</option>
+                        <option value="en">English</option>
+                        <option value="ja">日本語</option>
                     </select>
                 </div>
                 <div>
@@ -1377,7 +1379,44 @@ import {
             const app = {};
             let apiKeys = []; 
 let currentKeyIndex = 0;
-            let currentLang = 'zh-TW';
+            let currentLang = 'zh-CN';
+
+            // 文本简繁与多语言自适应转换器
+            const toSimplified = (function() {
+                let converter = null;
+                return function(text) {
+                    if (!text || typeof text !== 'string') return text;
+                    try {
+                        if (!converter && typeof window !== 'undefined' && window.OpenCC && window.OpenCC.Converter) {
+                            converter = window.OpenCC.Converter({ from: 'tw', to: 'cn' });
+                        }
+                        if (converter) {
+                            return converter(text);
+                        }
+                    } catch (e) {
+                        console.warn('OpenCC error:', e);
+                    }
+                    return text;
+                };
+            })();
+
+            function tZh(twText) {
+                if (currentLang === 'zh-CN' || currentLang === 'zh') {
+                    return toSimplified(twText);
+                }
+                return twText;
+            }
+
+            function isChinese(lang = currentLang) {
+                return lang === 'zh-CN' || lang === 'zh-TW' || lang === 'zh';
+            }
+
+            function getPromptLanguageName(lang = currentLang) {
+                if (lang === 'zh-CN' || lang === 'zh') return '简体中文';
+                if (lang === 'zh-TW') return '繁體中文';
+                if (lang === 'ja') return '日本語';
+                return 'English';
+            }
             let selectedModel = 'gemini-3.1-flash-lite';
             let adventureLog = [];
             let playerState = {};
@@ -1422,15 +1461,15 @@ function normalizeStatusBars(bars) {
     // Automatically guarantee SP (Energy), Hunger, and Thirst bars exist for any game
     const hasSp = normalized.some(b => b.type === 'sp');
     if (!hasSp) {
-        normalized.push({ name: currentLang === 'zh-TW' ? '精力' : (currentLang === 'ja' ? 'スタミナ' : 'Energy'), value: 100, max_value: 100, type: 'sp' });
+        normalized.push({ name: isChinese(currentLang) ? tZh('精力') : (currentLang === 'ja' ? 'スタミナ' : 'Energy'), value: 100, max_value: 100, type: 'sp' });
     }
     const hasHunger = normalized.some(b => b.type === 'hunger');
     if (!hasHunger) {
-        normalized.push({ name: currentLang === 'zh-TW' ? '飽腹度' : (currentLang === 'ja' ? '満腹度' : 'Hunger'), value: 100, max_value: 100, type: 'hunger' });
+        normalized.push({ name: isChinese(currentLang) ? tZh('飽腹度') : (currentLang === 'ja' ? '満腹度' : 'Hunger'), value: 100, max_value: 100, type: 'hunger' });
     }
     const hasThirst = normalized.some(b => b.type === 'thirst');
     if (!hasThirst) {
-        normalized.push({ name: currentLang === 'zh-TW' ? '水分' : (currentLang === 'ja' ? '水分' : 'Hydration'), value: 100, max_value: 100, type: 'thirst' });
+        normalized.push({ name: isChinese(currentLang) ? tZh('水分') : (currentLang === 'ja' ? '水分' : 'Hydration'), value: 100, max_value: 100, type: 'thirst' });
     }
 
     return normalized;
@@ -1497,17 +1536,17 @@ function updateSurvivalUI() {
     if (dom.shelterLevelDisplay) {
         const lv = state.shelter_level;
         const levels = {
-            0: currentLang === 'zh-TW' ? '未搭建 (Lv 0)' : (currentLang === 'ja' ? '未建設 (Lv 0)' : 'Not Built (Lv 0)'),
-            1: currentLang === 'zh-TW' ? '簡易帳篷 (Lv 1)' : (currentLang === 'ja' ? '簡易テント (Lv 1)' : 'Simple Tent (Lv 1)'),
-            2: currentLang === 'zh-TW' ? '加固營地 (Lv 2)' : (currentLang === 'ja' ? '補強キャンプ (Lv 2)' : 'Reinforced Camp (Lv 2)'),
-            3: currentLang === 'zh-TW' ? '安全哨所 (Lv 3)' : (currentLang === 'ja' ? '安全な前哨基地 (Lv 3)' : 'Safe Outpost (Lv 3)')
+            0: isChinese(currentLang) ? tZh('未搭建 (Lv 0)') : (currentLang === 'ja' ? '未建設 (Lv 0)' : 'Not Built (Lv 0)'),
+            1: isChinese(currentLang) ? tZh('簡易帳篷 (Lv 1)') : (currentLang === 'ja' ? '簡易テント (Lv 1)' : 'Simple Tent (Lv 1)'),
+            2: isChinese(currentLang) ? tZh('加固營地 (Lv 2)') : (currentLang === 'ja' ? '補強キャンプ (Lv 2)' : 'Reinforced Camp (Lv 2)'),
+            3: isChinese(currentLang) ? tZh('安全哨所 (Lv 3)') : (currentLang === 'ja' ? '安全な前哨基地 (Lv 3)' : 'Safe Outpost (Lv 3)')
         };
         dom.shelterLevelDisplay.textContent = levels[lv] || `Lv ${lv}`;
         
         // Adjust upgrade button titles and requirements
         if (lv >= 3) {
-            dom.shelterActionTitle.textContent = currentLang === 'zh-TW' ? '住所已升至滿級' : (currentLang === 'ja' ? 'シェルターは最大レベルです' : 'Shelter at Max Level');
-            dom.shelterActionDesc.textContent = currentLang === 'zh-TW' ? '已達到最高安全級別的防禦！' : (currentLang === 'ja' ? '最高安全レベルの防衛に達しました！' : 'Maximum security level reached!');
+            dom.shelterActionTitle.textContent = isChinese(currentLang) ? tZh('住所已升至滿級') : (currentLang === 'ja' ? 'シェルターは最大レベルです' : 'Shelter at Max Level');
+            dom.shelterActionDesc.textContent = isChinese(currentLang) ? tZh('已達到最高安全級別的防禦！') : (currentLang === 'ja' ? '最高安全レベルの防衛に達しました！' : 'Maximum security level reached!');
             dom.shelterCostBadge.textContent = 'MAX';
             dom.shelterUpgradeBtn.disabled = true;
             dom.shelterUpgradeBtn.classList.add('opacity-50', 'cursor-not-allowed');
@@ -1517,14 +1556,14 @@ function updateSurvivalUI() {
             dom.shelterCostBadge.textContent = `🪵 x${requiredWood}`;
             
             if (lv === 0) {
-                dom.shelterActionTitle.textContent = currentLang === 'zh-TW' ? '建造簡易帳篷' : (currentLang === 'ja' ? '簡易テントを建てる' : 'Build Simple Tent');
-                dom.shelterActionDesc.textContent = currentLang === 'zh-TW' ? '消耗 3 木材。搭建安全據點並減少夜襲。' : (currentLang === 'ja' ? '木材3を消費。安全な拠点を建て、夜襲を減らす。' : 'Consumes 3 wood. Reduce night ambush rate.');
+                dom.shelterActionTitle.textContent = isChinese(currentLang) ? tZh('建造簡易帳篷') : (currentLang === 'ja' ? '簡易テントを建てる' : 'Build Simple Tent');
+                dom.shelterActionDesc.textContent = isChinese(currentLang) ? tZh('消耗 3 木材。搭建安全據點並減少夜襲。') : (currentLang === 'ja' ? '木材3を消費。安全な拠点を建て、夜襲を減らす。' : 'Consumes 3 wood. Reduce night ambush rate.');
             } else if (lv === 1) {
-                dom.shelterActionTitle.textContent = currentLang === 'zh-TW' ? '升級加固營地' : (currentLang === 'ja' ? '補強キャンプにアップグレード' : 'Upgrade to Reinforced Camp');
-                dom.shelterActionDesc.textContent = currentLang === 'zh-TW' ? '消耗 5 木材。進一步防禦，並解鎖儲物箱。' : (currentLang === 'ja' ? '木材5を消費。防御を高め、収納箱をアンロック。' : 'Consumes 5 wood. Enhances defense and unlocks storage.');
+                dom.shelterActionTitle.textContent = isChinese(currentLang) ? tZh('升級加固營地') : (currentLang === 'ja' ? '補強キャンプにアップグレード' : 'Upgrade to Reinforced Camp');
+                dom.shelterActionDesc.textContent = isChinese(currentLang) ? tZh('消耗 5 木材。進一步防禦，並解鎖儲物箱。') : (currentLang === 'ja' ? '木材5を消費。防御を高め、収納箱をアンロック。' : 'Consumes 5 wood. Enhances defense and unlocks storage.');
             } else if (lv === 2) {
-                dom.shelterActionTitle.textContent = currentLang === 'zh-TW' ? '升級安全哨所' : (currentLang === 'ja' ? '安全な前哨基地にアップグレード' : 'Upgrade to Safe Outpost');
-                dom.shelterActionDesc.textContent = currentLang === 'zh-TW' ? '消耗 10 木材。將被襲機率降至 0%！' : (currentLang === 'ja' ? '木材10を消費。夜襲確率を0%にする！' : 'Consumes 10 wood. Ambush chance drops to 0%!');
+                dom.shelterActionTitle.textContent = isChinese(currentLang) ? tZh('升級安全哨所') : (currentLang === 'ja' ? '安全な前哨基地にアップグレード' : 'Upgrade to Safe Outpost');
+                dom.shelterActionDesc.textContent = isChinese(currentLang) ? tZh('消耗 10 木材。將被襲機率降至 0%！') : (currentLang === 'ja' ? '木材10を消費。夜襲確率を0%にする！' : 'Consumes 10 wood. Ambush chance drops to 0%!');
             }
             
             dom.shelterUpgradeBtn.disabled = false;
@@ -1534,7 +1573,7 @@ function updateSurvivalUI() {
     
     if (dom.shelterLocationDisplay) {
         const loc = state.shelter_location || 'None';
-        dom.shelterLocationDisplay.textContent = (currentLang === 'zh-TW' ? '地點: ' : (currentLang === 'ja' ? '場所: ' : 'Location: ')) + loc;
+        dom.shelterLocationDisplay.textContent = (isChinese(currentLang) ? tZh('地點: ') : (currentLang === 'ja' ? '場所: ' : 'Location: ')) + loc;
     }
 }
 
@@ -1567,7 +1606,7 @@ function processInventorySurvivalItems() {
             // Add to wood stock
             playerState.shelter_state.wood_stock += 1;
             // Notify
-            showNotification(currentLang === 'zh-TW' ? '🪵 收集到 1 單位木材！已存入營地建材中。' : '🪵 Collected 1 wood! Transferred to camp building materials.', 'success');
+            showNotification(isChinese(currentLang) ? tZh('🪵 收集到 1 單位木材！已存入營地建材中。') : '🪵 Collected 1 wood! Transferred to camp building materials.', 'success');
         }
     }
     
@@ -2069,9 +2108,7 @@ function openNpcModal(npcKey) {
     
     const tierText = getFavorLevelText(npc.favor);
     const chatLimitToday = npc.chat_count_today === undefined ? 0 : npc.chat_count_today;
-    const limitLabel = currentLang === 'zh-TW' 
-        ? `（今日剩餘閒聊次數: ${2 - chatLimitToday}）` 
-        : ` (Today's remaining chats: ${2 - chatLimitToday})`;
+    const limitLabel = isChinese(currentLang) ? tZh(`（今日剩餘閒聊次數: ${2 - chatLimitToday}）`) : ` (Today's remaining chats: ${2 - chatLimitToday})`;
     dom.npcModalFavorBadge.textContent = `❤️ [${tierText}] 好感信任度: ${npc.favor}% ${limitLabel}`;
 
     // Populate dialogues based on favorability
@@ -2298,10 +2335,10 @@ const NPC_GIFT_PREFERENCES = {
 };
 
 function getFavorLevelText(favor) {
-    if (favor >= 90) return currentLang === 'zh-TW' ? '生死之交' : 'Sworn Ally';
-    if (favor >= 60) return currentLang === 'zh-TW' ? '信賴' : 'Trusted';
-    if (favor >= 30) return currentLang === 'zh-TW' ? '友好' : 'Friendly';
-    return currentLang === 'zh-TW' ? '冷淡' : 'Cold';
+    if (favor >= 90) return isChinese(currentLang) ? tZh('生死之交') : 'Sworn Ally';
+    if (favor >= 60) return isChinese(currentLang) ? tZh('信賴') : 'Trusted';
+    if (favor >= 30) return isChinese(currentLang) ? tZh('友好') : 'Friendly';
+    return isChinese(currentLang) ? tZh('冷淡') : 'Cold';
 }
 
 function getFavorDiscountFactor(favor) {
@@ -2476,13 +2513,9 @@ function npcTalkChat(npcKey) {
         npc.chat_count_today++;
         npc.favor = Math.min(100, npc.favor + 5);
         favorAdded = 5;
-        limitMessage = currentLang === 'zh-TW' 
-            ? `（今日閒聊次數：${npc.chat_count_today}/2，好感度 +5%）` 
-            : ` (Today's chats: ${npc.chat_count_today}/2, Favor +5%)`;
+        limitMessage = isChinese(currentLang) ? tZh(`（今日閒聊次數：${npc.chat_count_today}/2，好感度 +5%）`) : ` (Today's chats: ${npc.chat_count_today}/2, Favor +5%)`;
     } else {
-        limitMessage = currentLang === 'zh-TW' 
-            ? `（今日閒聊好感已達上限，不再增加）` 
-            : ` (Daily chat favor limit reached, no longer increases)`;
+        limitMessage = isChinese(currentLang) ? tZh(`（今日閒聊好感已達上限，不再增加）`) : ` (Daily chat favor limit reached, no longer increases)`;
     }
 
     const chats = {
@@ -2496,9 +2529,7 @@ function npcTalkChat(npcKey) {
     dom.npcModalDialog.textContent = chats[npcKey] || "「今天也是個開拓荒野的好日子。」";
     
     const tierText = getFavorLevelText(npc.favor);
-    const limitLabel = currentLang === 'zh-TW' 
-        ? `（今日剩餘閒聊次數: ${2 - npc.chat_count_today}）` 
-        : ` (Today's remaining chats: ${2 - npc.chat_count_today})`;
+    const limitLabel = isChinese(currentLang) ? tZh(`（今日剩餘閒聊次數: ${2 - npc.chat_count_today}）`) : ` (Today's remaining chats: ${2 - npc.chat_count_today})`;
     
     dom.npcModalFavorBadge.textContent = `❤️ [${tierText}] 好感信任度: ${npc.favor}% ${limitLabel}`;
 
@@ -2521,11 +2552,11 @@ function npcSendGift(npcKey) {
     
     const giftKeys = ['wood', 'scrap', 'herb', 'glowing_core', 'core_crystal'];
     const itemNames = {
-        'wood': currentLang === 'zh-TW' ? '木頭' : 'Wood',
-        'scrap': currentLang === 'zh-TW' ? '金屬廢料' : 'Metal Scrap',
-        'herb': currentLang === 'zh-TW' ? '草藥' : 'Medicinal Herb',
-        'glowing_core': currentLang === 'zh-TW' ? '發光核心' : 'Glowing Core',
-        'core_crystal': currentLang === 'zh-TW' ? '能量晶體' : 'Core Crystal'
+        'wood': isChinese(currentLang) ? tZh('木頭') : 'Wood',
+        'scrap': isChinese(currentLang) ? tZh('金屬廢料') : 'Metal Scrap',
+        'herb': isChinese(currentLang) ? tZh('草藥') : 'Medicinal Herb',
+        'glowing_core': isChinese(currentLang) ? tZh('發光核心') : 'Glowing Core',
+        'core_crystal': isChinese(currentLang) ? tZh('能量晶體') : 'Core Crystal'
     };
     const itemIcons = {
         'wood': '🪵',
@@ -2568,19 +2599,19 @@ function npcSendGift(npcKey) {
             let prefColor = '';
             let valChange = 0;
             if (pref.loved.includes(k)) {
-                prefLabel = currentLang === 'zh-TW' ? '❤️✨ 最愛 (+15%)' : '❤️✨ Loved (+15%)';
+                prefLabel = isChinese(currentLang) ? tZh('❤️✨ 最愛 (+15%)') : '❤️✨ Loved (+15%)';
                 prefColor = 'text-rose-400 font-bold';
                 valChange = 15;
             } else if (pref.liked.includes(k)) {
-                prefLabel = currentLang === 'zh-TW' ? '👍 喜歡 (+8%)' : '👍 Liked (+8%)';
+                prefLabel = isChinese(currentLang) ? tZh('👍 喜歡 (+8%)') : '👍 Liked (+8%)';
                 prefColor = 'text-amber-400';
                 valChange = 8;
             } else if (pref.disliked.includes(k)) {
-                prefLabel = currentLang === 'zh-TW' ? '💢 討厭 (-5%)' : '💢 Disliked (-5%)';
+                prefLabel = isChinese(currentLang) ? tZh('💢 討厭 (-5%)') : '💢 Disliked (-5%)';
                 prefColor = 'text-red-400';
                 valChange = -5;
             } else {
-                prefLabel = currentLang === 'zh-TW' ? '😐 普通 (+3%)' : '😐 Neutral (+3%)';
+                prefLabel = isChinese(currentLang) ? tZh('😐 普通 (+3%)') : '😐 Neutral (+3%)';
                 prefColor = 'text-slate-400';
                 valChange = 3;
             }
@@ -2626,11 +2657,11 @@ function submitNpcGift(npcKey, itemKey, valChange) {
     npc.favor = Math.max(0, Math.min(100, npc.favor + valChange));
 
     const itemNames = {
-        'wood': currentLang === 'zh-TW' ? '木頭' : 'Wood',
-        'scrap': currentLang === 'zh-TW' ? '金屬廢料' : 'Metal Scrap',
-        'herb': currentLang === 'zh-TW' ? '草藥' : 'Medicinal Herb',
-        'glowing_core': currentLang === 'zh-TW' ? '發光核心' : 'Glowing Core',
-        'core_crystal': currentLang === 'zh-TW' ? '能量晶體' : 'Core Crystal'
+        'wood': isChinese(currentLang) ? tZh('木頭') : 'Wood',
+        'scrap': isChinese(currentLang) ? tZh('金屬廢料') : 'Metal Scrap',
+        'herb': isChinese(currentLang) ? tZh('草藥') : 'Medicinal Herb',
+        'glowing_core': isChinese(currentLang) ? tZh('發光核心') : 'Glowing Core',
+        'core_crystal': isChinese(currentLang) ? tZh('能量晶體') : 'Core Crystal'
     };
     const name = itemNames[itemKey] || itemKey;
     const sign = valChange >= 0 ? '+' : '';
@@ -3044,7 +3075,7 @@ function processLootBagSurvivalItems() {
                 playerState.shelter_state = { shelter_level: 0, shelter_location: 'None', wood_stock: 0, campfire_lit: false };
             }
             playerState.shelter_state.wood_stock += 1;
-            showNotification(currentLang === 'zh-TW' ? '🪵 臨時背包中的木材已直接轉化為營地建材！' : '🪵 Wood in temporary bag automatically transferred to camp materials.', 'success');
+            showNotification(isChinese(currentLang) ? tZh('🪵 臨時背包中的木材已直接轉化為營地建材！') : '🪵 Wood in temporary bag automatically transferred to camp materials.', 'success');
         }
     }
     updateSurvivalUI();
@@ -3074,7 +3105,7 @@ function updateExplorationUI() {
         if (state.loot_bag.length === 0) {
             const li = document.createElement('li');
             li.className = 'opacity-50 text-center py-1 text-xs text-slate-400';
-            li.textContent = currentLang === 'zh-TW' ? '無內容' : (currentLang === 'ja' ? '空っぽ' : 'Empty');
+            li.textContent = isChinese(currentLang) ? tZh('無內容') : (currentLang === 'ja' ? '空っぽ' : 'Empty');
             dom.exploreLootItemsList.appendChild(li);
         } else {
             state.loot_bag.forEach(item => {
@@ -3197,7 +3228,7 @@ function extractLootBag() {
     state.loot_bag = [];
     
     showNotification(
-        currentLang === 'zh-TW' ? `🎉 撤離成功！已將 ${count} 件物資安全存入背包。` :
+        isChinese(currentLang) ? tZh(`🎉 撤離成功！已將 ${count} 件物資安全存入背包。`) :
         (currentLang === 'ja' ? `🎉 撤退成功！${count} 件の物資をインベントリに保管しました。` :
         `🎉 Extraction successful! Secured ${count} items to your inventory.`),
         'success'
@@ -3210,28 +3241,28 @@ function extractLootBag() {
 function getRandomLootItem(spotType) {
     const genericItems = {
         chest: [
-            { name: currentLang === 'zh-TW' ? '軍用戰術大刀' : 'Tactical Machete', type: 'weapon' },
-            { name: currentLang === 'zh-TW' ? '精緻醫藥箱' : 'Medical First Aid Kit', type: 'item' },
-            { name: currentLang === 'zh-TW' ? '軍用能量罐頭' : 'Military Energy Can', type: 'item' },
-            { name: currentLang === 'zh-TW' ? '純淨蒸餾水' : 'Pure Distilled Water', type: 'item' }
+            { name: isChinese(currentLang) ? tZh('軍用戰術大刀') : 'Tactical Machete', type: 'weapon' },
+            { name: isChinese(currentLang) ? tZh('精緻醫藥箱') : 'Medical First Aid Kit', type: 'item' },
+            { name: isChinese(currentLang) ? tZh('軍用能量罐頭') : 'Military Energy Can', type: 'item' },
+            { name: isChinese(currentLang) ? tZh('純淨蒸餾水') : 'Pure Distilled Water', type: 'item' }
         ],
         corpse: [
-            { name: currentLang === 'zh-TW' ? '生鏽防空洞密鑰' : 'Rusty Shelter Key', type: 'item' },
-            { name: currentLang === 'zh-TW' ? '乾淨紗布繃帶' : 'Clean Gauze Bandage', type: 'item' },
-            { name: currentLang === 'zh-TW' ? '脫水牛肉乾' : 'Beef Jerky Pack', type: 'item' },
-            { name: currentLang === 'zh-TW' ? '折疊求生鏟' : 'Survival Spade', type: 'item' }
+            { name: isChinese(currentLang) ? tZh('生鏽防空洞密鑰') : 'Rusty Shelter Key', type: 'item' },
+            { name: isChinese(currentLang) ? tZh('乾淨紗布繃帶') : 'Clean Gauze Bandage', type: 'item' },
+            { name: isChinese(currentLang) ? tZh('脫水牛肉乾') : 'Beef Jerky Pack', type: 'item' },
+            { name: isChinese(currentLang) ? tZh('折疊求生鏟') : 'Survival Spade', type: 'item' }
         ],
         shelf: [
-            { name: currentLang === 'zh-TW' ? '萬能保險鎖針' : 'Master Lockpick Pin', type: 'item' },
-            { name: currentLang === 'zh-TW' ? '廣譜抗生素' : 'Antibiotics Pack', type: 'item' },
-            { name: currentLang === 'zh-TW' ? '高性能鹼性電池' : 'High Performance Battery', type: 'item' },
-            { name: currentLang === 'zh-TW' ? '午餐肉水果罐頭' : 'Spam Lunch Can', type: 'item' }
+            { name: isChinese(currentLang) ? tZh('萬能保險鎖針') : 'Master Lockpick Pin', type: 'item' },
+            { name: isChinese(currentLang) ? tZh('廣譜抗生素') : 'Antibiotics Pack', type: 'item' },
+            { name: isChinese(currentLang) ? tZh('高性能鹼性電池') : 'High Performance Battery', type: 'item' },
+            { name: isChinese(currentLang) ? tZh('午餐肉水果罐頭') : 'Spam Lunch Can', type: 'item' }
         ],
         ruins: [
-            { name: currentLang === 'zh-TW' ? '厚實防護大衣' : 'Heavy Hazard Coat', type: 'armor' },
-            { name: currentLang === 'zh-TW' ? '富氧瓶裝水' : 'Bottled Water', type: 'item' },
-            { name: currentLang === 'zh-TW' ? '高硬度備用木材' : 'High Hardness Timber', type: 'wood' },
-            { name: currentLang === 'zh-TW' ? '發光裂變核石' : 'Glow Relic Crystal', type: 'valuable' }
+            { name: isChinese(currentLang) ? tZh('厚實防護大衣') : 'Heavy Hazard Coat', type: 'armor' },
+            { name: isChinese(currentLang) ? tZh('富氧瓶裝水') : 'Bottled Water', type: 'item' },
+            { name: isChinese(currentLang) ? tZh('高硬度備用木材') : 'High Hardness Timber', type: 'wood' },
+            { name: isChinese(currentLang) ? tZh('發光裂變核石') : 'Glow Relic Crystal', type: 'valuable' }
         ]
     };
     const list = genericItems[spotType] || genericItems.ruins;
@@ -3249,20 +3280,20 @@ function startLootMinigame(type) {
     
     if (dom.lootModalTitleText) {
         const titles = {
-            chest: currentLang === 'zh-TW' ? '🔐 寶箱鎖定解除' : '🔐 Lockpicking Chest',
-            corpse: currentLang === 'zh-TW' ? '⛏️ 逐格挖掘搜刮' : '⛏️ Corpse Excavation',
-            shelf: currentLang === 'zh-TW' ? '🧹 貨架刮刮樂' : '🧹 Shelf Scraping',
-            ruins: currentLang === 'zh-TW' ? '🏛️ 廢墟遺跡清理' : '🏛️ Ruins Scraping'
+            chest: isChinese(currentLang) ? tZh('🔐 寶箱鎖定解除') : '🔐 Lockpicking Chest',
+            corpse: isChinese(currentLang) ? tZh('⛏️ 逐格挖掘搜刮') : '⛏️ Corpse Excavation',
+            shelf: isChinese(currentLang) ? tZh('🧹 貨架刮刮樂') : '🧹 Shelf Scraping',
+            ruins: isChinese(currentLang) ? tZh('🏛️ 廢墟遺跡清理') : '🏛️ Ruins Scraping'
         };
         dom.lootModalTitleText.textContent = titles[type] || '🔍 搜刮中';
     }
     
     if (dom.lootModalDesc) {
         const descs = {
-            chest: currentLang === 'zh-TW' ? '指針旋轉時，在「綠色成功區」點擊鎖定！按錯會增加危險。' : 'Strike Lock when pointer is in the GREEN zone!',
-            corpse: currentLang === 'zh-TW' ? '逐格點擊翻找，有機率獲得高級物資，踩中陷阱或翻找多次會上升危險。' : 'Tap tiles to dig. Beware of traps and alarm triggers!',
-            shelf: currentLang === 'zh-TW' ? '在灰色塗層上用滑鼠/手指抹開。刮開面積越多，暴露的物資越多，但也越危險！' : 'Drag/swipe to reveal hidden items under the gray film.',
-            ruins: currentLang === 'zh-TW' ? '抹開灰色廢墟石堆，揭開底下遺留的遠古奇珍。動作越大越容易引起警覺。' : 'Clear the stone debris to reveal relics.'
+            chest: isChinese(currentLang) ? tZh('指針旋轉時，在「綠色成功區」點擊鎖定！按錯會增加危險。') : 'Strike Lock when pointer is in the GREEN zone!',
+            corpse: isChinese(currentLang) ? tZh('逐格點擊翻找，有機率獲得高級物資，踩中陷阱或翻找多次會上升危險。') : 'Tap tiles to dig. Beware of traps and alarm triggers!',
+            shelf: isChinese(currentLang) ? tZh('在灰色塗層上用滑鼠/手指抹開。刮開面積越多，暴露的物資越多，但也越危險！') : 'Drag/swipe to reveal hidden items under the gray film.',
+            ruins: isChinese(currentLang) ? tZh('抹開灰色廢墟石堆，揭開底下遺留的遠古奇珍。動作越大越容易引起警覺。') : 'Clear the stone debris to reveal relics.'
         };
         dom.lootModalDesc.textContent = descs[type] || '進行搜刮小遊戲。';
     }
@@ -3388,7 +3419,7 @@ function revealScratchItem(index) {
         
         const payload = JSON.parse(el.dataset.payload);
         revealedLootItems.push(payload);
-        showNotification(currentLang === 'zh-TW' ? `✨ 發現：${payload.name}` : `✨ Found: ${payload.name}`, 'success');
+        showNotification(isChinese(currentLang) ? tZh(`✨ 發現：${payload.name}`) : `✨ Found: ${payload.name}`, 'success');
         triggerVisualEffect('sparkles');
     }
 }
@@ -3408,7 +3439,7 @@ function setupDiggingGame() {
         if (rand < 0.45) {
             payload = { type: 'item', data: getRandomLootItem('corpse') };
         } else if (rand < 0.65) {
-            payload = { type: 'trap', text: currentLang === 'zh-TW' ? '💥 毒蛇咬傷' : '💥 Viper Bite' };
+            payload = { type: 'trap', text: isChinese(currentLang) ? tZh('💥 毒蛇咬傷') : '💥 Viper Bite' };
         } else {
             payload = { type: 'empty' };
         }
@@ -3427,7 +3458,7 @@ function setupDiggingGame() {
                 tile.className = 'w-full h-full bg-emerald-950/40 border border-emerald-500/30 rounded-xl flex flex-col items-center justify-center font-bold text-xs text-emerald-400 p-1';
                 tile.innerHTML = `🎁<span class="mt-1 font-semibold text-[10px] text-center truncate w-full">${content.data.name}</span>`;
                 revealedLootItems.push(content.data);
-                showNotification(currentLang === 'zh-TW' ? `✨ 挖出：${content.data.name}` : `✨ Dug out: ${content.data.name}`, 'success');
+                showNotification(isChinese(currentLang) ? tZh(`✨ 挖出：${content.data.name}`) : `✨ Dug out: ${content.data.name}`, 'success');
                 triggerVisualEffect('level_up_glow');
             } else if (content.type === 'trap') {
                 tile.className = 'w-full h-full bg-rose-950/40 border border-rose-500/30 rounded-xl flex flex-col items-center justify-center font-bold text-xs text-rose-400 p-1';
@@ -3441,7 +3472,7 @@ function setupDiggingGame() {
                 currentLootRisk = Math.min(100, currentLootRisk + 15);
                 updateLootRiskBar();
                 
-                showNotification(currentLang === 'zh-TW' ? `💥 踩中陷阱！生命-12，搜刮危險上升！` : `💥 Trapped! HP-12, alert level raised!`, 'error');
+                showNotification(isChinese(currentLang) ? tZh(`💥 踩中陷阱！生命-12，搜刮危險上升！`) : `💥 Trapped! HP-12, alert level raised!`, 'error');
                 triggerVisualEffect('shake');
             } else {
                 tile.className = 'w-full h-full bg-slate-900 border border-white/5 rounded-xl flex items-center justify-center text-xs text-slate-500';
@@ -3481,7 +3512,7 @@ function handleLockpickStrike() {
     if (isSuccess) {
         const prize = getRandomLootItem('chest');
         revealedLootItems.push(prize);
-        showNotification(currentLang === 'zh-TW' ? `🔓 解鎖成功！獲得了：${prize.name}` : `🔓 Success! Unlocked: ${prize.name}`, 'success');
+        showNotification(isChinese(currentLang) ? tZh(`🔓 解鎖成功！獲得了：${prize.name}`) : `🔓 Success! Unlocked: ${prize.name}`, 'success');
         triggerVisualEffect('level_up_glow');
         setTimeout(() => {
             claimLootAndExit();
@@ -3493,7 +3524,7 @@ function handleLockpickStrike() {
         currentLootRisk = Math.min(100, currentLootRisk + penalty);
         updateLootRiskBar();
         
-        showNotification(currentLang === 'zh-TW' ? `❌ 開鎖失手！危險度增加 ${penalty}%` : `❌ Missed! Alert level raised ${penalty}%`, 'warning');
+        showNotification(isChinese(currentLang) ? tZh(`❌ 開鎖失手！危險度增加 ${penalty}%`) : `❌ Missed! Alert level raised ${penalty}%`, 'warning');
         triggerVisualEffect('shake');
         
         if (currentLootRisk >= 100) {
@@ -3509,7 +3540,7 @@ function triggerLootAlarm() {
         lockAnimationId = null;
     }
     
-    showNotification(currentLang === 'zh-TW' ? '🚨 驚動了敵人或觸發陷阱！搜刮失敗，進入遭遇戰！' : '🚨 Warning! Trap triggered or scavenger alert! Forced combat!', 'error');
+    showNotification(isChinese(currentLang) ? tZh('🚨 驚動了敵人或觸發陷阱！搜刮失敗，進入遭遇戰！') : '🚨 Warning! Trap triggered or scavenger alert! Forced combat!', 'error');
     revealedLootItems = [];
     
     processPlayerChoice(`[System: Trigger Loot Encounter] The player was greedily searching a ${currentLootType} and triggered a direct warning/trap/ambush. Force a direct and sudden combat scenario or dangerous trap encounter immediately!`);
@@ -3523,7 +3554,7 @@ function claimLootAndExit() {
     }
     
     if (revealedLootItems.length === 0) {
-        showNotification(currentLang === 'zh-TW' ? '你一無所獲地離開了。' : 'You left empty-handed.', 'info');
+        showNotification(isChinese(currentLang) ? tZh('你一無所獲地離開了。') : 'You left empty-handed.', 'info');
         return;
     }
     
@@ -3531,7 +3562,7 @@ function claimLootAndExit() {
     playerState.explore_state.loot_bag.push(...revealedLootItems);
     
     const count = revealedLootItems.length;
-    showNotification(currentLang === 'zh-TW' ? `🎒 收穫頗豐！將 ${count} 件戰利品塞入了臨時搜刮袋。` : `🎒 Added ${count} items to temporary loot bag.`, 'success');
+    showNotification(isChinese(currentLang) ? tZh(`🎒 收穫頗豐！將 ${count} 件戰利品塞入了臨時搜刮袋。`) : `🎒 Added ${count} items to temporary loot bag.`, 'success');
     
     updateExplorationUI();
     revealedLootItems = [];
@@ -3589,7 +3620,7 @@ function registerExplorationEventListeners() {
             const spBar = playerState.player_status.status_bars.find(b => b.type === 'sp');
             
             if (spBar && spBar.value < 5) {
-                showNotification(currentLang === 'zh-TW' ? '精力不足！無法長途移動區域。' : 'Insufficient energy! Cannot change sectors.', 'warning');
+                showNotification(isChinese(currentLang) ? tZh('精力不足！無法長途移動區域。') : 'Insufficient energy! Cannot change sectors.', 'warning');
                 dom.exploreZoneSelect.value = playerState.explore_state.zone_type;
                 return;
             }
@@ -3598,9 +3629,9 @@ function registerExplorationEventListeners() {
             playerState.explore_state.zone_type = targetZone;
             
             const zoneNames = {
-                safe: currentLang === 'zh-TW' ? '安全區' : 'Safe Zone',
-                danger: currentLang === 'zh-TW' ? '危險區' : 'Danger Zone',
-                maze: currentLang === 'zh-TW' ? '未知迷宮區' : 'Maze Zone'
+                safe: isChinese(currentLang) ? tZh('安全區') : 'Safe Zone',
+                danger: isChinese(currentLang) ? tZh('危險區') : 'Danger Zone',
+                maze: isChinese(currentLang) ? tZh('未知迷宮區') : 'Maze Zone'
             };
             
             adventureLog.push(`<span class="text-amber-400 font-bold">你動身前往【${zoneNames[targetZone]}】，途中消耗了 5 點精力。</span>`);
@@ -3628,7 +3659,7 @@ function registerExplorationEventListeners() {
                 const spBar = playerState.player_status.status_bars.find(b => b.type === 'sp');
                 
                 if (spBar && spBar.value < 10) {
-                    showNotification(currentLang === 'zh-TW' ? '精力不足！搜刮搜刮需要 10 點精力。' : 'Insufficient energy! Searching spots costs 10 SP.', 'warning');
+                    showNotification(isChinese(currentLang) ? tZh('精力不足！搜刮搜刮需要 10 點精力。') : 'Insufficient energy! Searching spots costs 10 SP.', 'warning');
                     return;
                 }
                 
@@ -3662,10 +3693,10 @@ function registerExplorationEventListeners() {
             const idx = state.maze_marks.indexOf(coordStr);
             if (idx === -1) {
                 state.maze_marks.push(coordStr);
-                showNotification(currentLang === 'zh-TW' ? '🚩 已在此格留下標記旗。' : '🚩 Placed navigational flag here.', 'info');
+                showNotification(isChinese(currentLang) ? tZh('🚩 已在此格留下標記旗。') : '🚩 Placed navigational flag here.', 'info');
             } else {
                 state.maze_marks.splice(idx, 1);
-                showNotification(currentLang === 'zh-TW' ? '🏳️ 已移除此格的標記。' : '🏳️ Removed flag from here.', 'info');
+                showNotification(isChinese(currentLang) ? tZh('🏳️ 已移除此格的標記。') : '🏳️ Removed flag from here.', 'info');
             }
             updateExplorationUI();
         });
@@ -3676,7 +3707,7 @@ function registerExplorationEventListeners() {
             if (!playerState || !playerState.explore_state) return;
             const spBar = playerState.player_status.status_bars.find(b => b.type === 'sp');
             if (spBar && spBar.value < 20) {
-                showNotification(currentLang === 'zh-TW' ? '精力不足！折返起點需要 20 點精力。' : 'Insufficient energy! Backtracking costs 20 SP.', 'warning');
+                showNotification(isChinese(currentLang) ? tZh('精力不足！折返起點需要 20 點精力。') : 'Insufficient energy! Backtracking costs 20 SP.', 'warning');
                 return;
             }
             
@@ -3689,7 +3720,7 @@ function registerExplorationEventListeners() {
             updateExplorationUI();
             renderPlayerHUD();
             renderAdventureLog();
-            showNotification(currentLang === 'zh-TW' ? '已安全折返回到迷宮起點。' : 'Successfully backtracked to the maze entrance.', 'info');
+            showNotification(isChinese(currentLang) ? tZh('已安全折返回到迷宮起點。') : 'Successfully backtracked to the maze entrance.', 'info');
         });
     }
 
@@ -3956,7 +3987,7 @@ function moveMazePlayer(dx, dy, label) {
     const spBar = playerState.player_status.status_bars.find(b => b.type === 'sp');
     
     if (spBar && spBar.value < 8) {
-        showNotification(currentLang === 'zh-TW' ? '精力不足！移動一步消耗 8 精力。' : 'Insufficient energy! Moves cost 8 SP.', 'warning');
+        showNotification(isChinese(currentLang) ? tZh('精力不足！移動一步消耗 8 精力。') : 'Insufficient energy! Moves cost 8 SP.', 'warning');
         return;
     }
     
@@ -3964,7 +3995,7 @@ function moveMazePlayer(dx, dy, label) {
     const nextY = state.maze_y + dy;
     
     if (nextX < 0 || nextX > 6 || nextY < 0 || nextY > 6) {
-        showNotification(currentLang === 'zh-TW' ? '🚫 撞到了虛無的迷宮邊界，無法前進！' : '🚫 Blocked by maze boundary.', 'warning');
+        showNotification(isChinese(currentLang) ? tZh('🚫 撞到了虛無的迷宮邊界，無法前進！') : '🚫 Blocked by maze boundary.', 'warning');
         return;
     }
     
@@ -3972,7 +4003,7 @@ function moveMazePlayer(dx, dy, label) {
     const nextCell = state.maze_grid[nextCellIndex];
     
     if (nextCell && nextCell.type === 'wall') {
-        showNotification(currentLang === 'zh-TW' ? '🚫 前方是死路（石牆），無法通行！' : '🚫 Path blocked by walls.', 'warning');
+        showNotification(isChinese(currentLang) ? tZh('🚫 前方是死路（石牆），無法通行！') : '🚫 Path blocked by walls.', 'warning');
         return;
     }
     
@@ -3992,18 +4023,18 @@ function moveMazePlayer(dx, dy, label) {
         const hpBar = playerState.player_status.status_bars.find(b => b.type === 'hp');
         if (hpBar) hpBar.value = Math.max(1, hpBar.value - 15);
         adventureLog.push(`<span class="text-red-500 font-bold">💥 踩到了地面尖刺陷阱！受到 15 點刺傷！</span>`);
-        showNotification(currentLang === 'zh-TW' ? '💥 踩中陷阱！生命 -15！' : '💥 Trapped! HP -15!', 'error');
+        showNotification(isChinese(currentLang) ? tZh('💥 踩中陷阱！生命 -15！') : '💥 Trapped! HP -15!', 'error');
         triggerVisualEffect('shake');
     } else if (nextCell.type === 'treasure' && !nextCell.searched) {
         nextCell.searched = true;
         adventureLog.push(`<span class="text-blue-400 font-bold font-mono">💎 發現一個發光的遠古寶箱！</span>`);
-        showNotification(currentLang === 'zh-TW' ? '💎 發現隱藏寶藏點！' : '💎 Found treasure box!', 'success');
+        showNotification(isChinese(currentLang) ? tZh('💎 發現隱藏寶藏點！') : '💎 Found treasure box!', 'success');
         setTimeout(() => {
             startLootMinigame('chest');
         }, 800);
     } else if (nextCell.type === 'exit') {
         adventureLog.push(`<span class="text-emerald-400 font-bold animate-pulse">🚪 找到了迷宮的安全撤離口！在這裡你可以將戰利品帶回據點。</span>`);
-        showNotification(currentLang === 'zh-TW' ? '🚪 找到了撤離出口！' : '🚪 Found extraction point!', 'success');
+        showNotification(isChinese(currentLang) ? tZh('🚪 找到了撤離出口！') : '🚪 Found extraction point!', 'success');
         triggerVisualEffect('level_up_glow');
     }
     
@@ -4059,9 +4090,7 @@ function applySurvivalTurnDecay() {
         if (hpBar && hpBar.value > 0) {
             const exhaustionHpBurn = 8;
             hpBar.value = Math.max(0, hpBar.value - exhaustionHpBurn);
-            notices.push(currentLang === 'zh-TW' 
-                ? `⚠️ <strong class="text-red-400">精力徹底竭盡！</strong>因過度疲憊氣血枯竭，肉身直接扣減 <strong class="text-rose-400 font-mono">-${exhaustionHpBurn} HP</strong>！` 
-                : `⚠️ <strong class="text-red-400">Total Exhaustion!</strong> Suffering <strong class="text-rose-400 font-mono">-${exhaustionHpBurn} HP</strong> due to severe fatigue!`);
+            notices.push(isChinese(currentLang) ? tZh(`⚠️ <strong class="text-red-400">精力徹底竭盡！</strong>因過度疲憊氣血枯竭，肉身直接扣減 <strong class="text-rose-400 font-mono">-${exhaustionHpBurn} HP</strong>！`) : `⚠️ <strong class="text-red-400">Total Exhaustion!</strong> Suffering <strong class="text-rose-400 font-mono">-${exhaustionHpBurn} HP</strong> due to severe fatigue!`);
             triggerVisualEffect('danger_flash');
         }
     }
@@ -4071,18 +4100,14 @@ function applySurvivalTurnDecay() {
         const starveDmg = Math.floor(Math.random() * 6) + 16; // 16-21 direct HP loss
         if (hpBar && hpBar.value > 0) {
             hpBar.value = Math.max(0, hpBar.value - starveDmg);
-            notices.push(currentLang === 'zh-TW'
-                ? `🍖 <strong class="text-red-500 font-bold">極度飢餓空腹！</strong>你因飢荒內臟絞痛，直接損失 <strong class="text-rose-400 font-mono">-${starveDmg} HP</strong>！`
-                : `🍖 <strong class="text-red-500 font-bold">Starving to death!</strong> Lost <strong class="text-rose-400 font-mono">-${starveDmg} HP</strong>!`);
+            notices.push(isChinese(currentLang) ? tZh(`🍖 <strong class="text-red-500 font-bold">極度飢餓空腹！</strong>你因飢荒內臟絞痛，直接損失 <strong class="text-rose-400 font-mono">-${starveDmg} HP</strong>！`) : `🍖 <strong class="text-red-500 font-bold">Starving to death!</strong> Lost <strong class="text-rose-400 font-mono">-${starveDmg} HP</strong>!`);
             triggerVisualEffect('danger_flash');
         }
     } else if (hungerBar.value <= 20) {
         const hungerDmg = Math.floor(Math.random() * 4) + 6; // 6-9 HP
         if (hpBar && hpBar.value > 0) {
             hpBar.value = Math.max(0, hpBar.value - hungerDmg);
-            notices.push(currentLang === 'zh-TW'
-                ? `🍖 飢餓難耐，體力不支，損失 ${hungerDmg} 點生命值。`
-                : `🍖 Hunger weakened you, losing ${hungerDmg} HP.`);
+            notices.push(isChinese(currentLang) ? tZh(`🍖 飢餓難耐，體力不支，損失 ${hungerDmg} 點生命值。`) : `🍖 Hunger weakened you, losing ${hungerDmg} HP.`);
         }
     }
 
@@ -4090,18 +4115,14 @@ function applySurvivalTurnDecay() {
         const thirstDmg = Math.floor(Math.random() * 6) + 18; // 18-23 direct HP loss
         if (hpBar && hpBar.value > 0) {
             hpBar.value = Math.max(0, hpBar.value - thirstDmg);
-            notices.push(currentLang === 'zh-TW'
-                ? `💧 <strong class="text-red-500 font-bold">重度脫水垂死！</strong>咽喉如焚高熱虛脫，直接損失 <strong class="text-rose-400 font-mono">-${thirstDmg} HP</strong>！`
-                : `💧 <strong class="text-red-500 font-bold">Dying of thirst!</strong> Lost <strong class="text-rose-400 font-mono">-${thirstDmg} HP</strong>!`);
+            notices.push(isChinese(currentLang) ? tZh(`💧 <strong class="text-red-500 font-bold">重度脫水垂死！</strong>咽喉如焚高熱虛脫，直接損失 <strong class="text-rose-400 font-mono">-${thirstDmg} HP</strong>！`) : `💧 <strong class="text-red-500 font-bold">Dying of thirst!</strong> Lost <strong class="text-rose-400 font-mono">-${thirstDmg} HP</strong>!`);
             triggerVisualEffect('danger_flash');
         }
     } else if (thirstBar.value <= 20) {
         const thirstDmg = Math.floor(Math.random() * 4) + 8; // 8-11 HP
         if (hpBar && hpBar.value > 0) {
             hpBar.value = Math.max(0, hpBar.value - thirstDmg);
-            notices.push(currentLang === 'zh-TW'
-                ? `💧 口乾舌燥嚴重缺水，損失 ${thirstDmg} 點生命值。`
-                : `💧 Dehydration takes a toll, losing ${thirstDmg} HP.`);
+            notices.push(isChinese(currentLang) ? tZh(`💧 口乾舌燥嚴重缺水，損失 ${thirstDmg} 點生命值。`) : `💧 Dehydration takes a toll, losing ${thirstDmg} HP.`);
         }
     }
 
@@ -4110,7 +4131,7 @@ function applySurvivalTurnDecay() {
         notices.forEach(note => {
             adventureLog.push(`<span class="text-orange-400 font-semibold">${note}</span>`);
         });
-        showNotification(currentLang === 'zh-TW' ? '生存狀態堪憂！請儘快露營休整。' : 'Survival conditions are critical! Please camp to rest.', 'warning');
+        showNotification(isChinese(currentLang) ? tZh('生存狀態堪憂！請儘快露營休整。') : 'Survival conditions are critical! Please camp to rest.', 'warning');
     }
 
     // 4. Tick active debuffs (bleed, poison, curse, exhaustion, etc.)
@@ -4128,13 +4149,13 @@ function applySurvivalTurnDecay() {
 
 function checkSurvivalActionAllowed() {
     if (isInCombat) {
-        showNotification(currentLang === 'zh-TW' ? '🚨 戰鬥進行中，無法進行露營或調整住所！' : '🚨 In combat! Cannot set camp or adjust shelter.', 'error');
+        showNotification(isChinese(currentLang) ? tZh('🚨 戰鬥進行中，無法進行露營或調整住所！') : '🚨 In combat! Cannot set camp or adjust shelter.', 'error');
         return false;
     }
     if (playerState && playerState.explore_state) {
         const zone = playerState.explore_state.zone_type;
         if (zone === 'maze') {
-            showNotification(currentLang === 'zh-TW' ? '🌀 迷宮深處危機四伏，在此處安營等於自尋死路！' : '🌀 The maze is too dangerous to set camp or shelter.', 'error');
+            showNotification(isChinese(currentLang) ? tZh('🌀 迷宮深處危機四伏，在此處安營等於自尋死路！') : '🌀 The maze is too dangerous to set camp or shelter.', 'error');
             return false;
         }
     }
@@ -4323,7 +4344,7 @@ function registerSurvivalEventListeners() {
             ensureSurvivalStateExists();
             const state = playerState.shelter_state;
             if (!state.campfire_lit) {
-                showNotification(currentLang === 'zh-TW' ? '🔥 需要先點燃篝火才能烹飪熱食！' : '🔥 Need to light the campfire first before cooking!', 'warning');
+                showNotification(isChinese(currentLang) ? tZh('🔥 需要先點燃篝火才能烹飪熱食！') : '🔥 Need to light the campfire first before cooking!', 'warning');
                 return;
             }
 
@@ -4334,7 +4355,7 @@ function registerSurvivalEventListeners() {
                     handleSurvivalResourceAction('eat');
                     return;
                 }
-                showNotification(currentLang === 'zh-TW' ? '🎒 背包裡沒有可以烹飪的食材！' : '🎒 No ingredients to cook in your inventory!', 'warning');
+                showNotification(isChinese(currentLang) ? tZh('🎒 背包裡沒有可以烹飪的食材！') : '🎒 No ingredients to cook in your inventory!', 'warning');
                 return;
             }
 
@@ -4357,7 +4378,7 @@ function registerSurvivalEventListeners() {
                     handleSurvivalResourceAction('eat');
                     return;
                 }
-                showNotification(currentLang === 'zh-TW' ? '🎒 沒有適合烹飪的食材！' : '🎒 No suitable ingredients for cooking found!', 'warning');
+                showNotification(isChinese(currentLang) ? tZh('🎒 沒有適合烹飪的食材！') : '🎒 No suitable ingredients for cooking found!', 'warning');
                 return;
             }
 
@@ -4385,9 +4406,7 @@ function registerSurvivalEventListeners() {
             }
 
             const itemName = typeof item === 'object' ? item.name : item;
-            const msg = currentLang === 'zh-TW' 
-                ? `🍳 你烹飪並享用了 [${itemName}]，飽腹度恢復了 ${doubledRecovery}！` 
-                : `🍳 You cooked and ate [${itemName}], recovering ${doubledRecovery} Hunger!`;
+            const msg = isChinese(currentLang) ? tZh(`🍳 你烹飪並享用了 [${itemName}]，飽腹度恢復了 ${doubledRecovery}！`) : `🍳 You cooked and ate [${itemName}], recovering ${doubledRecovery} Hunger!`;
 
             showNotification(msg, 'success');
             triggerVisualEffect('heal_glow');
@@ -4492,13 +4511,13 @@ const ScavengeSystem = {
             const risk = this.currentRisk;
             if (risk < 40) {
                 badgeEl.className = "px-2 py-0.5 rounded-full font-bold bg-emerald-950 text-emerald-300 border border-emerald-500/40";
-                badgeEl.textContent = currentLang === 'zh-TW' ? "🟢 安全區 (Quiet)" : "🟢 Safe Zone (Quiet)";
+                badgeEl.textContent = isChinese(currentLang) ? tZh("🟢 安全區 (Quiet)") : "🟢 Safe Zone (Quiet)";
             } else if (risk < 80) {
                 badgeEl.className = "px-2 py-0.5 rounded-full font-bold bg-amber-950 text-amber-300 border border-amber-500/40";
-                badgeEl.textContent = currentLang === 'zh-TW' ? "🟡 警戒區 (Alert)" : "🟡 Alert Zone";
+                badgeEl.textContent = isChinese(currentLang) ? tZh("🟡 警戒區 (Alert)") : "🟡 Alert Zone";
             } else {
                 badgeEl.className = "px-2 py-0.5 rounded-full font-bold bg-red-950 text-red-300 border border-red-500/40 animate-pulse";
-                badgeEl.textContent = currentLang === 'zh-TW' ? "🔴 觸發危險 (Critical!)" : "🔴 Danger Critical!";
+                badgeEl.textContent = isChinese(currentLang) ? tZh("🔴 觸發危險 (Critical!)") : "🔴 Danger Critical!";
             }
         }
 
@@ -4585,8 +4604,8 @@ const ScavengeSystem = {
 
     renderFallbackPOIs() {
         const fallbacks = [
-            { id: 'fallback_1', type: 'chest', displayName: currentLang === 'zh-TW' ? '生鏽的儲物鐵箱' : 'Rusted Supply Chest', displayDesc: currentLang === 'zh-TW' ? '半掩埋在泥土中的老舊軍用鐵箱。' : 'An old supply chest buried in dirt.' },
-            { id: 'fallback_2', type: 'ruins', displayName: currentLang === 'zh-TW' ? '坍塌的瓦礫廢墟' : 'Collapsed Rubble Pile', displayDesc: currentLang === 'zh-TW' ? '散落的建材與機械零件堆。' : 'Piled construction scraps and wires.' }
+            { id: 'fallback_1', type: 'chest', displayName: isChinese(currentLang) ? tZh('生鏽的儲物鐵箱') : 'Rusted Supply Chest', displayDesc: isChinese(currentLang) ? tZh('半掩埋在泥土中的老舊軍用鐵箱。') : 'An old supply chest buried in dirt.' },
+            { id: 'fallback_2', type: 'ruins', displayName: isChinese(currentLang) ? tZh('坍塌的瓦礫廢墟') : 'Collapsed Rubble Pile', displayDesc: isChinese(currentLang) ? tZh('散落的建材與機械零件堆。') : 'Piled construction scraps and wires.' }
         ];
         this.renderPOIList(fallbacks);
     },
@@ -4660,7 +4679,7 @@ const ScavengeSystem = {
         ctx.fillStyle = '#fbbf24';
         ctx.font = 'bold 13px sans-serif';
         ctx.textAlign = 'center';
-        ctx.fillText(currentLang === 'zh-TW' ? '✨ 滑動刮開瓦礫遮罩層 ✨' : '✨ Scratch or Swipe to Reveal ✨', canvas.width / 2, canvas.height / 2);
+        ctx.fillText(isChinese(currentLang) ? tZh('✨ 滑動刮開瓦礫遮罩層 ✨') : '✨ Scratch or Swipe to Reveal ✨', canvas.width / 2, canvas.height / 2);
 
         // Bind Scratch Event Handlers
         let isDrawing = false;
@@ -4779,9 +4798,7 @@ const ScavengeSystem = {
     // 5. 風險條爆滿 (100% Breach) 強制遭遇
     handleRiskBreach() {
         closeModal(document.getElementById('scavenge-minigame-modal'));
-        const msg = currentLang === 'zh-TW' 
-            ? '🚨 搜刮動靜過大，警戒度爆表！遊蕩的威脅已包圍此處，你被迫倉皇撤離！' 
-            : '🚨 Noise exceeded safe limits! Hostiles breached your position, forcing a rushed evacuation!';
+        const msg = isChinese(currentLang) ? tZh('🚨 搜刮動靜過大，警戒度爆表！遊蕩的威脅已包圍此處，你被迫倉皇撤離！') : '🚨 Noise exceeded safe limits! Hostiles breached your position, forcing a rushed evacuation!';
         
         showNotification(msg, 'error');
         triggerVisualEffect('danger_flash');
@@ -4793,7 +4810,7 @@ const ScavengeSystem = {
     // 6. 安全停手並撤離 (Extract & Secure)
     async extractLoot(forcedEscape = false) {
         if (this.scavengedLoot.length === 0 && !forcedEscape) {
-            showNotification(currentLang === 'zh-TW' ? '本次尚未探明任何戰利品。' : 'No loot discovered yet.', 'info');
+            showNotification(isChinese(currentLang) ? tZh('本次尚未探明任何戰利品。') : 'No loot discovered yet.', 'info');
             closeModal(document.getElementById('scavenge-minigame-modal'));
             return;
         }
@@ -4843,15 +4860,15 @@ const ScavengeSystem = {
         if (label) {
             if (risk < 40) {
                 label.className = "text-emerald-400 font-bold";
-                label.textContent = currentLang === 'zh-TW' ? `警戒度: 安靜 (${risk}%)` : `Risk: Quiet (${risk}%)`;
+                label.textContent = isChinese(currentLang) ? tZh(`警戒度: 安靜 (${risk}%)`) : `Risk: Quiet (${risk}%)`;
                 if (icon) icon.textContent = '🟢';
             } else if (risk < 80) {
                 label.className = "text-amber-400 font-bold";
-                label.textContent = currentLang === 'zh-TW' ? `警戒度: 注意 (${risk}%)` : `Risk: Alert (${risk}%)`;
+                label.textContent = isChinese(currentLang) ? tZh(`警戒度: 注意 (${risk}%)`) : `Risk: Alert (${risk}%)`;
                 if (icon) icon.textContent = '🟡';
             } else {
                 label.className = "text-red-400 font-bold animate-pulse";
-                label.textContent = currentLang === 'zh-TW' ? `警戒度: 危急 (${risk}%)` : `Risk: Critical (${risk}%)`;
+                label.textContent = isChinese(currentLang) ? tZh(`警戒度: 危急 (${risk}%)`) : `Risk: Critical (${risk}%)`;
                 if (icon) icon.textContent = '🔴';
             }
         }
@@ -4959,7 +4976,7 @@ const ScavengeSystem = {
                     // Trigger seamless combat encounter
                     closeModal(document.getElementById('maze-mental-modal'));
                     setTimeout(() => {
-                        processPlayerChoice(currentLang === 'zh-TW' ? '與迷宮凶獸展開戰鬥！' : 'Engage the dungeon beast in combat!');
+                        processPlayerChoice(isChinese(currentLang) ? tZh('與迷宮凶獸展開戰鬥！') : 'Engage the dungeon beast in combat!');
                     }, 500);
                 }
 
@@ -5763,6 +5780,7 @@ async function handlePreviewRequest(isReroll = false) {
     
     // 定義多語言的 UI 文字
     const uiText = {
+        'zh-CN': { analyzing: "分析角色中...", reroll: "重骰" },
         'zh-TW': { analyzing: "分析角色中...", reroll: "重骰" },
         'en': { analyzing: "Analyzing...", reroll: "Reroll" },
         'ja': { analyzing: "分析中...", reroll: "リロール" }
@@ -5823,16 +5841,16 @@ async function handlePreviewRequest(isReroll = false) {
 
 async function generateCharacterPreview(description) {
     const genre = dom.gameGenreSelect.value;
-    const langLabel = currentLang === 'zh-TW' ? 'Traditional Chinese' : (currentLang === 'ja' ? 'Japanese' : 'English');
+    const langLabel = isChinese(currentLang) ? tZh('Traditional Chinese') : (currentLang === 'ja' ? 'Japanese' : 'English');
 
     const prompt = `You are a strict RPG System Architect.
 User Input: Genre="${genre}", Description="${description}".
-Language: ${currentLang === 'zh-TW' ? '繁體中文' : (currentLang === 'ja' ? '日本語' : 'English')}.
+Language: ${getPromptLanguageName(currentLang)}.
 
 Task: Analyze the description and generate a "Level 1 Character Sheet" JSON.
 
 🔴 CRITICAL LANGUAGE INSTRUCTION 🔴
-1. You MUST write the ENTIRE story, narration, and choice texts in **${currentLang === 'zh-TW' ? '繁體中文' : (currentLang === 'ja' ? '日本語' : 'English')}**.
+1. You MUST write the ENTIRE story, narration, and choice texts in **${getPromptLanguageName(currentLang)}**.
 
 **CRITICAL RULES:**
 1. **Attributes:** Assign 3 stats (Strength, Vitality, Dexterity) between 8 and 18 based on the description.
@@ -5884,6 +5902,7 @@ function renderCharacterPreview(data) {
     
     // 定義標籤翻譯
     const labels = {
+        'zh-CN': { active: '主动', passive: '被动', noTraits: '无特殊特质', noSkills: '无初始技能', defaultName: '无名者' },
         'zh-TW': { active: '主動', passive: '被動', noTraits: '無特殊特質', noSkills: '無初始技能', defaultName: '無名者' },
         'en': { active: 'ACT', passive: 'PSV', noTraits: 'No Traits', noSkills: 'No Skills', defaultName: 'Nameless' },
         'ja': { active: '能動', passive: '受動', noTraits: '特性なし', noSkills: 'スキルなし', defaultName: '名無し' }
@@ -5948,7 +5967,7 @@ function renderCharacterPreview(data) {
             const costText = s.cost && s.cost !== 'None' ? `(${s.cost})` : '';
             
             // 防呆：如果 AI 沒生成描述，顯示預設文字
-            const desc = s.description || (currentLang === 'zh-TW' ? '暫無描述' : 'No description');
+            const desc = s.description || (isChinese(currentLang) ? tZh('暫無描述') : 'No description');
 
             return `
             <li class="mb-2 last:mb-0">
@@ -6039,7 +6058,13 @@ function initialize() {
         apiKeys = [''];
     }
 
-    currentLang = localStorage.getItem('userLanguage') || 'zh-TW';
+    const storedUserLang = localStorage.getItem('userLanguage');
+    const hasExplicitLang = localStorage.getItem('userLanguageExplicit');
+    if (!storedUserLang || (!hasExplicitLang && storedUserLang === 'zh-TW')) {
+        currentLang = 'zh-CN';
+    } else {
+        currentLang = storedUserLang;
+    }
     selectedModel = localStorage.getItem('userSelectedModel') || 'gemini-3.1-flash-lite';
 
     // --- API Key 負載平衡與持久化 (隨機冷啟動) ---
@@ -6183,6 +6208,7 @@ function updateUI(lang) {
         if (t[key]) el.title = t[key];
     });
     populateDropdowns(lang);
+    if (dom && dom.languageSelector) dom.languageSelector.value = lang;
     populateInfoModalContent(lang);
     applyTheme(dom.gameGenreSelect.value);
     applyUIPermissions();
@@ -6228,7 +6254,7 @@ function syncEmbeddedHUD() {
     const embeddedTime = document.getElementById('embedded-time-of-day-display');
     const embeddedCurrency = document.getElementById('embedded-currency-value');
 
-    const t = i18nData[currentLang] || i18nData['zh-TW'];
+    const t = i18nData[currentLang] || i18nData['zh-CN'];
 
     if (embeddedStatus && dom.statusBarsContainer) {
         embeddedStatus.innerHTML = dom.statusBarsContainer.innerHTML;
@@ -6589,6 +6615,7 @@ dom.gameGenreSelect.addEventListener('input', (e) => applyTheme(e.target.value))
         apiKeys = validKeys.length > 0 ? validKeys : [''];
         localStorage.setItem('userApiKey', JSON.stringify(apiKeys));
         selectedModel = dom.modalModelSelector.value;
+        localStorage.setItem('userLanguageExplicit', 'true');
         localStorage.setItem('userLanguage', currentLang);
         localStorage.setItem('userSelectedModel', selectedModel);
         closeModal(document.getElementById('settings-modal'));
@@ -6652,9 +6679,7 @@ dom.gameGenreSelect.addEventListener('input', (e) => applyTheme(e.target.value))
         : null;
     const choiceTag = choiceButton.dataset.tag || 'NORMAL';
     if (spBar && spBar.value <= 0 && choiceTag === 'RISKY') {
-        const msg = currentLang === 'zh-TW'
-            ? '⚠️ 你太疲憊了 (精力 SP 為 0)，身體虛弱使你無法選擇冒險 (RISKY) 的選項！請先進行露營休整。'
-            : '⚠️ You are too exhausted (SP is 0) to select RISKY choices! Please camp and rest first.';
+        const msg = isChinese(currentLang) ? tZh('⚠️ 你太疲憊了 (精力 SP 為 0)，身體虛弱使你無法選擇冒險 (RISKY) 的選項！請先進行露營休整。') : '⚠️ You are too exhausted (SP is 0) to select RISKY choices! Please camp and rest first.';
         showNotification(msg, 'warning');
         triggerVisualEffect('danger_flash');
         return; // Intercept selection
@@ -6879,7 +6904,8 @@ if (action && action.startsWith('MG_START_')) {
             }
             const choiceIndex = choiceButton.dataset.index;
             const selectedChoiceObject = (choiceIndex !== undefined && playerState && playerState.last_choices) ? playerState.last_choices[choiceIndex] : null;
-            processPlayerChoice(choiceButton.textContent.trim(), selectedChoiceObject);
+            const cleanChoiceText = choiceButton.dataset.choiceText || choiceButton.textContent.trim();
+            processPlayerChoice(cleanChoiceText, selectedChoiceObject);
         });
 
     // ==========================================
@@ -6913,19 +6939,19 @@ if (action && action.startsWith('MG_START_')) {
             modeBadge.className = "font-mono text-[10px] font-bold px-2 py-0.5 rounded border transition-all duration-300";
             if (inCombat) {
                 modeBadge.className = "font-mono text-[10px] font-bold px-2 py-0.5 rounded border transition-all duration-300 bg-red-500/10 border-red-500/30 text-red-400";
-                modeBadge.textContent = currentLang === 'zh-TW' ? '⚔️ 戰鬥鎖定' : (currentLang === 'ja' ? '⚔️ 戦闘中' : '⚔️ In Combat');
+                modeBadge.textContent = isChinese(currentLang) ? tZh('⚔️ 戰鬥鎖定') : (currentLang === 'ja' ? '⚔️ 戦闘中' : '⚔️ In Combat');
             } else if (curState === 'EVENT_LOCKED') {
                 modeBadge.className = "font-mono text-[10px] font-bold px-2 py-0.5 rounded border transition-all duration-300 bg-purple-500/10 border-purple-500/30 text-purple-400";
-                modeBadge.textContent = currentLang === 'zh-TW' ? '🔒 事件鎖定' : (currentLang === 'ja' ? '🔒 イベント中' : '🔒 Event Locked');
+                modeBadge.textContent = isChinese(currentLang) ? tZh('🔒 事件鎖定') : (currentLang === 'ja' ? '🔒 イベント中' : '🔒 Event Locked');
             } else if (mode === "剧情" || mode === "劇情") {
                 modeBadge.className = "font-mono text-[10px] font-bold px-2 py-0.5 rounded border transition-all duration-300 bg-blue-500/10 border-blue-500/30 text-blue-400";
-                modeBadge.textContent = currentLang === 'zh-TW' ? '🔵 劇情模式' : (currentLang === 'ja' ? '🔵 ストーリー' : '🔵 Story Mode');
+                modeBadge.textContent = isChinese(currentLang) ? tZh('🔵 劇情模式') : (currentLang === 'ja' ? '🔵 ストーリー' : '🔵 Story Mode');
             } else if (mode === "过渡" || mode === "過渡") {
                 modeBadge.className = "font-mono text-[10px] font-bold px-2 py-0.5 rounded border transition-all duration-300 bg-yellow-500/10 border-yellow-500/30 text-yellow-400";
-                modeBadge.textContent = currentLang === 'zh-TW' ? '🟡 過渡模式' : (currentLang === 'ja' ? '🟡 移行モード' : '🟡 Transition');
+                modeBadge.textContent = isChinese(currentLang) ? tZh('🟡 過渡模式') : (currentLang === 'ja' ? '🟡 移行モード' : '🟡 Transition');
             } else {
                 modeBadge.className = "font-mono text-[10px] font-bold px-2 py-0.5 rounded border transition-all duration-300 bg-green-500/10 border-green-500/30 text-green-400";
-                modeBadge.textContent = currentLang === 'zh-TW' ? '🟢 自由探索' : (currentLang === 'ja' ? '🟢 自由探索' : '🟢 Free Explore');
+                modeBadge.textContent = isChinese(currentLang) ? tZh('🟢 自由探索') : (currentLang === 'ja' ? '🟢 自由探索' : '🟢 Free Explore');
             }
         }
 
@@ -6948,9 +6974,9 @@ if (action && action.startsWith('MG_START_')) {
                     btn.classList.add("opacity-30", "pointer-events-none", "cursor-not-allowed");
                     btn.classList.remove("hover:bg-white/10", "active:scale-95");
                     if (isCampOrDead) {
-                        btn.setAttribute('title', currentLang === 'zh-TW' ? '戰鬥中或處於特殊狀態時無法進行主動行動' : 'Action disabled in current state');
+                        btn.setAttribute('title', isChinese(currentLang) ? tZh('戰鬥中或處於特殊狀態時無法進行主動行動') : 'Action disabled in current state');
                     } else {
-                        btn.setAttribute('title', currentLang === 'zh-TW' ? '當前處於劇情引導中，請使用下方的劇情選項推進' : 'Disabled during Story / Transition mode');
+                        btn.setAttribute('title', isChinese(currentLang) ? tZh('當前處於劇情引導中，請使用下方的劇情選項推進') : 'Disabled during Story / Transition mode');
                     }
                 } else {
                     btn.classList.remove("opacity-30", "pointer-events-none", "cursor-not-allowed");
@@ -7009,7 +7035,7 @@ if (action && action.startsWith('MG_START_')) {
                 compPill.classList.remove('flex');
             }
             if (capsuleCompIcon) capsuleCompIcon.textContent = '💬';
-            if (capsuleCompName) capsuleCompName.textContent = currentLang === 'zh-TW' ? '夥伴互動' : 'Companion';
+            if (capsuleCompName) capsuleCompName.textContent = isChinese(currentLang) ? tZh('夥伴互動') : 'Companion';
         }
 
         const freeInput = document.getElementById('action-panel-free-input');
@@ -7024,16 +7050,16 @@ if (action && action.startsWith('MG_START_')) {
                 freeSubmit.classList.add("opacity-30", "pointer-events-none", "cursor-not-allowed");
                 freeInput.classList.add("opacity-50", "cursor-not-allowed");
                 if (isCampOrDead) {
-                    freeInput.placeholder = currentLang === 'zh-TW' ? '戰鬥中或受限狀態下無法輸入自訂動作...' : 'Input disabled in current state...';
+                    freeInput.placeholder = isChinese(currentLang) ? tZh('戰鬥中或受限狀態下無法輸入自訂動作...') : 'Input disabled in current state...';
                 } else {
-                    freeInput.placeholder = currentLang === 'zh-TW' ? '當前處於劇情引導中，請使用下方的劇情選項推進' : 'Disabled during Story / Transition mode';
+                    freeInput.placeholder = isChinese(currentLang) ? tZh('當前處於劇情引導中，請使用下方的劇情選項推進') : 'Disabled during Story / Transition mode';
                 }
             } else {
                 freeInput.disabled = false;
                 freeSubmit.disabled = false;
                 freeSubmit.classList.remove("opacity-30", "pointer-events-none", "cursor-not-allowed");
                 freeInput.classList.remove("opacity-50", "cursor-not-allowed");
-                freeInput.placeholder = currentLang === 'zh-TW' ? '輸入你想執行的任意冒險動作...' : (currentLang === 'ja' ? '任意の冒険アクションを入力...' : 'Enter any adventure action...');
+                freeInput.placeholder = isChinese(currentLang) ? tZh('輸入你想執行的任意冒險動作...') : (currentLang === 'ja' ? '任意の冒険アクションを入力...' : 'Enter any adventure action...');
             }
         }
 
@@ -7055,7 +7081,7 @@ if (action && action.startsWith('MG_START_')) {
     async function executeActiveAction(type, target, rawInput = '') {
         if (isProcessingAction) return;
         if (isFrontendStateRestricted(playerState)) {
-            showNotification(currentLang === 'zh-TW' ? '當前處於受限狀態，無法執行此主動操作！' : 'Action restricted in current state!', 'warning');
+            showNotification(isChinese(currentLang) ? tZh('當前處於受限狀態，無法執行此主動操作！') : 'Action restricted in current state!', 'warning');
             return;
         }
 
@@ -7231,7 +7257,7 @@ ${pacingPrompt}
             const gameUpdate = await callTextAPI(prompt, true, 0, extraParams);
 
             if (gameUpdate.unintelligible === true) {
-                showNotification(currentLang === 'zh-TW' ? '🧙‍♂️ 引導者：我不太能理解你這個意圖，試著換個說法吧！' : '🧙‍♂️ Director: I don\'t quite understand this action. Try phrasing it differently!', 'warning');
+                showNotification(isChinese(currentLang) ? tZh('🧙‍♂️ 引導者：我不太能理解你這個意圖，試著換個說法吧！') : '🧙‍♂️ Director: I don\'t quite understand this action. Try phrasing it differently!', 'warning');
                 actionCount--;
                 updateActionCounter();
                 renderChoices(playerState.last_choices || []);
@@ -7239,7 +7265,7 @@ ${pacingPrompt}
             }
 
             if (gameUpdate.can_advance_campaign === false || gameUpdate.error_message) {
-                const warningMsg = gameUpdate.error_message || (currentLang === 'zh-TW' ? '❌ 當前狀態下，引導者拒絕了該行動！' : '❌ Action rejected in current state!');
+                const warningMsg = gameUpdate.error_message || (isChinese(currentLang) ? tZh('❌ 當前狀態下，引導者拒絕了該行動！') : '❌ Action rejected in current state!');
                 showNotification(warningMsg, 'warning');
                 triggerVisualEffect('danger_flash');
                 actionCount--;
@@ -7256,23 +7282,24 @@ ${pacingPrompt}
                 else if (oc.tier === 'Failure') resultColor = 'text-red-400 border-red-500/30 bg-red-500/10';
                 else if (oc.tier === 'BarelySuccess') resultColor = 'text-orange-400 border-orange-500/30 bg-orange-500/10';
 
+                const isZhCn = (currentLang === 'zh-CN');
                 const rollCardHtml = `
                 <div class="my-2 p-2.5 sm:p-3 rounded-lg border ${resultColor} bg-black/40 backdrop-blur-sm select-none animate-fade-in text-xs font-mono">
                     <div class="flex items-center justify-between border-b border-white/10 pb-1.5">
                         <span class="font-bold flex items-center gap-1.5 text-xs text-slate-200">
-                            <i class="ph-fill ph-dice-six text-base text-amber-400"></i> ${oc.checkTitle || '關鍵判定'}
+                            <i class="ph-fill ph-dice-six text-base text-amber-400"></i> ${oc.checkTitle || (isZhCn ? '关键判定' : '關鍵判定')}
                         </span>
                         <span class="px-2 py-0.5 rounded bg-black/50 border border-white/10 text-[11px] font-bold text-slate-300">DC ${oc.DC}</span>
                     </div>
                     <div class="flex items-center justify-between pt-1.5 flex-wrap gap-2 text-slate-300 text-[11px]">
                         <div>
                             <span>d20(<strong>${oc.roll}</strong>)</span>
-                            ${oc.modifier ? `<span> + 屬性(${oc.modifier >= 0 ? '+' : ''}${oc.modifier})</span>` : ''}
-                            ${oc.itemBonus ? `<span> + 道具(+${oc.itemBonus})</span>` : ''}
+                            ${oc.modifier ? `<span> + ${isZhCn ? '属性' : '屬性'}(${oc.modifier >= 0 ? '+' : ''}${oc.modifier})</span>` : ''}
+                            ${oc.itemBonus ? `<span> + ${isZhCn ? '道具' : '道具'}(+${oc.itemBonus})</span>` : ''}
                             <span> = <strong class="text-white text-xs">${oc.score}</strong></span>
                         </div>
                         <div class="font-bold tracking-wider text-xs px-2 py-0.5 rounded bg-black/50 border border-white/10">
-                            <span>判定結果：</span><span class="underline underline-offset-2">${oc.tierZh}</span>
+                            <span>${isZhCn ? '判定结果：' : '判定結果：'}</span><span class="underline underline-offset-2">${oc.tierZh}</span>
                         </div>
                     </div>
                 </div>
@@ -7612,8 +7639,8 @@ ${pacingPrompt}
         });
         
         if (npcList.length === 0) {
-            npcList.push(currentLang === 'zh-TW' ? '神祕的陌生人 (Mysterious Stranger)' : 'Mysterious Stranger');
-            npcList.push(currentLang === 'zh-TW' ? '隱藏的寶箱 (Hidden Chest)' : 'Hidden Chest');
+            npcList.push(isChinese(currentLang) ? tZh('神祕的陌生人 (Mysterious Stranger)') : 'Mysterious Stranger');
+            npcList.push(isChinese(currentLang) ? tZh('隱藏的寶箱 (Hidden Chest)') : 'Hidden Chest');
         }
         
         const knownContainer = document.getElementById('interact-known-list');
@@ -7627,7 +7654,7 @@ ${pacingPrompt}
                     <span>👤</span>
                     <span>${name}</span>
                 </span>
-                <span class="text-[10px] bg-amber-500/10 text-amber-400 px-1.5 py-0.5 rounded border border-amber-500/20">${currentLang === 'zh-TW' ? '點擊互動' : 'Interact'}</span>
+                <span class="text-[10px] bg-amber-500/10 text-amber-400 px-1.5 py-0.5 rounded border border-amber-500/20">${isChinese(currentLang) ? tZh('點擊互動') : 'Interact'}</span>
             `;
             btn.addEventListener('click', () => {
                 closeModal(document.getElementById('interact-modal'));
@@ -7693,6 +7720,28 @@ ${pacingPrompt}
 // 4. 物品與技能使用事件 (最終優化版：沈浸式敘事 + 數值計算)
 // 物品與任務詳細翻譯與敘事設定檔 (支援中英日多國語言)
 const detailTranslations = {
+    'zh-CN': {
+        'type.weapon': '🗡️ 武器',
+        'type.armor': '🛡️ 防具',
+        'type.accessory': '💍 配件',
+        'type.consumable': '🧪 消耗品',
+        'type.medicine': '💊 药品',
+        'type.key_item': '🔑 关键道具',
+        'type.misc': '📦 一般道具',
+        'type.material': '⚙️ 素材材料',
+        
+        'quest.status.active': '进行中',
+        'quest.status.completed': '已完成',
+        'quest.status.failed': '已失败',
+        
+        'item.confirm.use': '您确定要使用/装备「{name}」吗？',
+        'item.confirm.discard': '警告：您确定要永久丢弃「{name}」吗？此操作将无法复原！',
+        'item.disabled.reason': '此物品为任务道具或合成素材，无法直接使用。',
+        
+        'quest.confirm.abandon': '警告：您确定要放弃任务「{name}」吗？此操作将无法复原，部分任务可能无法重新接取！',
+        'quest.disabled.main_abandon': '主线任务至关重要，无法放弃！',
+        'quest.focus_prompt': '【聚焦任务目标】请引导剧情前往执行此任务：'
+    },
     'zh-TW': {
         'type.weapon': '🗡️ 武器',
         'type.armor': '🛡️ 防具',
@@ -7898,11 +7947,11 @@ function openItemDetails(itemData, isEquipped = false) {
         } else {
             // General type fallback
             if (['consumable', 'medicine'].includes(type)) {
-                desc = currentLang === 'zh-TW' ? '這是一件可以恢復狀態的補給物資，在漫長生存旅途中至關重要。' : (currentLang === 'ja' ? 'これはステータスを回復するための消耗品であり、過酷な旅において不可欠です。' : 'This is a status recovery item, vital for survival on long journeys.');
+                desc = isChinese(currentLang) ? tZh('這是一件可以恢復狀態的補給物資，在漫長生存旅途中至關重要。') : (currentLang === 'ja' ? 'これはステータスを回復するための消耗品であり、過酷な旅において不可欠です。' : 'This is a status recovery item, vital for survival on long journeys.');
             } else if (['weapon', 'armor', 'accessory'].includes(type)) {
-                desc = currentLang === 'zh-TW' ? '一件工藝精良的裝備，穿戴在身上能顯著增強個人的戰鬥屬性。' : (currentLang === 'ja' ? '精巧に作られた装備であり、着用することで個人の戦闘能力を大幅に高めることができます。' : 'A finely crafted piece of equipment, wear it to significantly enhance combat capabilities.');
+                desc = isChinese(currentLang) ? tZh('一件工藝精良的裝備，穿戴在身上能顯著增強個人的戰鬥屬性。') : (currentLang === 'ja' ? '精巧に作られた装備であり、着用することで個人の戦闘能力を大幅に高めることができます。' : 'A finely crafted piece of equipment, wear it to significantly enhance combat capabilities.');
             } else {
-                desc = currentLang === 'zh-TW' ? '在冒險與探索中收集到的實用物品，可能在營地合成或某些任務中派上用場。' : (currentLang === 'ja' ? '冒険と探索で集めた実用的なアイテム。キャンプでの合成や特定のクエストで役立つ場合があります。' : 'A useful item gathered during exploration, which might be handy for crafting at camp or specific quests.');
+                desc = isChinese(currentLang) ? tZh('在冒險與探索中收集到的實用物品，可能在營地合成或某些任務中派上用場。') : (currentLang === 'ja' ? '冒険と探索で集めた実用的なアイテム。キャンプでの合成や特定のクエストで役立つ場合があります。' : 'A useful item gathered during exploration, which might be handy for crafting at camp or specific quests.');
             }
         }
     }
@@ -7918,7 +7967,7 @@ function openItemDetails(itemData, isEquipped = false) {
         if (itemData.vit_bonus) bonuses.push(`❤️ 幸運 (LUC) +${itemData.vit_bonus}`);
         if (itemData.dex_bonus) bonuses.push(`⚡ 敏捷 (DEX) +${itemData.dex_bonus}`);
         
-        effectsText = bonuses.length > 0 ? bonuses.join('<br>') : (currentLang === 'zh-TW' ? '✨ 提供基礎裝備防護與戰力提升' : '✨ Provides basic defense & combat support');
+        effectsText = bonuses.length > 0 ? bonuses.join('<br>') : (isChinese(currentLang) ? tZh('✨ 提供基礎裝備防護與戰力提升') : '✨ Provides basic defense & combat support');
     } else if (type === 'consumable' || type === 'medicine') {
         const targetTag = itemData.effect_target || 'hp';
         const effectPercent = (typeof itemData.effect_percent === 'number') ? itemData.effect_percent : 0.2;
@@ -7926,7 +7975,7 @@ function openItemDetails(itemData, isEquipped = false) {
         const percentStr = Math.floor(effectPercent * 100);
         effectsText = `💖 回復 (Recover) ${percentStr}% ${targetLabel}`;
     } else {
-        effectsText = currentLang === 'zh-TW' ? '📦 用於營地合成改裝或特定事件委託' : '📦 Used for crafting, trading, or quest objectives';
+        effectsText = isChinese(currentLang) ? tZh('📦 用於營地合成改裝或特定事件委託') : '📦 Used for crafting, trading, or quest objectives';
     }
     document.getElementById('item-detail-effects').innerHTML = effectsText;
 
@@ -7935,18 +7984,18 @@ function openItemDetails(itemData, isEquipped = false) {
     if (isEquipped) {
         useBtn.classList.remove('hidden', 'opacity-50', 'cursor-not-allowed');
         useBtn.disabled = false;
-        useBtn.textContent = currentLang === 'zh-TW' ? '脫下' : (currentLang === 'ja' ? '外す' : 'Unequip');
+        useBtn.textContent = isChinese(currentLang) ? tZh('脫下') : (currentLang === 'ja' ? '外す' : 'Unequip');
     } else if (['weapon', 'armor', 'accessory'].includes(type)) {
         useBtn.classList.remove('hidden', 'opacity-50', 'cursor-not-allowed');
         useBtn.disabled = false;
-        useBtn.textContent = currentLang === 'zh-TW' ? '裝備' : (currentLang === 'ja' ? '装備' : 'Equip');
+        useBtn.textContent = isChinese(currentLang) ? tZh('裝備') : (currentLang === 'ja' ? '装備' : 'Equip');
     } else if (type === 'consumable' || type === 'medicine') {
         useBtn.classList.remove('hidden', 'opacity-50', 'cursor-not-allowed');
         useBtn.disabled = false;
-        useBtn.textContent = currentLang === 'zh-TW' ? '使用' : (currentLang === 'ja' ? '使用' : 'Use');
+        useBtn.textContent = isChinese(currentLang) ? tZh('使用') : (currentLang === 'ja' ? '使用' : 'Use');
     } else {
         // Disallowed
-        useBtn.textContent = currentLang === 'zh-TW' ? '無法使用' : (currentLang === 'ja' ? '使用不可' : 'Cannot Use');
+        useBtn.textContent = isChinese(currentLang) ? tZh('無法使用') : (currentLang === 'ja' ? '使用不可' : 'Cannot Use');
         useBtn.classList.add('opacity-50', 'cursor-not-allowed');
         useBtn.disabled = true;
     }
@@ -8005,17 +8054,17 @@ function openQuestDetails(questData) {
         objContainer.innerHTML = `
             <div class="flex items-center gap-2 text-xs">
                 <span>${checkIcon}</span>
-                <span>${questData.goal || questData.description || (currentLang === 'zh-TW' ? '前往指引地點以完成委託目標' : 'Proceed to the designated location to complete the objective')}</span>
+                <span>${questData.goal || questData.description || (isChinese(currentLang) ? tZh('前往指引地點以完成委託目標') : 'Proceed to the designated location to complete the objective')}</span>
             </div>`;
     }
 
     // Quest Description
-    const descText = questData.desc || questData.description || (currentLang === 'zh-TW' ? '在探索途中接收到的冒險任務，完成它能獲得豐厚的經驗值與廢土資源回報。' : 'An active quest received during exploration. Completing it awards useful resources, experience, and storyline progressions.');
+    const descText = questData.desc || questData.description || (isChinese(currentLang) ? tZh('在探索途中接收到的冒險任務，完成它能獲得豐厚的經驗值與廢土資源回報。') : 'An active quest received during exploration. Completing it awards useful resources, experience, and storyline progressions.');
     document.getElementById('quest-detail-desc').textContent = descText;
 
     // NPC & Location Association
-    document.getElementById('quest-detail-npc').textContent = questData.giver || questData.npc || (currentLang === 'zh-TW' ? '未知委託人' : 'Unknown');
-    document.getElementById('quest-detail-location').textContent = questData.location || (currentLang === 'zh-TW' ? '未知地點' : 'Unknown');
+    document.getElementById('quest-detail-npc').textContent = questData.giver || questData.npc || (isChinese(currentLang) ? tZh('未知委託人') : 'Unknown');
+    document.getElementById('quest-detail-location').textContent = questData.location || (isChinese(currentLang) ? tZh('未知地點') : 'Unknown');
 
     // Rewards
     const rewardsContainer = document.getElementById('quest-detail-rewards');
@@ -8040,7 +8089,7 @@ function openQuestDetails(questData) {
             rewardsContainer.innerHTML += `<span class="px-2 py-1 bg-yellow-500/10 border border-yellow-500/20 rounded font-mono text-[11px] text-yellow-400">${reward}</span>`;
         });
     } else {
-        rewardsContainer.innerHTML = `<span class="text-slate-400 text-xs italic">${currentLang === 'zh-TW' ? '隨機廢土資源' : 'Random wasteland supplies'}</span>`;
+        rewardsContainer.innerHTML = `<span class="text-slate-400 text-xs italic">${isChinese(currentLang) ? tZh('隨機廢土資源') : 'Random wasteland supplies'}</span>`;
     }
 
     // Track Button actions
@@ -8099,11 +8148,11 @@ function minimizeCampModal() {
         const bar = document.getElementById('camp-minimized-bar');
         if (bar) {
             bar.classList.remove('hidden');
-            const tText = (i18nData[currentLang] || i18nData['zh-TW'])['camp.minimized'] || '⛺ 露營休整中 (點擊恢復)';
+            const tText = (i18nData[currentLang] || i18nData['zh-CN'])['camp.minimized'] || '⛺ 露營休整中 (點擊恢復)';
             const txtSpan = bar.querySelector('[data-i18n="camp.minimized"]');
             if (txtSpan) txtSpan.textContent = tText;
         }
-        showNotification(currentLang === 'zh-TW' ? '⛺ 露營已最小化，可隨時點擊左下角恢復。' : '⛺ Camp minimized. Click bottom-left indicator to restore.', 'info');
+        showNotification(isChinese(currentLang) ? tZh('⛺ 露營已最小化，可隨時點擊左下角恢復。') : '⛺ Camp minimized. Click bottom-left indicator to restore.', 'info');
     }
 }
 
@@ -8143,11 +8192,11 @@ function minimizeShelterModal() {
         const bar = document.getElementById('shelter-minimized-bar');
         if (bar) {
             bar.classList.remove('hidden');
-            const tText = (i18nData[currentLang] || i18nData['zh-TW'])['shelter.minimized'] || '🏡 臨時住所中 (點擊恢復)';
+            const tText = (i18nData[currentLang] || i18nData['zh-CN'])['shelter.minimized'] || '🏡 臨時住所中 (點擊恢復)';
             const txtSpan = bar.querySelector('[data-i18n="shelter.minimized"]');
             if (txtSpan) txtSpan.textContent = tText;
         }
-        showNotification(currentLang === 'zh-TW' ? '🏡 住所已最小化，可隨時點擊左下角恢復。' : '🏡 Shelter minimized. Click bottom-left indicator to restore.', 'info');
+        showNotification(isChinese(currentLang) ? tZh('🏡 住所已最小化，可隨時點擊左下角恢復。') : '🏡 Shelter minimized. Click bottom-left indicator to restore.', 'info');
     }
 }
 
@@ -8393,17 +8442,11 @@ document.getElementById('item-action-use-btn').addEventListener('click', () => {
     
     let msg = '';
     if (isEquipped) {
-        msg = currentLang === 'zh-TW' 
-            ? `您確定要脫下「${itemData.name}」嗎？` 
-            : (currentLang === 'ja' ? `本当に「${itemData.name}」を外しますか？` : `Are you sure you want to unequip "${itemData.name}"?`);
+        msg = isChinese(currentLang) ? tZh(`您確定要脫下「${itemData.name}」嗎？`) : (currentLang === 'ja' ? `本当に「${itemData.name}」を外しますか？` : `Are you sure you want to unequip "${itemData.name}"?`);
     } else if (isEquip) {
-        msg = currentLang === 'zh-TW' 
-            ? `您確定要裝備「${itemData.name}」嗎？` 
-            : (currentLang === 'ja' ? `本当に「${itemData.name}」を装備しますか？` : `Are you sure you want to equip "${itemData.name}"?`);
+        msg = isChinese(currentLang) ? tZh(`您確定要裝備「${itemData.name}」嗎？`) : (currentLang === 'ja' ? `本当に「${itemData.name}」を装備しますか？` : `Are you sure you want to equip "${itemData.name}"?`);
     } else {
-        msg = currentLang === 'zh-TW' 
-            ? `您確定要使用「${itemData.name}」嗎？` 
-            : (currentLang === 'ja' ? `本当に「${itemData.name}」を使用しますか？` : `Are you sure you want to use "${itemData.name}"?`);
+        msg = isChinese(currentLang) ? tZh(`您確定要使用「${itemData.name}」嗎？`) : (currentLang === 'ja' ? `本当に「${itemData.name}」を使用しますか？` : `Are you sure you want to use "${itemData.name}"?`);
     }
     
     document.getElementById('item-confirm-message').textContent = msg;
@@ -8426,9 +8469,7 @@ if (sellActionBtn) {
         itemData._calculatedSellPrice = sellPrice;
         
         const cName = playerState?.player_status?.currency_name || '金幣';
-        const msg = currentLang === 'zh-TW'
-            ? `確定要出售「${itemData.name}」並換取 ${sellPrice} ${cName} 嗎？`
-            : (currentLang === 'ja' ? `「${itemData.name}」を売却して ${sellPrice} ${cName} に換金しますか？` : `Sell "${itemData.name}" for ${sellPrice} ${cName}?`);
+        const msg = isChinese(currentLang) ? tZh(`確定要出售「${itemData.name}」並換取 ${sellPrice} ${cName} 嗎？`) : (currentLang === 'ja' ? `「${itemData.name}」を売却して ${sellPrice} ${cName} に換金しますか？` : `Sell "${itemData.name}" for ${sellPrice} ${cName}?`);
             
         document.getElementById('item-confirm-message').textContent = msg;
         document.getElementById('item-detail-actions').classList.add('hidden');
@@ -8536,8 +8577,8 @@ document.getElementById('item-confirm-yes-btn').addEventListener('click', () => 
                 closeItemDetailModal();
                 closeModal(dom.hudModal);
                 
-                const subjectMap = { 'zh-TW': '你', 'en': 'You', 'ja': 'あなた' };
-                const verbMap = { 'zh-TW': '使用了', 'en': 'used', 'ja': 'を使用し' };
+                const subjectMap = { 'zh-CN': '你', 'zh-TW': '你', 'en': 'You', 'ja': 'あなた' };
+                const verbMap = { 'zh-CN': '使用了', 'zh-TW': '使用了', 'en': 'used', 'ja': 'を使用し' };
                 
                 const subj = subjectMap[currentLang] || 'You';
                 const vrb = verbMap[currentLang] || 'used';
@@ -9482,9 +9523,7 @@ async function handleSellItem(itemData, sellPrice) {
     playerState.gold = playerState.player_status.currency;
     const cName = playerState.player_status.currency_name || '金幣';
     
-    const msg = currentLang === 'zh-TW' 
-        ? `💰 成功出售【${itemName}】，獲得了 +${price} ${cName}！` 
-        : (currentLang === 'ja' ? `💰 【${itemName}】を売却し、+${price} ${cName} を獲得！` : `💰 Sold [${itemName}] for +${price} ${cName}!`);
+    const msg = isChinese(currentLang) ? tZh(`💰 成功出售【${itemName}】，獲得了 +${price} ${cName}！`) : (currentLang === 'ja' ? `💰 【${itemName}】を売却し、+${price} ${cName} を獲得！` : `💰 Sold [${itemName}] for +${price} ${cName}!`);
         
     showNotification(msg, 'success');
     triggerVisualEffect('item_gain');
@@ -9753,8 +9792,8 @@ if (status.skills && status.skills.length > 0) {
     
     // 定義簡易的翻譯對照 (因為 i18nData 可能沒有這些 key)
     const typeLabel = { 
-        'active': (currentLang === 'zh-TW' ? '主動' : (currentLang === 'ja' ? '能動' : 'ACT')),
-        'passive': (currentLang === 'zh-TW' ? '被動' : (currentLang === 'ja' ? '受動' : 'PSV')) 
+        'active': (isChinese(currentLang) ? tZh('主動') : (currentLang === 'ja' ? '能動' : 'ACT')),
+        'passive': (isChinese(currentLang) ? tZh('被動') : (currentLang === 'ja' ? '受動' : 'PSV')) 
     };
 
     status.skills.forEach(item => {
@@ -10047,71 +10086,94 @@ function renderQuestItem(quest, t) {
                         }
                     }
 
-                    // --- 判定徽章與提示渲染 (僅在關鍵時刻：戰鬥比拼、偷竊潛行、運氣賭博、絕境避險，或選項明確要求 check 時顯示) ---
+                    // --- 日常安全行为白名单：医疗包扎、送礼交流、常规移动探索绝不触发 DC 判定徽章 ---
+                    function isRoutineSafeAction(text) {
+                        if (!text || typeof text !== 'string') return false;
+                        const t = text.trim().toLowerCase();
+                        if (/(?:包扎|包紮|止血|伤口|傷口|绷带|繃帶|敷药|敷藥|上药|上藥|服药|服藥|吃药|吃藥|喝药|喝藥|药水|藥水|草药|草藥|药剂|藥劑|治疗|治療|疗伤|療傷|救治|恢复|恢復|回血|休息|休整|睡眠|睡觉|睡覺|入睡|打坐|调息|調息|闭目)/.test(t)) return true;
+                        if (/(?:送礼|送禮|赠礼|贈禮|送个|送個|送件|赠送|贈送|赠予|贈予|送给|送給|给npc|給npc|礼物|禮物|交谈|交談|聊天|说话|說話|对话|對話|询问|詢問|打听|打聽|请教|請教|问候|問候|寒暄|道谢|道謝|感谢|感謝|安慰|道歉|买|買|购买|購買|交易|付钱|付錢|结账|結賬|支付|打赏|賞金)/.test(t)) return true;
+                        if (/(?:观察|觀察|查看|打量|环顾|環顧|四处看|四處看|四处张望|四處張望|环视|環視|寻找|尋找|调查|調查|前进|前進|向前走|走近|走去|走向|回营|回營|回城|回去|返回|离开|離開|赶路|趕路|继续前行|繼續前行|敲门|敲門|推开门|推開門|进门|進門|出门|出門|坐下|起立|驻足|駐足)/.test(t)) return true;
+                        if (/(?:吃|喝|饮|飲|进食|進食|干粮|乾糧|水壶|水壺|饮水|飲水|生火|烤火|生起篝火|烹饪|烤肉|整理|放入|拿出|取出|背包|行囊|拾取|拾起|捡起|撿起|采摘|採摘)/.test(t)) return true;
+                        return false;
+                    }
+
+                    // --- 判定徽章與提示渲染 (僅在關鍵生死/高危時刻顯示，日常行為絕不判定) ---
                     let badgeHtml = '';
                     let hintHtml = '';
                     let isCritical = false;
                     let checkAttr = 'strength';
                     let checkDC = 10;
-                    let checkTypeLabel = '關鍵判定';
+                    const isZhCn = (currentLang === 'zh-CN');
+                    let checkTypeLabel = isZhCn ? '关键判定' : '關鍵判定';
                     let badgeColor = 'bg-amber-500/20 text-amber-300 border-amber-500/30';
                     let hintText = '';
 
-                    if (typeof choice === 'object' && choice.check) {
+                    const isSafeAction = isRoutineSafeAction(choiceText);
+
+                    if (typeof choice === 'object' && choice.check && !isSafeAction) {
                         isCritical = true;
                         const check = choice.check;
                         checkAttr = check.attribute || 'strength';
                         checkDC = parseInt(check.difficulty || '10', 10);
                         const type = choice.type || 'normal';
 
-                        if (type === 'aggressive') { checkTypeLabel = '⚔️ 戰鬥比拼'; badgeColor = 'bg-red-500/20 text-red-300 border-red-500/30'; }
-                        else if (type === 'cautious') { checkTypeLabel = '🛡️ 謹慎防禦'; badgeColor = 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30'; }
-                        else if (type === 'smart') { checkTypeLabel = '🧠 機智破解'; badgeColor = 'bg-blue-500/20 text-blue-300 border-blue-500/30'; }
-                        else if (type === 'social') { checkTypeLabel = '💬 社交交涉'; badgeColor = 'bg-purple-500/20 text-purple-300 border-purple-300/30'; }
-                        else { checkTypeLabel = check.title || '🎲 關鍵判定'; badgeColor = 'bg-amber-500/20 text-amber-300 border-amber-500/30'; }
+                        if (type === 'aggressive') { checkTypeLabel = isZhCn ? '⚔️ 战斗比拼' : '⚔️ 戰鬥比拼'; badgeColor = 'bg-red-500/20 text-red-300 border-red-500/30'; }
+                        else if (type === 'cautious') { checkTypeLabel = isZhCn ? '🛡️ 谨慎防御' : '🛡️ 謹慎防禦'; badgeColor = 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30'; }
+                        else if (type === 'smart') { checkTypeLabel = isZhCn ? '🧠 机智破解' : '🧠 機智破解'; badgeColor = 'bg-blue-500/20 text-blue-300 border-blue-500/30'; }
+                        else if (type === 'social') { checkTypeLabel = isZhCn ? '💬 社交交涉' : '💬 社交交涉'; badgeColor = 'bg-purple-500/20 text-purple-300 border-purple-300/30'; }
+                        else { checkTypeLabel = check.title || (isZhCn ? '🎲 关键判定' : '🎲 關鍵判定'); badgeColor = 'bg-amber-500/20 text-amber-300 border-amber-500/30'; }
 
                         if (check.required_item) {
-                            badgeHtml += `<span class="inline-flex items-center text-[10px] font-bold border border-emerald-500/30 bg-emerald-500/20 text-emerald-300 rounded px-1.5 py-0.5 mr-1.5">🔑 已持有: ${check.required_item}</span>`;
+                            badgeHtml += `<span class="inline-flex items-center text-[10px] font-bold border border-emerald-500/30 bg-emerald-500/20 text-emerald-300 rounded px-1.5 py-0.5 mr-1.5">🔑 ${isZhCn ? '已持有' : '已持有'}: ${check.required_item}</span>`;
                         }
                         if (check.consequence_hint) {
                             hintText = check.consequence_hint;
                         }
-                    } else if (choiceText) {
+                    } else if (choiceText && !isSafeAction) {
                         const textLower = choiceText.toLowerCase();
-                        if (/[拼死搏殺|強行突圍|破陣斬首|絕命反擊|生死決鬥|蓄力一擊|致命一擊|近身搏鬥|正面硬拼|拔刀相向]/.test(choiceText) || /duel|deathmatch|desperate strike|breakthrough|assassinate/i.test(textLower)) {
+                        const isRisky = choiceTag === 'RISKY' || choiceTag === 'BAD';
+
+                        const isCombatClash = /(?:拼死搏殺|拼死搏杀|拼死一搏|拼死突圍|拼死突围|強行突圍|强行突围|破陣斬首|破阵斩首|絕命反擊|绝命反击|生死決鬥|生死决斗|拔刀死戰|拔刀死战)/.test(choiceText) || /(?:duel to death|desperate strike|breakthrough assault|assassinate boss)/i.test(textLower);
+                        const isSteal = /(?:暗中行竊|暗中行窃|暗中扒竊|暗中扒窃|撬開金庫|撬开金库|撬開寶箱|撬开宝箱|潛入敵營|潜入敌营)/.test(choiceText) || /(?:pickpocket guard|lockpick safe|sneak past guard)/i.test(textLower);
+                        const isLuckGamble = /(?:生死豪賭|生死豪赌|命運對決|命运对决|押上性命|赌命一搏|賭命一搏)/.test(choiceText) || /(?:gamble life|bet everything|russian roulette)/i.test(textLower);
+                        const isHazard = /(?:拆除致命陷阱|解除致命機關|解除致命机关|飛躍萬丈深淵|飞跃万丈深渊|抵禦致死劇毒|抵御致死剧毒)/.test(choiceText) || /(?:disarm lethal trap|leap across abyss|resist deadly poison)/i.test(textLower);
+
+                        if (isCombatClash && (isRisky || choiceText.includes('拼死') || choiceText.includes('生死'))) {
                             isCritical = true;
                             checkAttr = 'strength';
-                            checkTypeLabel = '⚔️ 戰鬥比拼';
+                            checkTypeLabel = isZhCn ? '⚔️ 生死搏杀' : '⚔️ 生死搏殺';
                             badgeColor = 'bg-red-500/20 text-red-300 border-red-500/30';
-                            hintText = '關鍵對決：成敗將直接影響戰局與損傷。';
-                        } else if (/[偷竊|竊取|扒竊|撬鎖|潛入|竊聽|摸索口袋|暗中順走]/.test(choiceText) || /steal|pickpocket|lockpick|sneak|infiltrate/i.test(textLower)) {
+                            hintText = isZhCn ? '关键对决：成败将直接影响战局与损伤。' : '關鍵對決：成敗將直接影響戰局與損傷。';
+                        } else if (isSteal && (isRisky || choiceText.includes('暗中') || choiceText.includes('潜入') || choiceText.includes('潛入'))) {
                             isCritical = true;
                             checkAttr = 'dexterity';
-                            checkTypeLabel = '🤫 偷竊/潛行';
+                            checkTypeLabel = isZhCn ? '🤫 高危潜行' : '🤫 高危潛行';
                             badgeColor = 'bg-indigo-500/20 text-indigo-300 border-indigo-500/30';
-                            hintText = '關鍵比拼：失敗可能驚動目標或被抓捕。';
-                        } else if (/[賭博|擲骰賭命|孤注一擲|生死一抽|運氣比拼|命運博弈|以命相搏|全押]/.test(choiceText) || /gamble|bet all|luck duel|fate gamble/i.test(textLower)) {
+                            hintText = isZhCn ? '关键比拼：失败可能惊动强敌或引发警报。' : '關鍵比拼：失敗可能驚動強敵或引發警報。';
+                        } else if (isLuckGamble && (isRisky || choiceText.includes('豪赌') || choiceText.includes('豪賭') || choiceText.includes('押上'))) {
                             isCritical = true;
                             checkAttr = 'vitality';
-                            checkTypeLabel = '🎲 運氣比拼';
+                            checkTypeLabel = isZhCn ? '🎲 绝命豪赌' : '🎲 絕命豪賭';
                             badgeColor = 'bg-purple-500/20 text-purple-300 border-purple-300/30';
-                            hintText = '關鍵比拼：勝負純憑天命與孤注一擲。';
-                        } else if (/[拆除陷阱|解除機關|驚險飛躍|抵抗致命劇毒|躲避致命陷阱]/.test(choiceText) || /disarm trap|defuse|resist lethal poison/i.test(textLower)) {
+                            hintText = isZhCn ? '关键比拼：胜负纯凭天命与孤注一掷。' : '關鍵比拼：勝負純憑天命與孤注一擲。';
+                        } else if (isHazard && (isRisky || choiceText.includes('致命') || choiceText.includes('深渊') || choiceText.includes('深淵'))) {
                             isCritical = true;
                             checkAttr = 'dexterity';
-                            checkTypeLabel = '⚠️ 險境避險';
+                            checkTypeLabel = isZhCn ? '⚠️ 绝境避险' : '⚠️ 絕境避險';
                             badgeColor = 'bg-amber-500/20 text-amber-300 border-amber-500/30';
-                            hintText = '關鍵避險：失手可能觸發陷阱或遭受重創。';
+                            hintText = isZhCn ? '关键避险：失手可能触发陷阱或遭受重创。' : '關鍵避險：失手可能觸發陷阱或遭受重創。';
                         }
                     }
 
                     if (isCritical) {
                         const chapter = playerState && playerState.camp_state ? (playerState.camp_state.chapter || 1) : 1;
-                        const DC = checkDC || (10 + chapter * 2);
-                        let attrZh = '力量';
-                        if (checkAttr === 'strength') attrZh = '力量';
-                        else if (checkAttr === 'vitality') attrZh = '體質';
-                        else if (checkAttr === 'dexterity') attrZh = '敏捷';
+                        const DC = checkDC || Math.min(14, 9 + chapter);
+                        let attrZh = isZhCn ? '力量' : '力量';
+                        if (checkAttr === 'strength') attrZh = isZhCn ? '力量' : '力量';
+                        else if (checkAttr === 'vitality') attrZh = isZhCn ? '体质' : '體質';
+                        else if (checkAttr === 'dexterity') attrZh = isZhCn ? '敏捷' : '敏捷';
+                        else if (checkAttr === 'intelligence') attrZh = isZhCn ? '智力' : '智力';
+                        else if (checkAttr === 'charisma') attrZh = isZhCn ? '魅力' : '魅力';
 
                         badgeHtml = `<span class="inline-flex items-center gap-1 text-[10px] uppercase tracking-wider font-bold border rounded px-1.5 py-0.5 mr-1.5 ${badgeColor}">${checkTypeLabel} (${attrZh} DC ${DC})</span>` + badgeHtml;
                         if (hintText) {
@@ -10135,6 +10197,7 @@ function renderQuestItem(quest, t) {
                     button.dataset.index = index;
                     button.dataset.cost = cost;
                     button.dataset.costType = costType;
+                    button.dataset.choiceText = choiceText;
                     button.dataset.action = (typeof choice === 'object' && choice.action) ? choice.action : choiceText;
                     button.dataset.tag = choiceTag;
                     dom.choicesContainer.appendChild(button);
@@ -10557,7 +10620,7 @@ const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/m
 const prompt = `You are a master Game Master (GM).
 Start a new adventure based on the user's request.
 **Game Settings:**
-* **Language:** ${currentLang === 'zh-TW' ? '繁體中文' : (currentLang === 'ja' ? '日本語' : 'English')}
+* **Language:** ${getPromptLanguageName(currentLang)}
 * **Genre:** ${genre}
 * **Character:** ${characterDesc}
 ${lockedDataPrompt}
@@ -10571,9 +10634,9 @@ ${lockedDataPrompt}
 
 **CRITICAL RULES:**
 🔴 CRITICAL LANGUAGE INSTRUCTION 🔴
-1. You MUST write the ENTIRE story, narration, and choice texts in **${currentLang === 'zh-TW' ? '繁體中文' : (currentLang === 'ja' ? '日本語' : 'English')}**.
+1. You MUST write the ENTIRE story, narration, and choice texts in **${getPromptLanguageName(currentLang)}**.
 2. Do NOT use different language for the story content, even if the user input or code variables are in English.
-3. Only the JSON keys (like "text", "action", "cost") remain in English. The VALUES must be in ${currentLang === 'zh-TW' ? '繁體中文' : (currentLang === 'ja' ? '日本語' : 'English')}.
+3. Only the JSON keys (like "text", "action", "cost") remain in English. The VALUES must be in ${getPromptLanguageName(currentLang)}.
 4. If the generated content is in English, it will be considered a SYSTEM FAILURE. 
 
 * **★★★ 情境一致性 (CRUCIAL) ★★★:** 你生成的開場故事 (\`narrative\`) **必須**與你選擇的 \`time_of_day\` 數值**完全一致**。如果你設定為 "night"，故事就必須描述夜晚的場景（例如月光、星空、黑暗）；如果設定為 "day"，就必須描述白天的場景（例如陽光、清晨、午後）。**絕對不允許**出現「清晨的故事」卻標記為「夜晚」這種矛盾情況。
@@ -10632,7 +10695,7 @@ d) **Supported Types:**
 - \`"reflex_strike"\`: For Dodging, Blacksmithing, Fishing, Precision Shots.
 * **★★★Choices Rules ★★★:**
 Choices MUST be objects with text and action:
-- text: The display text in ${currentLang === 'zh-TW' ? '繁體中文' : (currentLang === 'ja' ? '日本語' : 'English')}. 
+- text: The display text in ${getPromptLanguageName(currentLang)}. 
 - action: The system ID (can be English, used internally)
 Example:
 {
@@ -11232,7 +11295,7 @@ switch (fateRoll) {
     ${genreRules}
 
     **CURRENT SITUATION:**
-    * **Language:** ${currentLang === 'zh-TW' ? '繁體中文' : (currentLang === 'ja' ? '日本語' : 'English')}
+    * **Language:** ${getPromptLanguageName(currentLang)}
     * **Genre:** ${genre}
     * **Time of Day:** ${time_of_day}
 ${choice.startsWith('[System:') ? `* **System Event:** "${choice}" (This is an internal game event. Advance the story based on this result.)` : `* **Player's Choice:** "${choice}"`}
@@ -11251,9 +11314,9 @@ ${choice.startsWith('[System:') ? `* **System Event:** "${choice}" (This is an i
    - **CORRECT:** Just make the event happen naturally (e.g., "Suddenly, the dragon wakes up"). Do not announce *why* it happened.
 
 🔴 CRITICAL LANGUAGE INSTRUCTION 🔴
-1. You MUST write the ENTIRE story, narration, and choice texts in **${currentLang === 'zh-TW' ? '繁體中文' : (currentLang === 'ja' ? '日本語' : 'English')}**.
+1. You MUST write the ENTIRE story, narration, and choice texts in **${getPromptLanguageName(currentLang)}**.
 2. Do NOT use different language for the story content, even if the user input or code variables are in English.
-3. Only the JSON keys (like "text", "action", "cost") remain in English. The VALUES must be in ${currentLang === 'zh-TW' ? '繁體中文' : (currentLang === 'ja' ? '日本語' : 'English')}.
+3. Only the JSON keys (like "text", "action", "cost") remain in English. The VALUES must be in ${getPromptLanguageName(currentLang)}.
 4. If the generated content is in English, it will be considered a SYSTEM FAILURE. 
 
     **GM's CRITICAL RULES & THOUGHT PROCESS FOR THIS TURN:**
@@ -11391,6 +11454,10 @@ b. **★★★ NO RE-NARRATION (HIGHEST PRIORITY):**
        - Choice: \`{ "text": "🎲 Challenge the Goblin", "action": "MG_START_DICE", "tag": "RISKY" }\`
     f. **Director Override:** If [Director Instruction] demands a game, simply output the narrative setup and the corresponding "Start" choice.
 
+24. **★★★ STRICT RESTRICTION ON DC CHECKS & REASONABLE DIFFICULTY (合理的属性检定原则) ★★★:**
+    a. **FORBIDDEN FOR ROUTINE ACTIONS:** NEVER require dice checks or attribute DC tests for ordinary, routine, or peaceful actions! Actions such as first aid/bandaging wounds (包扎伤口/涂抹药膏/服用药水), resting/sleeping (休息/打坐/休整), social gifting & casual chatting (赠送礼物/向NPC问好/日常对话/道谢), basic trade (购买物品/交付钱币), or basic movement & observation (环顾四周/继续前行/敲门) MUST succeed automatically and smoothly without ANY attribute checks or DC tests.
+    b. **CRITICAL ONLY:** Attribute checks (check field) are strictly and exclusively reserved for true critical turning points: 生死攸关的生死决斗、破解致命机关陷阱、高风险秘密渗透潜行、或赌上全部身家的绝命豪赌。绝不在普通日常行为中添加判定！
+
         **YOUR TASK:**
     1. **Generate the Next Scene.**
     2. **Summarize This Turn.**
@@ -11458,23 +11525,24 @@ b. **★★★ NO RE-NARRATION (HIGHEST PRIORITY):**
             else if (oc.tier === 'Failure') resultColor = 'text-red-400 border-red-500/30 bg-red-500/10';
             else if (oc.tier === 'BarelySuccess') resultColor = 'text-orange-400 border-orange-500/30 bg-orange-500/10';
 
+            const isZhCn = (currentLang === 'zh-CN');
             const rollCardHtml = `
             <div class="my-2 p-2.5 sm:p-3 rounded-lg border ${resultColor} bg-black/40 backdrop-blur-sm select-none animate-fade-in text-xs font-mono">
                 <div class="flex items-center justify-between border-b border-white/10 pb-1.5">
                     <span class="font-bold flex items-center gap-1.5 text-xs text-slate-200">
-                        <i class="ph-fill ph-dice-six text-base text-amber-400"></i> ${oc.checkTitle || '關鍵判定'}
+                        <i class="ph-fill ph-dice-six text-base text-amber-400"></i> ${oc.checkTitle || (isZhCn ? '关键判定' : '關鍵判定')}
                     </span>
                     <span class="px-2 py-0.5 rounded bg-black/50 border border-white/10 text-[11px] font-bold text-slate-300">DC ${oc.DC}</span>
                 </div>
                 <div class="flex items-center justify-between pt-1.5 flex-wrap gap-2 text-slate-300 text-[11px]">
                     <div>
                         <span>d20(<strong>${oc.roll}</strong>)</span>
-                        ${oc.modifier ? `<span> + 屬性(${oc.modifier >= 0 ? '+' : ''}${oc.modifier})</span>` : ''}
-                        ${oc.itemBonus ? `<span> + 道具(+${oc.itemBonus})</span>` : ''}
+                        ${oc.modifier ? `<span> + ${isZhCn ? '属性' : '屬性'}(${oc.modifier >= 0 ? '+' : ''}${oc.modifier})</span>` : ''}
+                        ${oc.itemBonus ? `<span> + ${isZhCn ? '道具' : '道具'}(+${oc.itemBonus})</span>` : ''}
                         <span> = <strong class="text-white text-xs">${oc.score}</strong></span>
                     </div>
                     <div class="font-bold tracking-wider text-xs px-2 py-0.5 rounded bg-black/50 border border-white/10">
-                        <span>判定結果：</span><span class="underline underline-offset-2">${oc.tierZh}</span>
+                        <span>${isZhCn ? '判定结果：' : '判定結果：'}</span><span class="underline underline-offset-2">${oc.tierZh}</span>
                     </div>
                 </div>
             </div>
@@ -12042,7 +12110,7 @@ if (choice.includes('攻擊') || choice.includes('Attack') || choice.includes('�
     Your goal is to process the player's combat move against "${combatTarget.name}".
 
     **COMBAT CONTEXT:**
-    * **Language:** ${currentLang === 'zh-TW' ? '繁體中文' : (currentLang === 'ja' ? '日本語' : 'English')}
+    * **Language:** ${getPromptLanguageName(currentLang)}
     * **Time of Day:** ${time_of_day}
 ${choice.startsWith('[System:') ? `* **System Event:** "${choice}" (Apply this effect and continue combat.)` : `* **Player's Choice:** "${choice}"`}
     * **Current Player Status:** ${JSON.stringify(playerState.player_status)}
@@ -12053,9 +12121,9 @@ ${choice.startsWith('[System:') ? `* **System Event:** "${choice}" (Apply this e
     * **System Calculated Damage:** ${playerDmgResult.damage}
 
 🔴 CRITICAL LANGUAGE INSTRUCTION 🔴
-1. You MUST write the ENTIRE story, narration, and choice texts in **${currentLang === 'zh-TW' ? '繁體中文' : (currentLang === 'ja' ? '日本語' : 'English')}**.
+1. You MUST write the ENTIRE story, narration, and choice texts in **${getPromptLanguageName(currentLang)}**.
 2. Do NOT use different language for the story content, even if the user input or code variables are in English.
-3. Only the JSON keys (like "text", "action", "cost") remain in English. The VALUES must be in ${currentLang === 'zh-TW' ? '繁體中文' : (currentLang === 'ja' ? '日本語' : 'English')}.
+3. Only the JSON keys (like "text", "action", "cost") remain in English. The VALUES must be in ${getPromptLanguageName(currentLang)}.
 4. If the generated content is in English, it will be considered a SYSTEM FAILURE. 
 
     **★★★ INTENT & COMBAT RULES ★★★:**
@@ -12627,9 +12695,7 @@ function applyLockFailurePenalty(genre) {
     if (['科幻', '賽博龐克', '末日生存'].includes(genre)) {
         if (hpBar) hpBar.value = Math.max(0, hpBar.value - 15);
         if (spBar) spBar.value = Math.max(0, spBar.value - 10);
-        penaltyMsg = currentLang === 'zh-TW' 
-            ? "⚡ 安全系統反饋高壓電擊！生命值減少 15，體力減少 10。" 
-            : (currentLang === 'ja' ? "⚡ 高電圧の電撃ショック！HPが15、SPが10減少しました。" : "⚡ High-voltage security shock! Lost 15 HP and 10 SP.");
+        penaltyMsg = isChinese(currentLang) ? tZh("⚡ 安全系統反饋高壓電擊！生命值減少 15，體力減少 10。") : (currentLang === 'ja' ? "⚡ 高電圧の電撃ショック！HPが15、SPが10減少しました。" : "⚡ High-voltage security shock! Lost 15 HP and 10 SP.");
     } else if (['武俠', '歷史架空', '宮鬥', '戀愛', '現代都市'].includes(genre)) {
         if (hpBar) hpBar.value = Math.max(0, hpBar.value - 15);
         if (typeof deductPlayerGold === 'function') {
@@ -12637,21 +12703,15 @@ function applyLockFailurePenalty(genre) {
         } else if (playerState.player_status.gold !== undefined) {
             playerState.player_status.gold = Math.max(0, playerState.player_status.gold - 20);
         }
-        penaltyMsg = currentLang === 'zh-TW' 
-            ? "🏹 暗器機弩突然射出！生命值減少 15，慌亂中掉落 20 金幣。" 
-            : (currentLang === 'ja' ? "🏹 隠し針の罠が作動！HPが15減少し、慌てて20ゴールドを紛失しました。" : "🏹 Hidden needle trap triggered! Lost 15 HP and dropped 20 Gold in panic.");
+        penaltyMsg = isChinese(currentLang) ? tZh("🏹 暗器機弩突然射出！生命值減少 15，慌亂中掉落 20 金幣。") : (currentLang === 'ja' ? "🏹 隠し針の罠が作動！HPが15減少し、慌てて20ゴールドを紛失しました。" : "🏹 Hidden needle trap triggered! Lost 15 HP and dropped 20 Gold in panic.");
     } else if (['懸疑偵探', '恐怖', '克蘇魯神話', '校園異聞'].includes(genre)) {
         if (mpBar) mpBar.value = Math.max(0, mpBar.value - 20);
         if (hpBar) hpBar.value = Math.max(0, hpBar.value - 10);
-        penaltyMsg = currentLang === 'zh-TW' 
-            ? "👁️ 邪神凝視在腦海中迴盪，精神遭到重創！魔力值減少 20，生命值減少 10。" 
-            : (currentLang === 'ja' ? "👁️ 邪神の囁きが正気を砕く！MPが20、HPが10減少しました。" : "👁️ Eldritch whisper shatters your sanity! Lost 20 MP and 10 HP.");
+        penaltyMsg = isChinese(currentLang) ? tZh("👁️ 邪神凝視在腦海中迴盪，精神遭到重創！魔力值減少 20，生命值減少 10。") : (currentLang === 'ja' ? "👁️ 邪神の囁きが正気を砕く！MPが20、HPが10減少しました。" : "👁️ Eldritch whisper shatters your sanity! Lost 20 MP and 10 HP.");
     } else {
         if (hpBar) hpBar.value = Math.max(0, hpBar.value - 15);
         if (mpBar) mpBar.value = Math.max(0, mpBar.value - 15);
-        penaltyMsg = currentLang === 'zh-TW' 
-            ? "💥 符文印記發生魔能反噬爆炸！生命值減少 15，魔力值減少 15。" 
-            : (currentLang === 'ja' ? "💥 ルーン魔力の逆流爆発！HPが15、MPが15減少しました。" : "💥 Rune glyph backfires in an explosion! Lost 15 HP and 15 MP.");
+        penaltyMsg = isChinese(currentLang) ? tZh("💥 符文印記發生魔能反噬爆炸！生命值減少 15，魔力值減少 15。") : (currentLang === 'ja' ? "💥 ルーン魔力の逆流爆発！HPが15、MPが15減少しました。" : "💥 Rune glyph backfires in an explosion! Lost 15 HP and 15 MP.");
     }
     
     // Update HUD display in real-time
@@ -12691,7 +12751,7 @@ function renderCodeCrackKeypad() {
             <i class="ph-bold ph-lock-key text-amber-400"></i> ${statusTitle}
         </span>
         <div class="flex items-center gap-1.5">
-            <span class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">${currentLang === 'zh-TW' ? '剩餘嘗試' : (currentLang === 'ja' ? '残機' : 'ATTEMPTS')}:</span>
+            <span class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">${isChinese(currentLang) ? tZh('剩餘嘗試') : (currentLang === 'ja' ? '残機' : 'ATTEMPTS')}:</span>
             <div id="mg-attempts-leds" class="flex gap-1.5">${attemptsDots}</div>
         </div>
     `;
@@ -12736,7 +12796,7 @@ function renderCodeCrackKeypad() {
     // CLR button
     const clrBtn = document.createElement('button');
     clrBtn.className = "choice-button h-9 sm:h-10 flex items-center justify-center rounded-lg bg-red-500/15 border border-red-500/25 hover:bg-red-500/25 hover:border-red-500/35 active:scale-95 text-xs font-bold text-red-400 transition-all shadow-sm cursor-pointer select-none";
-    clrBtn.innerHTML = `<span class="pointer-events-none tracking-wider">${currentLang === 'zh-TW' ? '清除' : (currentLang === 'ja' ? 'クリア' : 'CLR')}</span>`;
+    clrBtn.innerHTML = `<span class="pointer-events-none tracking-wider">${isChinese(currentLang) ? tZh('清除') : (currentLang === 'ja' ? 'クリア' : 'CLR')}</span>`;
     clrBtn.dataset.action = "KEY_CLR";
     grid.appendChild(clrBtn);
     
@@ -12762,7 +12822,7 @@ function renderCodeCrackKeypad() {
 
     const okBtn = document.createElement('button');
     okBtn.className = "choice-button py-2 px-3 rounded-lg bg-emerald-600 hover:bg-emerald-500 active:scale-95 active:bg-emerald-700 text-white font-bold tracking-wider transition-all shadow-md border border-emerald-400/40 cursor-pointer flex items-center justify-center gap-1.5 text-xs sm:text-sm select-none";
-    okBtn.innerHTML = `<i class="ph-bold ph-keyhole pointer-events-none text-base"></i> <span class="pointer-events-none">${currentLang === 'zh-TW' ? '確認解鎖' : (currentLang === 'ja' ? '解除' : 'CONFIRM')}</span>`;
+    okBtn.innerHTML = `<i class="ph-bold ph-keyhole pointer-events-none text-base"></i> <span class="pointer-events-none">${isChinese(currentLang) ? tZh('確認解鎖') : (currentLang === 'ja' ? '解除' : 'CONFIRM')}</span>`;
     okBtn.dataset.action = "KEY_OK";
     actionsRow.appendChild(okBtn);
     
@@ -12974,7 +13034,17 @@ const MiniGameSystem = {
         };
 
         const tCategory = templates[category] || templates['fantasy'];
-        const clueSet = tCategory[lang] || tCategory['en'];
+        let clueSet = tCategory[lang] || (lang && lang.startsWith('zh') ? tCategory['zh-TW'] : null) || tCategory['en'];
+        if ((lang === 'zh-CN' || lang === 'zh') && clueSet) {
+            clueSet = {
+                title: toSimplified(clueSet.title),
+                n1: toSimplified(clueSet.n1),
+                n2: toSimplified(clueSet.n2),
+                n3: toSimplified(clueSet.n3),
+                n4: toSimplified(clueSet.n4),
+                narrator: toSimplified(clueSet.narrator)
+            };
+        }
         return clueSet;
     },
 
@@ -13080,7 +13150,7 @@ const MiniGameSystem = {
                 <div class="flex items-center justify-between px-1 mb-2">
                     <span class="text-[11px] font-bold tracking-wider text-slate-400 font-mono">${statusTitle}</span>
                     <div class="flex items-center gap-1.5">
-                        <span class="text-[10px] uppercase font-bold text-slate-500 tracking-wider">${currentLang === 'zh-TW' ? '安全鎖定' : (currentLang === 'ja' ? '生命信号' : 'SECURE')}:</span>
+                        <span class="text-[10px] uppercase font-bold text-slate-500 tracking-wider">${isChinese(currentLang) ? tZh('安全鎖定') : (currentLang === 'ja' ? '生命信号' : 'SECURE')}:</span>
                         <div id="mg-attempts-leds" class="flex gap-1.5">${attemptsDots}</div>
                     </div>
                 </div>
@@ -13318,7 +13388,7 @@ const MiniGameSystem = {
                         `<span class="text-emerald-400 text-2xl sm:text-3xl font-black mx-1 tracking-widest select-none">${state.inputBuffer}</span>`,
                         "mg-code-screen py-2 px-3 rounded-lg border border-emerald-500 shadow-[0_0_15px_rgba(16,185,129,0.4)] flex items-center justify-center bg-emerald-950/30"
                     );
-                    updateAllFeedbacks(`<span class="text-emerald-400 font-bold tracking-wider animate-pulse">${currentLang === 'zh-TW' ? '🔓 機關已解鎖！' : (currentLang === 'ja' ? '🔓 ロック解除！' : '🔓 LOCK UNLOCKED!')}</span>`);
+                    updateAllFeedbacks(`<span class="text-emerald-400 font-bold tracking-wider animate-pulse">${isChinese(currentLang) ? tZh('🔓 機關已解鎖！') : (currentLang === 'ja' ? '🔓 ロック解除！' : '🔓 LOCK UNLOCKED!')}</span>`);
                     
                     if (typeof triggerVisualEffect === 'function') {
                         triggerVisualEffect('sparkle');
@@ -13370,15 +13440,11 @@ const MiniGameSystem = {
                         const d4 = parseInt(state.secretCode[3]);
                         
                         if (state.wrongAttempts === 1) {
-                            hintMsg = currentLang === 'zh-TW'
-                                ? `❌ 密碼錯誤！剩餘 ${remaining} 次嘗試。提示：第 1 位數是 ${d1 % 2 === 0 ? '偶數' : '奇數'}，且前兩位數相加為 ${d1 + d2}。`
-                                : (currentLang === 'ja'
+                            hintMsg = isChinese(currentLang) ? tZh(`❌ 密碼錯誤！剩餘 ${remaining} 次嘗試。提示：第 1 位數是 ${d1 % 2 === 0 ? '偶數' : '奇數'}，且前兩位數相加為 ${d1 + d2}。`) : (currentLang === 'ja'
                                     ? `❌ コード不一致！あと ${remaining} 回。ヒント：1桁目は${d1 % 2 === 0 ? '偶数' : '奇数'}で、最初の2桁の合計は ${d1 + d2} です。`
                                     : `❌ Wrong code! Only ${remaining} attempts left. Hint: The 1st digit is ${d1 % 2 === 0 ? 'EVEN' : 'ODD'}, and the sum of the first two digits is ${d1 + d2}.`);
                         } else if (state.wrongAttempts === 2) {
-                            hintMsg = currentLang === 'zh-TW'
-                                ? `❌ 再次錯誤！剩餘 ${remaining} 次嘗試。提示：第 3 位數是 ${d3 % 2 === 0 ? '偶數' : '奇數'}，且後兩位數相加為 ${d3 + d4}。`
-                                : (currentLang === 'ja'
+                            hintMsg = isChinese(currentLang) ? tZh(`❌ 再次錯誤！剩餘 ${remaining} 次嘗試。提示：第 3 位數是 ${d3 % 2 === 0 ? '偶數' : '奇數'}，且後兩位數相加為 ${d3 + d4}。`) : (currentLang === 'ja'
                                     ? `❌ 警告！あと ${remaining} 回のみ。ヒント：3桁目は${d3 % 2 === 0 ? '偶数' : '奇数'}で、後半2桁の合計は ${d3 + d4}。`
                                     : `❌ Wrong again! Only ${remaining} attempt left. Hint: The 3rd digit is ${d3 % 2 === 0 ? 'EVEN' : 'ODD'}, and the sum of the last two digits is ${d3 + d4}.`);
                         }
@@ -13651,7 +13717,7 @@ async function openShopAPI() {
 
 const prompt = `You are a RPG Shop Generator.
 Context:
-- Language: ${currentLang === 'zh-TW' ? '繁體中文' : (currentLang === 'ja' ? '日本語' : 'English')} (Generate all names/descriptions in this language)
+- Language: ${getPromptLanguageName(currentLang)} (Generate all names/descriptions in this language)
 - Genre: ${genre}
 - Location/Story Context: ${livingSummary}
 - Player Level: ${level}
@@ -13660,9 +13726,9 @@ Context:
 - Existing Currency: ${existingCurrency || "None"}
 
 🔴 CRITICAL LANGUAGE INSTRUCTION 🔴
-1. You MUST write the ENTIRE story, narration, and choice texts in **${currentLang === 'zh-TW' ? '繁體中文' : (currentLang === 'ja' ? '日本語' : 'English')}**.
+1. You MUST write the ENTIRE story, narration, and choice texts in **${getPromptLanguageName(currentLang)}**.
 2. Do NOT use different language for the story content, even if the user input or code variables are in English.
-3. Only the JSON keys (like "text", "action", "cost") remain in English. The VALUES must be in ${currentLang === 'zh-TW' ? '繁體中文' : (currentLang === 'ja' ? '日本語' : 'English')}.
+3. Only the JSON keys (like "text", "action", "cost") remain in English. The VALUES must be in ${getPromptLanguageName(currentLang)}.
 4. If the generated content is in English, it will be considered a SYSTEM FAILURE. 
 
 
@@ -14002,9 +14068,7 @@ function checkEquipmentRequirements(newItem) {
     // Support level requirements
     const reqLevel = newItem.req_level || newItem.required_level || newItem.level_req || 0;
     if (status.level && status.level < reqLevel) {
-        const msg = currentLang === 'zh-TW' 
-            ? `⚠️ 無法裝備：需要等級 ${reqLevel}（當前等級 ${status.level}）` 
-            : (currentLang === 'ja' ? `⚠️ 装備不可：レベル ${reqLevel} が必要（現在レベル ${status.level}）` : `⚠️ Cannot Equip: Requires Level ${reqLevel} (Current Level ${status.level})`);
+        const msg = isChinese(currentLang) ? tZh(`⚠️ 無法裝備：需要等級 ${reqLevel}（當前等級 ${status.level}）`) : (currentLang === 'ja' ? `⚠️ 装備不可：レベル ${reqLevel} が必要（現在レベル ${status.level}）` : `⚠️ Cannot Equip: Requires Level ${reqLevel} (Current Level ${status.level})`);
         return { allowed: false, reason: msg };
     }
     
@@ -14013,9 +14077,7 @@ function checkEquipmentRequirements(newItem) {
     const stats = calculatePlayerStats(status);
     const playerStr = (stats && stats.base && stats.base.str) || status.str || 0;
     if (playerStr < reqStr) {
-        const msg = currentLang === 'zh-TW' 
-            ? `⚠️ 無法裝備：需要力量 ${reqStr}（當前力量 ${playerStr}）` 
-            : (currentLang === 'ja' ? `⚠️ 装備不可：力 ${reqStr} が必要（現在値 ${playerStr}）` : `⚠️ Cannot Equip: Requires STR ${reqStr} (Current STR ${playerStr})`);
+        const msg = isChinese(currentLang) ? tZh(`⚠️ 無法裝備：需要力量 ${reqStr}（當前力量 ${playerStr}）`) : (currentLang === 'ja' ? `⚠️ 装備不可：力 ${reqStr} が必要（現在値 ${playerStr}）` : `⚠️ Cannot Equip: Requires STR ${reqStr} (Current STR ${playerStr})`);
         return { allowed: false, reason: msg };
     }
 
@@ -14024,9 +14086,7 @@ function checkEquipmentRequirements(newItem) {
     if (reqQuest) {
         const hasCompleted = status.quests && status.quests.some(q => q.name === reqQuest && q.is_completed);
         if (!hasCompleted) {
-            const msg = currentLang === 'zh-TW' 
-                ? `⚠️ 無法裝備：需要完成任務「${reqQuest}」` 
-                : (currentLang === 'ja' ? `⚠️ 装備不可：クエスト「${reqQuest}」のクリアが必要` : `⚠️ Cannot Equip: Requires Quest "${reqQuest}" completed`);
+            const msg = isChinese(currentLang) ? tZh(`⚠️ 無法裝備：需要完成任務「${reqQuest}」`) : (currentLang === 'ja' ? `⚠️ 装備不可：クエスト「${reqQuest}」のクリアが必要` : `⚠️ Cannot Equip: Requires Quest "${reqQuest}" completed`);
             return { allowed: false, reason: msg };
         }
     }
@@ -14035,7 +14095,7 @@ function checkEquipmentRequirements(newItem) {
 }
 
 function handleUnequipItemLocally(itemData) {
-    const t = i18nData[currentLang] || i18nData['zh-TW'];
+    const t = i18nData[currentLang] || i18nData['zh-CN'];
     const slot = itemData.type; // e.g. 'weapon', 'armor', 'accessory'
     const itemName = itemData.name;
 
@@ -14506,7 +14566,7 @@ async function generateNovelOutline() {
     const prompt = `Role: Novel Editor. Task: Create a 5-chapter outline from the log.
     Requirements:
     1. Title. 2. Exactly 5 chapters. 3. Each chapter needs 'title' & 'summary'.
-    4. Language: ${currentLang === 'zh-TW' ? '繁體中文' : (currentLang === 'ja' ? '日本語' : 'English')}.
+    4. Language: ${getPromptLanguageName(currentLang)}.
     Response JSON: { "book_title": "...", "chapters": [ { "chapter_num": 1, "title": "...", "summary": "..." }, ... ] }
     Log: ${adventureLog.join("\n").slice(0, 40000)}`;
 
@@ -14550,7 +14610,7 @@ async function generateAllChaptersAtOnce() {
     const prompt = `
     Role: Best-selling Novelist.
     Task: Write the **ENTIRE 5-Chapter Novel** in one go based on the outline provided.
-    Language: ${currentLang === 'zh-TW' ? '繁體中文' : (currentLang === 'ja' ? '日本語' : 'English')}.
+    Language: ${getPromptLanguageName(currentLang)}.
 
     **CRITICAL FORMATTING RULES (YOU MUST FOLLOW):**
     1. You must write the full content for Chapter 1 through Chapter 5.
@@ -14860,8 +14920,8 @@ function renderGeneratedCartridges(cartridges) {
         const card = document.createElement('div');
         card.className = 'cartridge-card theme-bg-input p-4 rounded-lg flex flex-col items-start gap-3 border-2 border-transparent hover:border-indigo-400 transition-colors';
 
-               const title = cartridge.title[currentLang] || cartridge.title['en'];
-        const description = cartridge.description[currentLang] || cartridge.description['en'];
+               const title = cartridge.title[currentLang] || (isChinese(currentLang) ? tZh(cartridge.title['zh-TW']) : null) || cartridge.title['en'];
+        const description = cartridge.description[currentLang] || (isChinese(currentLang) ? tZh(cartridge.description['zh-TW']) : null) || cartridge.description['en'];
         const characterDescription = cartridge.description[currentLang] || cartridge.description['en']; // <-- 已修正
 
         // 【修改】使用 sanitizeForHTML 淨化資料
@@ -14898,8 +14958,8 @@ function renderSavedCartridgeList(savedCartridges) {
         const card = document.createElement('div');
         card.className = 'cartridge-card theme-bg-input p-4 rounded-lg flex flex-col items-start gap-3 border-2 border-transparent hover:border-sky-400 transition-colors';
 
-               const title = cartridge.title[currentLang] || cartridge.title['en'];
-        const description = cartridge.description[currentLang] || cartridge.description['en'];
+               const title = cartridge.title[currentLang] || (isChinese(currentLang) ? tZh(cartridge.title['zh-TW']) : null) || cartridge.title['en'];
+        const description = cartridge.description[currentLang] || (isChinese(currentLang) ? tZh(cartridge.description['zh-TW']) : null) || cartridge.description['en'];
         const characterDescription = cartridge.description[currentLang] || cartridge.description['en']; // <-- 已修正
 
 
@@ -14984,7 +15044,7 @@ async function processEurekaMoment() {
     - Situation: ${combatInfo}
     - Player Class/Desc: ${document.getElementById('character-description').value}
     - Existing Skills: ${skillList}
-    - Language: ${currentLang === 'zh-TW' ? '繁體中文' : (currentLang === 'ja' ? '日本語' : 'English')}
+    - Language: ${getPromptLanguageName(currentLang)}
 
     **Task:**
     Create a unique, powerful, and thematic SKILL based EXACTLY on the "Current Story Context".
