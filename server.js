@@ -693,20 +693,20 @@ const server = http.createServer(async (req, res) => {
             const activeKey = (apiKey || dbCache.settings.global_api_key || process.env.GEMINI_API_KEY || '').trim();
             const activeModel = model || dbCache.settings.default_model || 'gemini-2.5-flash';
 
-            const companionPrompt = `You are an expert game narrative designer specialized in creating endearing, comedic, and charming "Gap-Moe" (反差萌) travel companions for a story-rich Road Trip adventure.
+            const companionPrompt = `You are an expert game narrative and character designer specialized in creating captivating, charming, and memorable "Bishoujo & Gap-Moe Heroines" (高魅力美少女/反差萌女伴) for a story-rich adventure RPG.
 Genre: ${genre}
 Player Character: ${characterDesc || 'A wandering traveler'}
 Language: ${language === 'zh-TW' ? '繁體中文' : (language === 'ja' ? '日本語' : (language === 'zh-CN' ? '简体中文' : 'English'))}
 
-Generate ONE unique companion who accompanies the player on their journey.
+Generate ONE distinctive, attractive heroine companion who encounters and accompanies the player on their journey.
 Requirements:
-1. **Name**: Memorable nickname/name (e.g. 洛夏, 林檬, 灰羽, 珀莉, 艾可).
-2. **Archetype**: Anime/RPG gap-moe archetype (e.g., 搞笑脱线工匠 / 三无冷面近卫 / 傲娇毒舌学者 / 元气治愈游侠 / 贪吃胆小向导).
-3. **Visual**: 1 representative Emoji + brief visual signature (e.g., "🎒 大号护目镜与宽大工装短裤").
-4. **Personality**: Core traits + 1 distinct everyday slice-of-life gap-moe quirk (e.g., "外冷内热，重度甜食控且极度害怕毛毛虫", "自称机械天才，却经常把扳手当点心咬").
-5. **Dialogue Quirk**: Distinctive speaking habit/quirk (e.g., 习惯用数据概率说话、元气满满但经常口误、傲娇吐槽).
-6. **Meet Scene**: A comical or warm slice-of-life opening encounter (e.g., 头卡在废弃自动贩卖机里拔不出来、偷偷烤红薯烤焦了在吹气、跟一只机械松鼠认真对峙).
-7. **Perk**: { "name": "特技名称", "description": "探索/生活/营地增益效果（如：野炊料理回复翻倍、废墟搜刮额外小玩意、被偷袭概率归零）" }.
+1. **Name**: Memorable heroine name (e.g. 希尔薇娅, 楚云裳, 蕾娜, 珀莉, 克洛伊, 夜凰, 米娅, 艾莉诺).
+2. **Archetype**: Engaging anime/galgame/RPG heroine archetype (e.g., 傲娇双马尾机械工匠 / 银发冷艳三无近卫 / 妩媚撩人神秘医仙 / 清冷出尘剑仙师姐 / 元气兽耳弓手 / 赛博魅影叛逆黑客 / 战力爆表龙角少女).
+3. **Visual**: 1 representative Emoji + vivid aesthetic appearance description (e.g., "❄️ 银白长发与修身皮革战斗服，白皙脸颊在冷风中透着淡淡绯红", "🗡️ 素白剑袍与墨玉发簪，身姿曼妙出尘，腰悬青霜古剑", "🦊 蓬松毛茸茸狐耳与灵动兽尾，眼眸清澈明亮，身穿轻便游侠短裙").
+4. **Personality**: Core charm + distinctive gap-moe quirk & romantic tension (e.g., "外表高傲毒舌其实极易害羞脸红，被夸奖时会慌乱整理裙摆", "平日清冷寡言，但在二人独处或营火夜谈时会流露温柔脆弱的一面", "看似从容魅惑的大姐姐，遇到心动时刻反倒会心跳加速不敢直视").
+5. **Dialogue Quirk**: Distinctive speaking habit/quirk with romantic/banter tone (e.g., 傲娇娇嗔吐槽、轻声细语中带着温柔依恋、调皮挑逗却又在关键时刻脸红).
+6. **Meet Scene**: A memorable, charming encounter with romantic/comedic tension (e.g., 遭遇机关时跌入主角怀中脸红对视、在清泉边洗浴后慌乱穿上衣衫、战斗中被主角援手后别扭道谢).
+7. **Perk**: { "name": "特技名称", "description": "探索/战斗/营地专属增益（如：贴心包扎回复翻倍、废墟搜刮稀有道具、危机舍身护佑）" }.
 8. **Affinity**: Initial value 20.
 
 Respond strictly with valid JSON conforming to this schema (no extra explanation):
@@ -770,43 +770,63 @@ Respond strictly with valid JSON conforming to this schema (no extra explanation
             if (!companionResult || !companionResult.name) {
                 const pool = [
                     {
-                        name: "洛夏 (Luoxia)",
-                        archetype: "搞笑脱线工匠",
-                        visual: "🎒 大号护目镜与工装短裤",
-                        personality: "自称万能机械天才，但重度甜食控且极度怕毛毛虫",
-                        dialogue_quirk: "每说三句话就要加上「根据本天才的精密测算！」",
-                        meet_scene: "脑袋卡在废弃自动贩卖机取物口里正在手忙脚乱地拔不出来，嘴里还咬着半块饼干",
-                        perk: { name: "野炊暴击", description: "营地烹饪效果提升50%，搜刮时有概率捡到旧时代的奇妙小玩意" },
+                        name: "希尔薇娅 (Sylvia)",
+                        archetype: "银发三无冷艳护卫",
+                        visual: "❄️ 银白披肩长发与漆黑战术风衣，清澈冰蓝眼眸中藏着不易察觉的温柔",
+                        personality: "平时寡言冷静像一柄出鞘利刃，但独处时只要被盯着看就会耳尖微红，默默握紧刀柄掩饰害羞",
+                        dialogue_quirk: "言简意赅，偶尔在主角受伤时会焦急地轻咬下唇：「……别乱动，让我处理。」",
+                        meet_scene: "在废弃列车顶端斩杀围攻的机械兽，战斗风衣在暴风中轻扬，转身与主角目光交汇时微微一怔",
+                        perk: { name: "霜刃守护", description: "营地休息时夜袭概率降为0，陷入危机时必定触发舍身格挡救助" },
                         affinity: 20
                     },
                     {
-                        name: "林檬 (Lin Meng)",
-                        archetype: "三无冷面近卫",
-                        visual: "🗡️ 黑色兜帽与破旧毛绒围巾",
-                        personality: "外表冷漠惜字如金，实则是重度毛茸茸控，私底下会对着机械小鸟傻笑",
-                        dialogue_quirk: "说话极简短，偶尔认真地蹦出一句完全不好笑的冷笑话",
-                        meet_scene: "为了把一只被困在路灯顶端的电子小猫救下来，自己反而挂在半空中进退两难",
-                        perk: { name: "警戒雷达", description: "营地休息被夜袭概率降为0，危机时必定替玩家格挡一次关键伤害" },
+                        name: "克洛伊 (Chloe)",
+                        archetype: "傲娇双马尾机械魔女",
+                        visual: "🔧 金色双马尾、护目镜与贴身工装皮裙，雪白大腿上绑着精密的微型工具包",
+                        personality: "嘴硬心软极易害羞，自称全大陆第一天才，被主角真诚夸奖时会脸红结巴并慌张拉下护目镜",
+                        dialogue_quirk: "「哼！才、才不是特意为你改良的武器！只是本小姐看不过去粗制滥造而已啦！」",
+                        meet_scene: "正在狭窄的废墟通道调试机械核心，不小心触发警报整个人跌入主角怀中，近距离心跳对视",
+                        perk: { name: "超频改装", description: "所有装备改装强化费用降低30%，废墟搜刮时极高概率发现稀有机械核心" },
                         affinity: 20
                     },
                     {
-                        name: "灰羽 (Huiyu)",
-                        archetype: "傲娇毒舌学者",
-                        visual: "📜 金丝单片眼镜与沾满墨水的皮手套",
-                        personality: "嘴上喋喋不休抱怨旅途环境糟糕，但每次风吹草动都会第一时间施加防护",
-                        dialogue_quirk: "口癖：「真是愚蠢的决定……不过本学者勉为其难原谅你一次」",
-                        meet_scene: "为了辨识一株发光的野外奇异蘑菇，以身试毒结果自己舌头麻痹说不出完整的话",
-                        perk: { name: "古籍破译", description: "古老遗迹与机械解谜DC判定直接降低3点，能解读古代失落文本" },
+                        name: "楚云裳 (Chu Yunshang)",
+                        archetype: "清冷出尘剑仙师姐",
+                        visual: "🗡️ 素白如雪的凌波剑袍，墨发如瀑，腰若流纨素，一双秋水明眸顾盼生辉",
+                        personality: "剑道天资绝顶，外表清冷如高岭之花，但在营火夜谈时会褪去防备，轻抚古剑吐露少女心事",
+                        dialogue_quirk: "声如碎玉清冷婉转，情绪悸动时会垂下眼帘轻唤主角名字：「……师弟/道友，莫要这般看我。」",
+                        meet_scene: "在竹林残阳下仗剑破敌，月白衣袂在剑气中翻飞，收剑入鞘时发丝拂过主角面颊，带起一缕冷香",
+                        perk: { name: "剑心通明", description: "洞察敌人弱点使暴击率提升25%，修炼与冥想时真气精力恢复翻倍" },
                         affinity: 20
                     },
                     {
-                        name: "珀莉 (Polly)",
-                        archetype: "元气治愈游侠",
-                        visual: "🌿 挂满干花的大草帽与旧药箱",
-                        personality: "充满无限干劲与乐观，但做饭经常变成充满爆炸声的黑暗料理",
-                        dialogue_quirk: "充满朝气的「今天也是闪闪发光的大冒险呢！」",
-                        meet_scene: "正在路边跟一只抢走了她烤红薯的变异松鼠进行严肃的“物权归属谈判”",
-                        perk: { name: "草药嗅觉", description: "每次野外探索采集到的野果、草药与泉水数量翻倍" },
+                        name: "夜凰 (Ye Huang)",
+                        archetype: "妩媚撩人神秘医仙",
+                        visual: "🍷 绯红暗纹开衩锦袍与轻柔紫纱，身姿曼妙妖娆，指尖萦绕着治愈与蛊毒的幽光",
+                        personality: "喜欢轻言调笑的主动大姐姐，言语间带着令人心跳加速的暧昧，实则对待感情至情至性且极度护短",
+                        dialogue_quirk: "尾音微扬带着慵懒媚意：「小家伙，这伤口若是再深半寸……姐姐可是会心疼的呢。」",
+                        meet_scene: "在幽暗茶肆的软榻上倚案品茗，纤细手腕轻轻托腮，在主角被追兵包围时掷出毒针解围",
+                        perk: { name: "回春妙手", description: "所有治疗药剂与包扎回复效果提升60%，且能驱散所有剧毒与负面异常" },
+                        affinity: 20
+                    },
+                    {
+                        name: "米娅 (Mia)",
+                        archetype: "元气纯情狐耳游侠",
+                        visual: "🦊 毛茸茸的雪白狐耳与蓬松灵动大尾巴，身着轻便短猎装，腰间挂着精致的木雕风铃",
+                        personality: "天真烂漫充满治愈感，对主角全心全意依赖，害羞或开心时头顶毛茸茸的狐耳会随心情剧烈晃动",
+                        dialogue_quirk: "声音清脆甜美：「今天也要一直跟在主人身边！米娅会把最甜的浆果都留给您！」",
+                        meet_scene: "被困在古代猎人捕兽网中拼命挣扎，被主角解救后紧紧抱住主角手臂不肯松开",
+                        perk: { name: "灵狐嗅觉", description: "野外探索必定发现隐藏秘境与甘泉，采集草药与食材收获量翻倍" },
+                        affinity: 20
+                    },
+                    {
+                        name: "蕾娜 (Reina)",
+                        archetype: "赛博魅影叛逆黑客",
+                        visual: "⚡ 荧光粉挑染短发与贴身发光机能服，修长锁骨与细腰处勾勒着流光义体纹路",
+                        personality: "性格狂放不羁且带着恶作剧属性，在战场上雷厉风行，但在狭窄安全屋靠在一起时会露出依恋眼神",
+                        dialogue_quirk: "嚼着泡泡糖轻笑：「数据流已经锁定了。喂，搭档，今晚的战利品分我一半，外加你的肩膀借我靠一小时。」",
+                        meet_scene: "在霓虹闪烁的暗巷中黑入企业炮塔救下主角，二人背靠背在子弹雨中共享同一个神经链接耳机",
+                        perk: { name: "神经同步", description: "所有电子门锁与终端直接秒解，黑客入侵DC判定直接豁免" },
                         affinity: 20
                     }
                 ];
@@ -1349,35 +1369,89 @@ Respond strictly with valid JSON conforming to this schema (no extra explanation
                 }
             }
 
-            const worldType = playerState?.world_theme || playerState?.genre || 'post_apoc';
+            const genre = (playerState?.world_theme || playerState?.genre || playerState?.game_genre || '').toLowerCase();
+            const location = playerState?.world_state?.location || '周遭區域';
             const zoneType = playerState?.explore_state?.zone_type || 'safe';
 
-            // POI templates based on genre and zone
-            const poiTemplates = {
-                chest: [
-                    { id: 'chest_1', name_zh: '生鏽的金屬儲物箱', name_en: 'Rusted Metal Chest', name_ja: '錆びた金属の保管箱', type: 'chest', minigame: 'scratch', desc_zh: '鎖頭有些鬆動的堅固金屬箱，裡面可能保存著完好的補給物資。', desc_en: 'A solid metal box with a loose latch, likely containing rations or supplies.', desc_ja: '留め具が緩んだ頑丈な金属箱。保存食などの物資が入っていそうだ。', danger_rating: 15 },
-                    { id: 'chest_2', name_zh: '鎖死的軍用物資箱', name_en: 'Locked Military Crate', name_ja: '施錠された軍用物資箱', type: 'chest', minigame: 'popup', desc_zh: '密封嚴密的軍用物資箱，隱約有機械防盜機關的咔嗒聲。', desc_en: 'A tightly sealed military container with mechanical traps.', desc_ja: '厳重に密封された軍用箱。罠が仕掛けられている気配がする。', danger_rating: 25 }
-                ],
-                corpse: [
-                    { id: 'corpse_1', name_zh: '倒斃的前探索者遺骸', name_en: 'Fallen Explorer Remains', name_ja: '倒れた探索者の遺骸', type: 'corpse', minigame: 'scratch', desc_zh: '倒在角落的旅行者，身上還掛著隨身行囊與武器配件。', desc_en: 'A traveler slumped in the corner, carrying gear and weapon accessories.', desc_ja: '物陰に倒れた旅人。まだ装備や武器パーツを身につけている。', danger_rating: 20 },
-                    { id: 'corpse_2', name_zh: '變異掠食者的殘骸', name_en: 'Mutated Beast Carcass', name_ja: '変異捕食者の死骸', type: 'corpse', minigame: 'scratch', desc_zh: '剛死不久的兇猛生物，或許能取下堅硬的甲殼或利齒。', desc_en: 'A recently slain beast from which durable fangs or carapaces can be harvested.', desc_ja: '息絶えたばかりの凶暴な獣。硬い甲殻や牙が採取できそうだ。', danger_rating: 30 }
-                ],
-                ruins: [
-                    { id: 'ruins_1', name_zh: '半掩埋的建築瓦礫堆', name_en: 'Buried Rubble Mound', name_ja: '半埋没の瓦礫の山', type: 'ruins', minigame: 'dig', desc_zh: '散落著磚石與金屬構件的殘骸，翻開深處可能找到實用建材。', desc_en: 'Piled masonry and metal scraps. Digging deep may uncover valuable components.', desc_ja: '石と金属片が散らばる瓦礫。掘り起こせば建築素材が見つかるかもしれない。', danger_rating: 15 },
-                    { id: 'ruins_2', name_zh: '坍塌的實驗室廢墟', name_en: 'Collapsed Laboratory Ruins', name_ja: '崩壊した研究所の残骸', type: 'ruins', minigame: 'dig', desc_zh: '碎裂的儀器與容器堆積在此，可能挖出化學試劑或稀有材料。', desc_en: 'Shattered instruments and glass flasks that might yield rare compounds.', desc_ja: '粉々になった機材が散乱している。貴重な試薬や素材が見つかるかもしれない。', danger_rating: 30 }
-                ],
-                shelf: [
-                    { id: 'shelf_1', name_zh: '積灰的物資貨架', name_en: 'Dusty Supply Shelf', name_ja: '埃をかぶった物資棚', type: 'shelf', minigame: 'scratch', desc_zh: '上面雜亂地擺放著各種罐頭與廢舊雜物。', desc_en: 'Cans and miscellaneous junk scattered on old shelves.', desc_ja: '缶詰や日用雑品が無造作に並んでいる。', danger_rating: 10 }
-                ]
+            // Multi-genre dynamic POI templates
+            const genrePoiMap = {
+                wuxia: {
+                    chest: [
+                        { id: 'wx_chest_1', name_zh: '荒廢神龕下的雕花木匣', name_en: 'Carved Wooden Box under Altar', name_ja: '荒れた祠の彫刻木箱', type: 'chest', minigame: 'scratch', desc_zh: '半掩在蒲團底下的沉木匣子，隱約有金屬搭扣痕跡。', desc_en: 'A heavy wooden box hidden under prayer mats.', desc_ja: '座布団の下に隠された重厚な木箱。', danger_rating: 10 },
+                        { id: 'wx_chest_2', name_zh: '折斷的鏢車暗格', name_en: 'Hidden Escort Wagon Compartment', name_ja: '壊れた護送車の隠し扉', type: 'chest', minigame: 'popup', desc_zh: '遺棄在路旁的運鏢馬車，底層夾板內藏有機關暗鎖。', desc_en: 'An abandoned escort wagon with a trapped hidden compartment.', desc_ja: '放棄された護送馬車。底部に罠付きの隠し棚がある。', danger_rating: 25 }
+                    ],
+                    corpse: [
+                        { id: 'wx_corpse_1', name_zh: '路旁歇息倒斃的江湖客', name_en: 'Fallen Swordsman Remains', name_ja: '倒れた武芸者の遺骸', type: 'corpse', minigame: 'scratch', desc_zh: '倚靠在巨石旁的黑衣俠客，腰間尚有隨身革囊與佩劍。', desc_en: 'A fallen swordsman resting by a boulder, carrying gear.', desc_ja: '大岩の脇に倒れた武芸者。革袋と帯刀が残されている。', danger_rating: 15 },
+                        { id: 'wx_corpse_2', name_zh: '伏誅的綠林草寇殘骸', name_en: 'Defeated Bandit Remains', name_ja: '討たれた山賊の亡骸', type: 'corpse', minigame: 'scratch', desc_zh: '遭人一劍封喉的劫道山匪，身上似乎搜刮了不少過路碎銀。', desc_en: 'A fallen highwayman likely carrying looted coins and daggers.', desc_ja: '討伐された山賊。通行人から奪った小銭を持っていそうだ。', danger_rating: 20 }
+                    ],
+                    ruins: [
+                        { id: 'wx_ruins_1', name_zh: '崩塌的山道古亭瓦礫', name_en: 'Rubble of Mountain Pavilion', name_ja: '崩れた山道の東屋跡', type: 'ruins', minigame: 'dig', desc_zh: '被風雨摧折的涼亭廢墟，石柱縫隙間可能生長著野生靈草。', desc_en: 'Collapsed mountain rest pavilion where wild herbs or tools might grow.', desc_ja: '風雨で崩れた東屋。岩の隙間に野草や道具が埋もれているかも。', danger_rating: 10 },
+                        { id: 'wx_ruins_2', name_zh: '荒廢義莊的積塵後室', name_en: 'Dusty Chamber of Abandoned Manor', name_ja: '廃屋の奥の間', type: 'ruins', minigame: 'dig', desc_zh: '門戶歪斜的舊時代瓦舍，磚瓦下藏著昔日主人埋藏的陶罐。', desc_en: 'Old brick ruins with buried urns and preserved tonics.', desc_ja: '崩れかけた古民家。陶器の壺が埋まっているかもしれない。', danger_rating: 25 }
+                    ],
+                    shelf: [
+                        { id: 'wx_shelf_1', name_zh: '荒店積灰的酒架', name_en: 'Dusty Tavern Liquor Shelf', name_ja: '寂れた宿場の酒棚', type: 'shelf', minigame: 'scratch', desc_zh: '廢棄驛站內的木架，上面殘存著幾罈未開封的老酒與粗碗。', desc_en: 'Shelves in an abandoned relay tavern with sealed jugs and supplies.', desc_ja: '廃宿の木棚。未開封の酒壺や乾物資が残されている。', danger_rating: 10 }
+                    ]
+                },
+                xianxia: {
+                    chest: [
+                        { id: 'xx_chest_1', name_zh: '古修遺留的禁制石匣', name_en: 'Ancient Cultivator Stone Box', name_ja: '古修の封印石函', type: 'chest', minigame: 'scratch', desc_zh: '刻滿流轉符文的靈玉石匣，散發著微弱靈力波動。', desc_en: 'A jade box inscribed with fading runes.', desc_ja: '微かな霊気を放つルーン刻印の玉匣。', danger_rating: 20 }
+                    ],
+                    corpse: [
+                        { id: 'xx_corpse_1', name_zh: '坐化修士的枯骨儲物袋', name_en: 'Meditator Remains & Storage Pouch', name_ja: '座化修道士の遺骸と収納袋', type: 'corpse', minigame: 'scratch', desc_zh: '在石壁前羽化的前輩殘骨，腰間掛著褪色的乾坤錦囊。', desc_en: 'Bones of an ancient cultivator holding a worn spatial pouch.', desc_ja: '静かに座化を遂げた先人の遺骨。帯に収納袋が残る。', danger_rating: 25 }
+                    ],
+                    ruins: [
+                        { id: 'xx_ruins_1', name_zh: '枯竭靈泉邊的伴生靈草叢', name_en: 'Drained Spirit Spring Herb Patch', name_ja: '霊泉跡の薬草群生', type: 'ruins', minigame: 'dig', desc_zh: '雖靈氣已微，但泉眼碎石堆中仍孕育著百年靈植。', desc_en: 'A rocky spring basin where precious herbs still sprout.', desc_ja: '霊気が薄れた泉跡。貴重な霊草が根を張っている。', danger_rating: 15 }
+                    ],
+                    shelf: [
+                        { id: 'xx_shelf_1', name_zh: '煉丹殘室的藥材玉架', name_en: 'Alchemy Chamber Jade Shelf', name_ja: '錬丹室の薬材棚', type: 'shelf', minigame: 'scratch', desc_zh: '散落著碎裂瓷瓶與乾枯靈植的置物架。', desc_en: 'A shelf of jade flasks and dried alchemical ingredients.', desc_ja: '砕けた薬瓶と乾燥霊草が散乱する棚。', danger_rating: 15 }
+                    ]
+                },
+                cyberpunk: {
+                    chest: [
+                        { id: 'cb_chest_1', name_zh: '短路的黑市晶片箱', name_en: 'Short-Circuited Chip Case', name_ja: 'ショートした闇市チップケース', type: 'chest', minigame: 'scratch', desc_zh: '帶有生物辨識鎖的改裝保險盒，外殼閃爍著微弱電弧。', desc_en: 'A modded safe with a flickering biometric latch.', desc_ja: '放電している生体認証付きセーフボックス。', danger_rating: 25 }
+                    ],
+                    corpse: [
+                        { id: 'cb_corpse_1', name_zh: '義體過載的街頭黑客骸體', name_en: 'Overloaded Netrunner Remains', name_ja: 'オーバーヒートしたハッカーの遺体', type: 'corpse', minigame: 'scratch', desc_zh: '倒在暗巷垃圾堆旁的流浪者，體內裝載著可回收的神經義件。', desc_en: 'A deceased netrunner in an alley with salvageable cyberware.', desc_ja: '裏路地に倒れたハッカー。回収可能な義体パーツが残る。', danger_rating: 20 }
+                    ],
+                    ruins: [
+                        { id: 'cb_ruins_1', name_zh: '廢棄改裝診所的儀器堆', name_en: 'Abandoned Ripperdoc Scrap Pile', name_ja: '違法診療所のジャンク山', type: 'ruins', minigame: 'dig', desc_zh: '堆滿廢舊冷卻管、電路板與生化凝膠的診所廢墟。', desc_en: 'Piles of bio-gel, coolant tubes, and discarded processors.', desc_ja: '冷却チューブや基板、生体ゲルが散乱する廃墟。', danger_rating: 15 }
+                    ],
+                    shelf: [
+                        { id: 'cb_shelf_1', name_zh: '斷電便利店的自動貨架', name_en: 'Powered-down Vendor Shelf', name_ja: '電源の切れた自販棚', type: 'shelf', minigame: 'scratch', desc_zh: '無人商店殘留的合成口糧與能量補給包。', desc_en: 'Nutrient paste and energy cells remaining in a dark shop.', desc_ja: '合成食料やバッテリーが残る無人店舗の棚。', danger_rating: 10 }
+                    ]
+                },
+                default: {
+                    chest: [
+                        { id: 'chest_1', name_zh: '生鏽的金屬儲物箱', name_en: 'Rusted Metal Chest', name_ja: '錆びた金属の保管箱', type: 'chest', minigame: 'scratch', desc_zh: '鎖頭有些鬆動的堅固金屬箱，裡面可能保存著完好的補給物資。', desc_en: 'A solid metal box with a loose latch, likely containing rations or supplies.', desc_ja: '留め具が緩んだ頑丈な金属箱。保存食などの物資が入っていそうだ。', danger_rating: 15 },
+                        { id: 'chest_2', name_zh: '鎖死的旅行皮箱', name_en: 'Locked Leather Travel Trunk', name_ja: '施錠された革製トランク', type: 'chest', minigame: 'popup', desc_zh: '用黃銅鎖扣扣緊的厚實皮箱，隱約能聽見內部金幣晃動聲。', desc_en: 'A sturdy leather trunk locked tight.', desc_ja: '頑丈な革のトランク。金貨の擦れる音がする。', danger_rating: 20 }
+                    ],
+                    corpse: [
+                        { id: 'corpse_1', name_zh: '倒斃的前探索者遺骸', name_en: 'Fallen Explorer Remains', name_ja: '倒れた探索者の遺骸', type: 'corpse', minigame: 'scratch', desc_zh: '倒在角落的旅行者，身上還掛著隨身行囊與武器配件。', desc_en: 'A traveler slumped in the corner, carrying gear and weapon accessories.', desc_ja: '物陰に倒れた旅人。まだ装備や武器パーツを身につけている。', danger_rating: 20 },
+                        { id: 'corpse_2', name_zh: '野獸獵殺後的行囊殘留', name_en: 'Beast-Scattered Travel Bag', name_ja: '獣に荒らされた荷物袋', type: 'corpse', minigame: 'scratch', desc_zh: '被野獸撕裂的行李袋，四周散落著乾糧與防身小刀。', desc_en: 'Torn travel pack with rations and tools scattered about.', desc_ja: '引き裂かれた鞄の周りに乾パンと小刀が散らばっている。', danger_rating: 25 }
+                    ],
+                    ruins: [
+                        { id: 'ruins_1', name_zh: '半掩埋的建築瓦礫堆', name_en: 'Buried Rubble Mound', name_ja: '半埋没の瓦礫の山', type: 'ruins', minigame: 'dig', desc_zh: '散落著磚石與木構件的殘骸，翻開深處可能找到實用材料。', desc_en: 'Piled masonry and scraps. Digging deep may uncover valuable components.', desc_ja: '石と木片が散らばる瓦礫。掘り起こせば素材が見つかるかも。', danger_rating: 15 }
+                    ],
+                    shelf: [
+                        { id: 'shelf_1', name_zh: '積灰的物資貨架', name_en: 'Dusty Supply Shelf', name_ja: '埃をかぶった物資棚', type: 'shelf', minigame: 'scratch', desc_zh: '上面雜亂地擺放著各種日用補給與雜物。', desc_en: 'Rations and miscellaneous goods scattered on old shelves.', desc_ja: '日用雑品や保存食が無造作に並んでいる。', danger_rating: 10 }
+                    ]
+                }
             };
+
+            let matchedCategory = 'default';
+            if (genre.includes('武俠') || genre.includes('wuxia') || genre.includes('江湖')) matchedCategory = 'wuxia';
+            else if (genre.includes('仙俠') || genre.includes('xianxia') || genre.includes('修真') || genre.includes('玄幻')) matchedCategory = 'xianxia';
+            else if (genre.includes('賽博') || genre.includes('cyber') || genre.includes('科幻') || genre.includes('sci')) matchedCategory = 'cyberpunk';
+
+            const activePoiTemplates = genrePoiMap[matchedCategory] || genrePoiMap.default;
 
             // Select 2-3 POIs randomly
             const pois = [];
-            const types = ['chest', 'corpse', 'ruins', 'shelf'];
-            const count = Math.min(4, Math.floor(Math.random() * 2) + 2);
+            const types = Object.keys(activePoiTemplates);
+            const count = Math.min(3, Math.floor(Math.random() * 2) + 2);
             for (let i = 0; i < count; i++) {
                 const t = types[i % types.length];
-                const pool = poiTemplates[t];
+                const pool = activePoiTemplates[t] || activePoiTemplates.chest || genrePoiMap.default.chest;
                 const selected = JSON.parse(JSON.stringify(pool[Math.floor(Math.random() * pool.length)]));
                 selected.id = `${selected.id}_${Date.now()}_${i}`;
                 selected.displayName = isEn ? selected.name_en : isJa ? selected.name_ja : selected.name_zh;
@@ -1389,7 +1463,8 @@ Respond strictly with valid JSON conforming to this schema (no extra explanation
                 success: true,
                 pois,
                 zoneType,
-                message: isEn ? 'Found potential scavenge points in the area.' : isJa ? '周囲に探索可能なポイントを発見しました。' : '在當前區域偵測到了可供搜刮的目標點。'
+                locationName: location,
+                message: isEn ? `Discovered ${pois.length} search points at ${location}.` : isJa ? `【${location}】で${pois.length}箇所の探索ポイントを発見しました。` : `在當前【${location}】發現了 ${pois.length} 處可供搜刮的目標點。`
             });
         } catch (e) {
             return sendError(res, 500, e.message);
@@ -1412,52 +1487,93 @@ Respond strictly with valid JSON conforming to this schema (no extra explanation
                         ? '❌ Currently in restricted state, cannot scavenge!' 
                         : isJa 
                         ? '❌ 現在は制限された状態のため、搜刮を行えません！' 
-                        : '❌ 当前处于受限状态（战斗中或事件锁定），无法进行搜刮！');
+                        : '❌ 當前處於劇情引導或戰鬥受限狀態，無法進行搜刮！');
                 }
             }
 
             const ws = playerState.world_state;
-            const spCost = Math.min(10, Math.max(8, Math.floor((scratchPercent || 50) / 10)));
+            const spCost = Math.min(10, Math.max(6, Math.floor((scratchPercent || 50) / 10)));
             ws.stamina = Math.max(0, (ws.stamina || 100) - spCost);
             playerState.stamina = ws.stamina;
-            const spBar = playerState.player_status?.status_bars?.find(b => b.type === 'sp' || b.name === '精力' || b.name === '體力');
-            if (spBar) spBar.value = ws.stamina;
+            
+            // Normalize & deduct SP from appropriate status bar across all genres
+            const spBar = playerState.player_status?.status_bars?.find(b => 
+                b.type === 'sp' || 
+                (b.name && (b.name.includes('精力') || b.name.includes('體力') || b.name.includes('氣力') || b.name.includes('耐力') || b.name.includes('身手')))
+            );
+            if (spBar) {
+                spBar.value = Math.max(0, spBar.value - spCost);
+                ws.stamina = spBar.value;
+            }
             if (ws.stamina <= 0) {
                 ws.survival_status = 'EXHAUSTED';
             }
 
+            const genre = (playerState?.world_theme || playerState?.genre || playerState?.game_genre || '').toLowerCase();
+            const isWuxia = genre.includes('武俠') || genre.includes('wuxia') || genre.includes('江湖');
+            const isXianxia = genre.includes('仙俠') || genre.includes('xianxia') || genre.includes('修真') || genre.includes('玄幻');
+            const isCyber = genre.includes('賽博') || genre.includes('cyber') || genre.includes('科幻') || genre.includes('sci');
+
             // Calculate loot yield based on POI type and reveal depth
             const percent = Math.min(100, Math.max(0, scratchPercent || 50));
-            let riskIncrement = Math.floor(percent * 0.35) + Math.floor(Math.random() * 10);
+            let riskIncrement = Math.floor(percent * 0.35) + Math.floor(Math.random() * 8);
             let trapTriggered = false;
             let trapDamage = 0;
 
             const lootTable = {
-                chest: [
+                chest: isWuxia ? [
+                    { name_zh: '特製金創藥散', name_en: 'Refined Golden Wound Salve', name_ja: '特製金創薬', type: 'medicine', val: 1, rarity: 'common', depth: 20 },
+                    { name_zh: '清冽山泉竹筒', name_en: 'Bamboo Spring Flask', name_ja: '竹筒の湧水', type: 'water', val: 1, rarity: 'common', depth: 30 },
+                    { name_zh: '沉甸甸的紋銀布袋', name_en: 'Heavy Silver Pouch', name_ja: 'ずっしりとした銀貨袋', type: 'money_container', val: 30, rarity: 'uncommon', depth: 45 },
+                    { name_zh: '精煉百煉鋼鐵錠', name_en: 'Tempered Steel Ingot', name_ja: '精錬された鋼鉄インゴット', type: 'material', val: 2, rarity: 'uncommon', depth: 60 },
+                    { name_zh: '古舊的吐納殘篇', name_en: 'Ancient Breath-Cultivation Page', name_ja: '古びた呼吸法の断片', type: 'quest_item', val: 1, rarity: 'rare', depth: 80 }
+                ] : isXianxia ? [
+                    { name_zh: '回春散瓶', name_en: 'Rejuvenation Salve Bottle', name_ja: '回春薬瓶', type: 'medicine', val: 1, rarity: 'common', depth: 20 },
+                    { name_zh: '下品靈石袋', name_en: 'Low-tier Spirit Stone Pouch', name_ja: '下品霊石の小袋', type: 'money_container', val: 25, rarity: 'uncommon', depth: 40 },
+                    { name_zh: '百年野山參', name_en: 'Century Wild Ginseng', name_ja: '百年野山参', type: 'food', val: 1, rarity: 'uncommon', depth: 60 },
+                    { name_zh: '玄鐵精金殘片', name_en: 'Black-Iron Metal Fragment', name_ja: '玄鉄の精金破片', type: 'material', val: 2, rarity: 'rare', depth: 80 }
+                ] : isCyber ? [
+                    { name_zh: '生化維生營養膏', name_en: 'Bio-Nutrient Paste', name_ja: '生体栄養ペースト', type: 'food', val: 1, rarity: 'common', depth: 20 },
+                    { name_zh: '加密信用點晶片', name_en: 'Encrypted CredChip', name_ja: '暗号化クレジットチップ', type: 'money_container', val: 35, rarity: 'uncommon', depth: 40 },
+                    { name_zh: '急救微型止血劑', name_en: 'Micro-Hemostatic Injector', name_ja: '応急止血インジェクター', type: 'medicine', val: 1, rarity: 'uncommon', depth: 55 },
+                    { name_zh: '高純度散熱超頻凝膠', name_en: 'Overclock Thermal Gel', name_ja: '高純度オーバークロック冷却ゲル', type: 'material', val: 1, rarity: 'rare', depth: 80 }
+                ] : [
                     { name_zh: '密封肉類罐頭', name_en: 'Sealed Meat Can', name_ja: '密封肉の缶詰', type: 'food', val: 1, rarity: 'common', depth: 20 },
                     { name_zh: '淨化水壺', name_en: 'Purified Water Flask', name_ja: '浄水フラスコ', type: 'water', val: 1, rarity: 'common', depth: 30 },
                     { name_zh: '沉甸甸的錢袋', name_en: 'Heavy Coin Pouch', name_ja: 'ずっしりとした金貨袋', type: 'money_container', val: 25, rarity: 'uncommon', depth: 40 },
                     { name_zh: '急救繃帶包', name_en: 'First Aid Bandages', name_ja: '応急包帯セット', type: 'medicine', val: 1, rarity: 'uncommon', depth: 55 },
                     { name_zh: '舊時代軍用口糧', name_en: 'Military MRE Pack', name_ja: '軍用MREレーション', type: 'food', val: 2, rarity: 'rare', depth: 80 }
                 ],
-                corpse: [
+                corpse: isWuxia ? [
+                    { name_zh: '磨損的精鋼短匕', name_en: 'Steel Dagger', name_ja: '鋼の短剣', type: 'weapon', val: 1, rarity: 'common', depth: 25 },
+                    { name_zh: '俠客隨身碎銀袋', name_en: 'Swordsman Coin Pouch', name_ja: '旅人の小銭入れ', type: 'money_container', val: 20, rarity: 'common', depth: 40 },
+                    { name_zh: '護身熟牛皮內甲', name_en: 'Hardened Leather Vest', name_ja: '牛革の胸当て', type: 'armor', val: 1, rarity: 'uncommon', depth: 60 },
+                    { name_zh: '精鋼佩劍 (+3)', name_en: 'Refined Steel Sword (+3)', name_ja: '精鋼の長剣 (+3)', type: 'weapon', val: 1, rarity: 'rare', depth: 80 }
+                ] : [
                     { name_zh: '磨損的短匕首', name_en: 'Worn Dagger', name_ja: '使い古された短剣', type: 'weapon', val: 1, rarity: 'common', depth: 20 },
                     { name_zh: '死者錢包與碎銀', name_en: 'Purse & Silver Pieces', name_ja: '財布と銀貨', type: 'money_container', val: 15, rarity: 'common', depth: 35 },
                     { name_zh: '強化皮革護手', name_en: 'Reinforced Leather Bracers', name_ja: '強化革の篭手', type: 'armor', val: 1, rarity: 'uncommon', depth: 50 },
-                    { name_zh: '生鏽的求生砍刀', name_en: 'Rusted Machete', name_ja: '錆びたサバイバルナタ', type: 'weapon', val: 1, rarity: 'rare', depth: 75 },
-                    { name_zh: '舊式戰術背心', name_en: 'Vintage Tactical Vest', name_ja: '旧式タクティカルベスト', type: 'armor', val: 1, rarity: 'rare', depth: 90 }
+                    { name_zh: '生鏽的求生砍刀 (+2)', name_en: 'Rusted Machete (+2)', name_ja: '錆びたサバイバルナタ (+2)', type: 'weapon', val: 1, rarity: 'rare', depth: 75 }
                 ],
-                ruins: [
+                ruins: isWuxia ? [
+                    { name_zh: '堅韌乾燥枯木', name_en: 'Seasoned Hardwood', name_ja: '乾燥した堅木', type: 'wood', val: 3, rarity: 'common', depth: 15 },
+                    { name_zh: '山壁野生止血草', name_en: 'Wild Mountain Herb', name_ja: '山野の止血草', type: 'medicine', val: 2, rarity: 'common', depth: 35 },
+                    { name_zh: '地底埋藏的古銅錢壺', name_en: 'Buried Copper Coin Pot', name_ja: '埋もれた古銅貨壺', type: 'money_container', val: 35, rarity: 'uncommon', depth: 65 },
+                    { name_zh: '隕鐵礦石殘片', name_en: 'Meteorite Ore Fragment', name_ja: '隕鉄の鉱石破片', type: 'material', val: 1, rarity: 'rare', depth: 85 }
+                ] : [
                     { name_zh: '乾硬木材', name_en: 'Hardened Wood Planks', name_ja: '硬質木材', type: 'wood', val: 2, rarity: 'common', depth: 15 },
                     { name_zh: '金屬廢料與螺栓', name_en: 'Scrap Metal & Bolts', name_ja: '金属スクラップとボルト', type: 'material', val: 3, rarity: 'common', depth: 35 },
                     { name_zh: '古代金幣陶罐', name_en: 'Ancient Coin Urn', name_ja: '古代金貨の壺', type: 'money_container', val: 30, rarity: 'rare', depth: 60 },
-                    { name_zh: '完整電路元件', name_en: 'Intact Circuit Component', name_ja: '無傷の電子回路', type: 'material', val: 1, rarity: 'rare', depth: 70 },
                     { name_zh: '高強度合金板', name_en: 'High-Tensile Alloy Sheet', name_ja: '高張力合金プレート', type: 'material', val: 1, rarity: 'rare', depth: 85 }
                 ],
-                shelf: [
+                shelf: isWuxia ? [
+                    { name_zh: '密封的烈酒葫蘆', name_en: 'Sealed Strong Liquor Gourd', name_ja: '密封の酒瓢箪', type: 'water', val: 1, rarity: 'common', depth: 20 },
+                    { name_zh: '油紙包裹的風乾肉', name_en: 'Dried Jerky in Oiled Paper', name_ja: '油紙包みの干し肉', type: 'food', val: 2, rarity: 'common', depth: 35 },
+                    { name_zh: '抽屜暗格的小銀錙', name_en: 'Drawer Silver Fragments', name_ja: '引き出しの小粒銀', type: 'money_container', val: 15, rarity: 'common', depth: 50 }
+                ] : [
                     { name_zh: '瓶裝飲用水', name_en: 'Bottled Water', name_ja: 'ボトル入り飲料水', type: 'water', val: 1, rarity: 'common', depth: 20 },
                     { name_zh: '隱藏的零錢盒', name_en: 'Stashed Coin Box', name_ja: '隠された小銭入れ', type: 'money_container', val: 12, rarity: 'common', depth: 25 },
-                    { name_zh: '壓縮餅乾', name_en: 'Compressed Biscuit', name_ja: '圧縮乾パン', type: 'food', val: 1, rarity: 'common', depth: 35 },
+                    { name_zh: '壓縮乾糧餅', name_en: 'Compressed Biscuit', name_ja: '圧縮乾パン', type: 'food', val: 1, rarity: 'common', depth: 35 },
                     { name_zh: '火柴與引火物', name_en: 'Matches & Tinder', name_ja: 'マッチと着火剤', type: 'wood', val: 1, rarity: 'common', depth: 50 }
                 ]
             };
@@ -1475,7 +1591,7 @@ Respond strictly with valid JSON conforming to this schema (no extra explanation
                         type: item.type,
                         val: item.val,
                         rarity: item.rarity,
-                        source: poi?.displayName || 'Scavenge'
+                        source: poi?.displayName || poi?.name_zh || 'Scavenge'
                     });
                 }
             });
@@ -1485,7 +1601,7 @@ Respond strictly with valid JSON conforming to this schema (no extra explanation
                 trapTriggered = true;
                 trapDamage = Math.floor(Math.random() * 12) + 5;
                 if (playerState.player_status?.status_bars) {
-                    const hpBar = playerState.player_status.status_bars.find(b => b.type === 'hp');
+                    const hpBar = playerState.player_status.status_bars.find(b => b.type === 'hp' || (b.name && (b.name.includes('生命') || b.name.includes('氣血'))));
                     if (hpBar) hpBar.value = Math.max(1, hpBar.value - trapDamage);
                 }
             }
@@ -1848,9 +1964,11 @@ Respond strictly with valid JSON conforming to this schema (no extra explanation
                 }
 
                 // B. 主動判定與選擇後果系統 (Authoritative Consequence Determination)
+                // ★ 僅在關鍵時刻判定：戰鬥比拼、偷竊潛行、運氣賭博、絕境避險，或選項明確要求 check 時才觸發！
                 let isChecking = false;
                 let checkType = 'normal'; // 'aggressive', 'cautious', 'smart', 'social'
                 let attrName = 'strength';
+                let checkTitle = '關鍵屬性判定';
                 let DC = 10;
                 let requiredItem = null;
                 let requiredNPC = null;
@@ -1859,23 +1977,8 @@ Respond strictly with valid JSON conforming to this schema (no extra explanation
                 let checkAction = '';
 
                 if (playerAction) {
-                    isChecking = true;
-                    // Map active playerAction types to action categories
-                    const typeMap = {
-                        'move': { type: 'smart', attr: 'dexterity' },
-                        'explore': { type: 'smart', attr: 'dexterity' },
-                        'interact': { type: 'social', attr: 'charisma' },
-                        'survive': { type: 'cautious', attr: 'vitality' },
-                        'campaign': { type: 'aggressive', attr: 'strength' }
-                    };
-                    const mapped = typeMap[playerAction.type] || { type: 'smart', attr: 'dexterity' };
-                    checkType = mapped.type;
-                    attrName = mapped.attr;
                     checkText = `Active Action: ${playerAction.type} (Target: ${playerAction.target || 'None'})`;
                     checkAction = `PlayerAction:${playerAction.type}`;
-
-                    const chapter = playerState.camp_state?.chapter || 1;
-                    DC = 8 + (chapter * 2);
 
                     // Deduct stamina for active actions: move (-5), explore (-8), other (-5)
                     let deductSp = 5;
@@ -1891,12 +1994,38 @@ Respond strictly with valid JSON conforming to this schema (no extra explanation
                     if (playerState.world_state.stamina <= 0) {
                         playerState.world_state.survival_status = 'EXHAUSTED';
                     }
+
+                    // 僅在明確為戰鬥搏殺、偷竊、賭博或顯式要求檢定時才判定
+                    if (playerAction.type === 'combat' || playerAction.type === 'steal' || playerAction.type === 'gamble' || playerAction.needsCheck) {
+                        isChecking = true;
+                        if (playerAction.type === 'combat') {
+                            checkType = 'aggressive';
+                            attrName = 'strength';
+                            checkTitle = '戰鬥比拼判定';
+                        } else if (playerAction.type === 'steal') {
+                            checkType = 'smart';
+                            attrName = 'dexterity';
+                            checkTitle = '偷竊潛行判定';
+                        } else if (playerAction.type === 'gamble') {
+                            checkType = 'cautious';
+                            attrName = 'vitality';
+                            checkTitle = '運氣比拼判定';
+                        } else {
+                            checkType = 'smart';
+                            attrName = 'dexterity';
+                            checkTitle = '行動挑戰判定';
+                        }
+                        const chapter = playerState.camp_state?.chapter || 1;
+                        DC = 10 + (chapter * 2);
+                    } else {
+                        isChecking = false;
+                    }
                 } else if (selectedChoice) {
-                    isChecking = true;
                     checkAction = selectedChoice.action || 'SelectedChoice';
                     checkText = selectedChoice.text || 'Selected Option';
 
                     if (selectedChoice.check) {
+                        isChecking = true;
                         const check = selectedChoice.check;
                         attrName = check.attribute || 'strength';
                         DC = parseInt(check.difficulty || '10', 10);
@@ -1904,30 +2033,49 @@ Respond strictly with valid JSON conforming to this schema (no extra explanation
                         requiredNPC = check.required_favor_npc;
                         requiredNPCVal = parseInt(check.required_favor_value || '0', 10);
                         checkType = selectedChoice.type || 'normal';
+                        checkTitle = check.title || (selectedChoice.type === 'aggressive' ? '戰鬥比拼判定' : '關鍵屬性判定');
                     } else {
-                        // Dynamic Check generation for options without explicit check
-                        let sum = 0;
+                        // 僅在選項文字包含高風險關鍵字（戰鬥對決、偷竊撬鎖、賭博運氣、拆除陷阱）時才觸發判定
                         const t = checkText;
-                        for (let i = 0; i < t.length; i++) sum += t.charCodeAt(i);
-                        
                         const textLower = t.toLowerCase();
-                        if (/[打殺衝闖強攻奪擊戰攻破]/.test(t) || /attack|fight|rush|charge|strike|break|aggressive/.test(textLower)) {
-                            checkType = 'aggressive'; attrName = 'strength';
-                        } else if (/[避躲藏防守等走避忍低觀察盯]/.test(t) || /hide|sneak|dodge|wait|guard|observe|cautious/.test(textLower)) {
-                            checkType = 'cautious'; attrName = 'vitality';
-                        } else if (/[研究解剖析讀用學法咒智慧具理思考]/.test(t) || /study|analyze|read|spell|device|hack|tool|smart|intelligent/.test(textLower)) {
-                            checkType = 'smart'; attrName = 'dexterity';
-                        } else if (/[說談騙服社交話交涉親善盟魅力]/.test(t) || /talk|persuade|deceive|negotiate|charm|npc|social/.test(textLower)) {
-                            checkType = 'social'; attrName = 'charisma';
+                        
+                        const isCombatClash = /[拼死搏殺|強行突圍|破陣斬首|絕命反擊|生死決鬥|蓄力一擊|致命一擊|近身搏鬥|正面硬拼|拔刀相向]/.test(t) || /duel|deathmatch|desperate strike|breakthrough|assassinate/i.test(textLower);
+                        const isSteal = /[偷竊|竊取|扒竊|撬鎖|潛入|竊聽|摸索口袋|暗中順走]/.test(t) || /steal|pickpocket|lockpick|sneak|infiltrate/i.test(textLower);
+                        const isLuckGamble = /[賭博|擲骰賭命|孤注一擲|生死一抽|運氣比拼|命運博弈|以命相搏|全押]/.test(t) || /gamble|bet all|luck duel|fate gamble/i.test(textLower);
+                        const isHazard = /[拆除陷阱|解除機關|驚險飛躍|抵抗致命劇毒|躲避致命陷阱]/.test(t) || /disarm trap|defuse|resist lethal poison/i.test(textLower);
+
+                        if (isCombatClash) {
+                            isChecking = true;
+                            checkType = 'aggressive';
+                            attrName = 'strength';
+                            checkTitle = '戰鬥比拼判定';
+                            const chapter = playerState.camp_state?.chapter || 1;
+                            DC = 10 + (chapter * 2);
+                        } else if (isSteal) {
+                            isChecking = true;
+                            checkType = 'smart';
+                            attrName = 'dexterity';
+                            checkTitle = '偷竊潛行判定';
+                            const chapter = playerState.camp_state?.chapter || 1;
+                            DC = 10 + (chapter * 2);
+                        } else if (isLuckGamble) {
+                            isChecking = true;
+                            checkType = 'cautious';
+                            attrName = 'vitality';
+                            checkTitle = '運氣比拼判定';
+                            const chapter = playerState.camp_state?.chapter || 1;
+                            DC = 10 + (chapter * 2);
+                        } else if (isHazard) {
+                            isChecking = true;
+                            checkType = 'smart';
+                            attrName = 'dexterity';
+                            checkTitle = '絕境避險判定';
+                            const chapter = playerState.camp_state?.chapter || 1;
+                            DC = 10 + (chapter * 2);
                         } else {
-                            const idx = sum % 4;
-                            if (idx === 0) { checkType = 'aggressive'; attrName = 'strength'; }
-                            else if (idx === 1) { checkType = 'cautious'; attrName = 'vitality'; }
-                            else if (idx === 2) { checkType = 'smart'; attrName = 'dexterity'; }
-                            else { checkType = 'social'; attrName = 'charisma'; }
+                            // 普通對話、普通抉擇、探索交流——不進行強制判定！
+                            isChecking = false;
                         }
-                        const chapter = playerState.camp_state?.chapter || 1;
-                        DC = 8 + (chapter * 2);
                     }
                 }
 
@@ -2060,11 +2208,17 @@ Your JSON fields "status_updates", "new_items", "removed_items", "start_combat",
                         tier,
                         tierZh,
                         checkType,
-                        attrName
+                        attrName,
+                        checkTitle: checkTitle || '關鍵判定'
                     };
 
                     // Put the metadata in world_state so the client can display the dice outcome perfectly!
                     playerState.world_state.last_check_info = outcomeCalculated;
+                } else {
+                    outcomeCalculated = null;
+                    if (playerState?.world_state) {
+                        playerState.world_state.last_check_info = null;
+                    }
                 }
 
                 // C.2 生存資源每回合消耗與探索掉落判定 (Turn Decay & Resource Loop)
@@ -2155,32 +2309,52 @@ Your JSON fields "status_updates", "new_items", "removed_items", "start_combat",
                 let companionPrompt = "";
                 if (playerState.active_companion) {
                     const comp = playerState.active_companion;
+                    const affinityVal = comp.affinity || 20;
                     companionPrompt = `
---- ACTIVE TRAVEL COMPANION (随行反差萌同伴) ---
+--- ACTIVE TRAVEL COMPANION (随行高魅力美少女/反差萌女伴) ---
 - Name: "${comp.name}"
-- Visual & Appearance: "${comp.visual || '🎒 随行伙伴'}"
-- Archetype: "${comp.archetype || '萌系旅伴'}"
-- Personality & Gap-Moe: "${comp.personality || '外冷内热，重度甜食控'}"
-- Dialogue Quirk / Speaking Style: "${comp.dialogue_quirk || '口癖鲜明'}"
+- Visual Appearance & Aesthetics: "${comp.visual || '✨ 随行女伴'}"
+- Archetype: "${comp.archetype || '高魅力女伴'}"
+- Personality & Gap-Moe Romance: "${comp.personality || '外冷内热，极易害羞脸红'}"
+- Dialogue Quirk / Speaking Style: "${comp.dialogue_quirk || '口癖鲜明且带有细腻情感'}"
 - Perk / Special Trait: "${comp.perk ? `${comp.perk.name} - ${comp.perk.description}` : '旅途互助'}"
-- Affinity (好感度): ${comp.affinity || 20}/100
+- Affinity (好感羁绊): ${affinityVal}/100 [当前阶段: ${affinityVal >= 90 ? '💖 生死相依/专属深情' : affinityVal >= 60 ? '🌸 芳心暗许/亲密无间' : affinityVal >= 30 ? '✨ 相互信任/默契伙伴' : '🌱 旅途初遇/小心试探'}]
 
-* COMPANION INTEGRATION RULES:
-1. Integrate ${comp.name} naturally into the scene descriptions, dialogue banter, travel observations, or humorous reactions!
-2. Reflect their unique dialogue quirk ("${comp.dialogue_quirk}") and gap-moe trait ("${comp.personality}").
-3. In choices, provide at least one option that involves ${comp.name} (e.g., "[听听${comp.name}的看法]", "[与${comp.name}一起探索]", or companion-assisted action).
-4. If the player interacts with or helps ${comp.name}, describe a cute/heartwarming moment.
+* COMPANION & ROMANTIC INTERACTION RULES:
+1. Integrate ${comp.name} deeply and organically into scene descriptions, dialogue banter, close-range teamwork, and campfire moments!
+2. Reflect her unique dialogue quirk ("${comp.dialogue_quirk}") and gap-moe trait ("${comp.personality}").
+3. **Sensory & Visual Intimacy (合规的高心动值感官描写)**:
+   - Provide rich, evocative descriptions of her expressions, blushes (脸颊泛红、微颤的睫毛、移开视线的羞怯), close physical proximity (并肩依靠、温热的吐息、发丝掠过肩头、心跳加速的肢体触碰), and tender glances.
+   - When dressing wounds or sharing camp food, depict the delicate atmosphere and romantic tension.
+4. In choices, provide at least one option involving ${comp.name} (e.g., "[与${comp.name}并肩作战]", "[拉着${comp.name}的手避险]", "[轻抚${comp.name}发丝/轻声安抚]", "[听取${comp.name}的娇嗔意见]").
+`;
+                } else {
+                    companionPrompt = `
+--- COMPANION STATUS: SOLO JOURNEY (独行探索状态 - 美少女偶遇机缘) ---
+* The player is currently traveling alone.
+* ORGANIC COMPANION / HEROINE ENCOUNTER OPPORTUNITY:
+1. In appropriate story moments (e.g. resting by a campfire, visiting a roadside tavern/tea-house, encountering a trapped or battling heroine, a mysterious maiden in distress, or an eccentric expert), introduce a captivating, beautifully designed Bishoujo NPC (e.g., 银发冷艳女剑士、傲娇机械魔女、妩媚神秘医仙、清冷出尘师姐、纯情兽耳游侠、赛博叛逆少女).
+2. Describe her striking appearance, delicate demeanor, and immediate dramatic chemistry with the player.
+3. If the player chooses to rescue, befriend, assist, or invite her to travel together, provide an updated "active_companion" object in the response world_state, welcoming her as the active companion!
 `;
                 }
 
                 const narrativeTonePrompt = `
---- NARRATIVE TONE & PACING RULES (公路漫游与日常生活化叙事) ---
-CRITICAL: Move away from pure high-anxiety survival disaster. Embrace a charming, atmospheric "Road Trip & Slice-of-Life" tone!
-Target narrative focus balance:
-1. [40% 探索发现与风土人情]: Depict the quiet beauty of ruins, golden sunset, gentle breeze, forgotten old-world relics, quirky landmarks, and cozy shelters.
-2. [30% 营地日常与伙伴互动]: Depict camp life, brewing hot tea/coffee over a fire, sharing rations, comedic cooking attempts, traveling banter, and small comforting moments.
-3. [20% 探索解谜与趣味互动]: Light scavenging, tinkering with eccentric broken machines, discovering old music players, chatting with neutral harmless wanderers.
-4. [10% 遭遇战/危机]: Combat is NOT grinding or punishing; it serves only as a spice and a test of teamwork with the companion. NEVER trigger continuous malicious combat.
+--- NARRATIVE TONE & DIVERSE LIFE / FAILURE CONSEQUENCES RULES (拒绝无尽战斗，拥抱鲜活日常与真实危机) ---
+★ USER CORE DIRECTIVE:
+1. 【拒绝无尽战斗，丰富生活与日常互动】:
+   - 剧情与选项绝不能一直在战斗！战斗仅占 10%~15% 的高潮时刻。
+   - 大量充实：日常生活、探索考察、城镇市井、旅途奇闻、美少女/伙伴与NPC互动、调情与戏谑(调戏/逗弄/开玩笑)、尝试奇特事物、烹饪露营、民俗风情与心动日常。
+   - 选项设计必须多元：提供对话调侃、机智观察、友好赠礼、尝试恶作剧、浪漫互动、谨慎撤退、探索细节等，绝不能 3 个选项全是“拔剑攻击”。
+2. 【严格控制升级速度，经验获取细水长流】:
+   - 升级绝不能太快！普通探索与日常互动仅给予极少量经验（10~25 XP），绝不能一次给上百点。
+   - 等级提升应当极具含金量，唯有经历多重磨砺或重大事件才能升阶。
+3. 【直观扣除生命值与严厉惩罚机制】:
+   - 拒绝“无论怎么选都必定获胜”的甜腻简单模式！冒险充满真实险恶与致命代价。
+   - 受到陷阱、毒刺、暗箭、失足摔落、严寒饥渴、激怒强敌或行动失败时，必须在 status_updates 中直接扣减生命值（例如: -15 ~ -35 HP），带来最直观痛切的肉身危机！
+   - 惩罚机制必须有强烈的切肤之痛：重创甚至濒死、钱财散落、装备损耗、任务挫败。
+   - 遇到严重危急情况，务必在 "new_debuffs" 中施加负面减益状态（"bleed"[流血重创], "poison"[剧毒侵蚀], "exhaustion"[深度力竭], "trauma"[心神受创], "burn"[烈焰灼伤], "frostbite"[极寒冻僵], "curse"[幽冥诅咒]）。负面状态会直接扣除生命值并在战斗与探索中造成严重反噬！
+   - 让玩家感受到生存世界的严酷与胜利的来之不易，才能带来真正的沉浸感！
 `;
 
                 let historyPrompt = `

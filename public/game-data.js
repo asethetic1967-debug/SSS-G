@@ -259,12 +259,12 @@ export const genreConfig = {
     }
 };
 
-// 5. 怪物階級設定
+// 5. 怪物階級設定 (平衡調整：提升挑戰難度與威脅度，大幅降低升級速度，戰鬥具備真實致命風險)
 export const MONSTER_RANKS = {
-    'MINION': { ttk: 1.5, threat: 0.02, xpMult: 0.2, name: '雜魚' },
-    'NORMAL': { ttk: 4.0, threat: 0.08, xpMult: 1.0, name: '一般' },
-    'ELITE':  { ttk: 10.0, threat: 0.15, xpMult: 3.0, name: '菁英' },
-    'BOSS':   { ttk: 20.0, threat: 0.25, xpMult: 10.0, name: '首領' }
+    'MINION': { ttk: 2.2, threat: 0.16, xpMult: 0.35, critChance: 0.10, name: '雜魚' },
+    'NORMAL': { ttk: 4.5, threat: 0.28, xpMult: 0.60, critChance: 0.18, name: '一般' },
+    'ELITE':  { ttk: 8.5, threat: 0.45, xpMult: 1.50, critChance: 0.25, name: '菁英' },
+    'BOSS':   { ttk: 15.0, threat: 0.60, xpMult: 3.20, critChance: 0.32, name: '首領' }
 };
 
 

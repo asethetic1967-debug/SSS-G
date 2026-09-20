@@ -830,26 +830,145 @@
 
             <!-- Quick Interaction Buttons -->
             <div class="space-y-1.5">
-                <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">互動選項 (Companion Interactions)</div>
-                <div class="grid grid-cols-2 gap-2">
-                    <button id="comp-action-chat-btn" class="py-2 px-3 rounded-lg bg-indigo-600/30 hover:bg-indigo-600/50 text-indigo-200 hover:text-white border border-indigo-500/40 font-bold text-xs transition-all active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer" type="button">
-                        <span>💬</span> 隨行對話
+                <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">互動與心動羈絆 (Heroine Interactions)</div>
+                <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                    <button id="comp-action-chat-btn" class="py-2 px-2.5 rounded-lg bg-indigo-600/30 hover:bg-indigo-600/50 text-indigo-200 hover:text-white border border-indigo-500/40 font-bold text-xs transition-all active:scale-95 flex items-center justify-center gap-1 cursor-pointer" type="button">
+                        <span>💬</span> 隨行閒聊
                     </button>
-                    <button id="comp-action-share-food-btn" class="py-2 px-3 rounded-lg bg-orange-600/30 hover:bg-orange-600/50 text-orange-200 hover:text-white border border-orange-500/40 font-bold text-xs transition-all active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer" type="button">
+                    <button id="comp-action-share-food-btn" class="py-2 px-2.5 rounded-lg bg-orange-600/30 hover:bg-orange-600/50 text-orange-200 hover:text-white border border-orange-500/40 font-bold text-xs transition-all active:scale-95 flex items-center justify-center gap-1 cursor-pointer" type="button">
                         <span>🍲</span> 分享口糧
                     </button>
-                    <button id="comp-action-gift-btn" class="py-2 px-3 rounded-lg bg-rose-600/30 hover:bg-rose-600/50 text-rose-200 hover:text-white border border-rose-500/40 font-bold text-xs transition-all active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer" type="button">
-                        <span>🎁</span> 贈送小玩意
+                    <button id="comp-action-gift-btn" class="py-2 px-2.5 rounded-lg bg-rose-600/30 hover:bg-rose-600/50 text-rose-200 hover:text-white border border-rose-500/40 font-bold text-xs transition-all active:scale-95 flex items-center justify-center gap-1 cursor-pointer" type="button">
+                        <span>🎁</span> 贈送心意
                     </button>
-                    <button id="comp-action-camp-story-btn" class="py-2 px-3 rounded-lg bg-cyan-600/30 hover:bg-cyan-600/50 text-cyan-200 hover:text-white border border-cyan-500/40 font-bold text-xs transition-all active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer" type="button">
+                    <button id="comp-action-camp-story-btn" class="py-2 px-2.5 rounded-lg bg-cyan-600/30 hover:bg-cyan-600/50 text-cyan-200 hover:text-white border border-cyan-500/40 font-bold text-xs transition-all active:scale-95 flex items-center justify-center gap-1 cursor-pointer" type="button">
                         <span>⛺</span> 圍爐夜話
+                    </button>
+                    <button id="comp-action-bandage-btn" class="py-2 px-2.5 rounded-lg bg-emerald-600/30 hover:bg-emerald-600/50 text-emerald-200 hover:text-white border border-emerald-500/40 font-bold text-xs transition-all active:scale-95 flex items-center justify-center gap-1 cursor-pointer" type="button">
+                        <span>🩹</span> 貼心療傷
+                    </button>
+                    <button id="comp-action-intimate-btn" class="py-2 px-2.5 rounded-lg bg-pink-600/30 hover:bg-pink-600/50 text-pink-200 hover:text-white border border-pink-500/40 font-bold text-xs transition-all active:scale-95 flex items-center justify-center gap-1 cursor-pointer" type="button">
+                        <span>💖</span> 溫柔凝視
                     </button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Exploration & Looting Modal -->
+    <!-- Area POI Exploration & Resource Selection Modal -->
+    <div id="explore-poi-modal" class="modal hidden fixed inset-0 z-[65] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
+        <div class="modal-content theme-bg-card rounded-2xl shadow-2xl w-full max-w-xl p-5 sm:p-6 transform scale-95 flex flex-col border border-amber-500/20 bg-slate-950/95 text-slate-100 max-h-[90vh]">
+            <div class="flex justify-between items-center mb-3 border-b border-white/10 pb-2.5 flex-shrink-0">
+                <div class="flex items-center gap-2.5">
+                    <span class="text-2xl p-1.5 rounded-lg bg-amber-500/20 text-amber-300 border border-amber-500/30">🧭</span>
+                    <div>
+                        <h2 class="text-lg font-black text-amber-300 flex items-center gap-2">
+                            <span>區域探索與搜刮</span>
+                            <span id="explore-zone-badge" class="text-[10px] px-2 py-0.5 rounded-full bg-slate-800 text-slate-300 border border-white/10 font-normal">安全區</span>
+                        </h2>
+                        <div class="text-xs text-slate-400 mt-0.5 flex items-center gap-2">
+                            <span>探索進度: <span id="explore-zone-progress" class="font-mono text-cyan-400 font-bold">25%</span></span>
+                        </div>
+                    </div>
+                </div>
+                <button class="modal-close text-slate-400 hover:text-white p-1 rounded-lg hover:bg-white/5 transition-all" type="button"><i class="ph-bold ph-x text-xl"></i></button>
+            </div>
+
+            <p class="text-xs text-slate-400 mb-3 leading-relaxed flex-shrink-0">
+                此處環境蘊藏各類資源點與舊時代遺跡。選擇一處地點搜刮，但請注意：<span class="text-amber-300 font-bold">資源點被搜空後將耗盡</span>，且深入搜刮可能引發環境風險！
+            </p>
+
+            <div id="explore-poi-list" class="space-y-2.5 overflow-y-auto pr-1 flex-1 min-h-[180px]">
+                <!-- Dynamic POIs populated here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Scavenge Scratch-Off & Extraction Minigame Modal -->
+    <div id="scavenge-minigame-modal" class="modal hidden fixed inset-0 z-[70] flex items-center justify-center p-4 bg-black/85 backdrop-blur-md select-none">
+        <div class="modal-content theme-bg-card rounded-2xl shadow-2xl w-full max-w-lg p-5 sm:p-6 transform scale-95 flex flex-col border border-cyan-500/30 bg-slate-950/95 text-slate-100 max-h-[95vh] overflow-y-auto">
+            <!-- Header -->
+            <div class="flex justify-between items-center mb-3 border-b border-white/10 pb-2.5 flex-shrink-0">
+                <div class="flex items-center gap-2">
+                    <span class="text-2xl p-1 rounded-lg bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">🔍</span>
+                    <div>
+                        <h2 id="scavenge-target-name" class="text-base sm:text-lg font-black text-cyan-300">正在搜刮：未知地點</h2>
+                        <p id="scavenge-target-desc" class="text-[11px] text-slate-400 line-clamp-1">滑動刮除灰塵與障礙，揭曉隱藏物資</p>
+                    </div>
+                </div>
+                <button id="scavenge-close-btn" class="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-white/5 transition-all" type="button"><i class="ph-bold ph-x text-xl"></i></button>
+            </div>
+
+            <!-- Risk Gauge & Scratch Info -->
+            <div class="space-y-2 mb-3 flex-shrink-0">
+                <div class="flex justify-between items-center text-xs">
+                    <span class="font-bold text-slate-300 flex items-center gap-1.5">
+                        <span id="scavenge-risk-icon">⚠️</span>
+                        <span>區域警戒度:</span>
+                        <span id="scavenge-risk-label" class="font-mono text-emerald-400 font-bold">0% (安全)</span>
+                    </span>
+                    <span class="text-slate-400 text-[11px]">
+                        刮除進度: <span id="scavenge-scratch-percent" class="font-mono text-cyan-400 font-bold">0%</span>
+                    </span>
+                </div>
+                <div class="w-full bg-slate-800/80 rounded-full h-2.5 overflow-hidden border border-white/5 shadow-inner">
+                    <div id="scavenge-risk-fill" class="h-full bg-emerald-500 transition-all duration-200" style="width: 0%"></div>
+                </div>
+            </div>
+
+            <!-- Scratch Interactive Stage -->
+            <div class="relative w-full h-56 sm:h-64 bg-slate-900 rounded-xl overflow-hidden border border-white/10 shadow-inner flex items-center justify-center mb-3 flex-shrink-0">
+                <!-- Revealed loot icons & previews underneath -->
+                <div id="scavenge-revealed-previews" class="absolute inset-0 grid grid-cols-3 grid-rows-2 p-3 gap-2 pointer-events-none"></div>
+                <!-- Interactive scratch canvas -->
+                <canvas id="scavenge-scratch-canvas" class="absolute inset-0 w-full h-full cursor-crosshair touch-none z-10" width="460" height="256"></canvas>
+            </div>
+
+            <!-- Temporary Staged Loot Tray -->
+            <div class="p-3 bg-slate-900/60 rounded-xl border border-white/5 mb-3 flex-shrink-0">
+                <div class="flex justify-between items-center mb-1.5 text-xs">
+                    <span class="font-bold text-slate-300 flex items-center gap-1">
+                        <span>🎒 暫存背包</span>
+                        <span class="text-[10px] text-slate-500 font-normal">（需安全撤離方可帶走）</span>
+                    </span>
+                    <span id="temp-loot-count" class="font-mono text-amber-400 font-bold text-[11px]">0 件物品</span>
+                </div>
+                <div id="temp-loot-list" class="flex flex-wrap gap-1.5 max-h-16 overflow-y-auto">
+                    <span class="text-slate-500 text-xs italic">尚未發現可用物資，請在上方區域塗抹刮除...</span>
+                </div>
+            </div>
+
+            <!-- Action Controls -->
+            <div class="flex gap-2 flex-shrink-0">
+                <button id="scavenge-extract-btn" class="flex-1 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-black rounded-xl transition-all shadow-lg active:scale-95 text-xs sm:text-sm flex items-center justify-center gap-1.5 cursor-pointer" type="button">
+                    <span>📦</span> 見好就收 (安全撤離帶走物資)
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Exploration Mental Maze Modal -->
+    <div id="maze-mental-modal" class="modal hidden fixed inset-0 z-[65] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
+        <div class="modal-content theme-bg-card rounded-2xl shadow-2xl w-full max-w-lg p-5 sm:p-6 transform scale-95 flex flex-col border border-purple-500/20 bg-slate-950/95 text-slate-100">
+            <div class="flex justify-between items-center mb-3 border-b border-white/10 pb-2.5">
+                <h2 class="text-base sm:text-lg font-black text-purple-300 flex items-center gap-2">
+                    <span>🧭 迷宮思維地圖 (Mental Map)</span>
+                </h2>
+                <button class="modal-close text-slate-400 hover:text-white p-1 rounded-lg hover:bg-white/5 transition-all" type="button"><i class="ph-bold ph-x text-xl"></i></button>
+            </div>
+            <div class="p-3 bg-slate-900/50 rounded-xl border border-white/5 text-xs text-slate-300 mb-3">
+                你在未知迷宮中探索前行。每一步都將消耗微量精力與時間，探索未知房間將可能遭遇奇遇或危險。
+            </div>
+            <div id="maze-grid-container" class="grid grid-cols-5 gap-1.5 p-3 bg-slate-950 rounded-xl border border-white/10 w-full aspect-square max-h-64 mx-auto mb-3">
+                <!-- 5x5 dynamic maze tiles -->
+            </div>
+            <div id="maze-step-feedback" class="text-center text-xs font-semibold text-purple-300 min-h-[20px]">
+                請選擇移動方向以繼續探勘...
+            </div>
+        </div>
+    </div>
+
+    <!-- Exploration & Looting Modal (Legacy Compatibility) -->
     <div id="loot-modal" class="modal hidden fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/85 backdrop-blur-md">
         <div class="modal-content theme-bg-card rounded-2xl shadow-2xl w-full max-w-lg p-6 transform scale-95 flex flex-col border border-white/10">
             <div class="flex justify-between items-center mb-4 border-b border-white/5 pb-2">
@@ -857,13 +976,10 @@
                     🔍 <span id="loot-modal-title-text">搜刮中...</span>
                 </h2>
             </div>
-            
             <div class="space-y-4 flex flex-col items-center">
                 <p id="loot-modal-desc" class="text-xs sm:text-sm theme-text-light text-center leading-relaxed">
                     請使用滑鼠或手指在塗層上擦除，揭曉隱藏的物資。刮得越深，風險越大！
                 </p>
-
-                <!-- Risk Progress Bar -->
                 <div class="w-full">
                     <div class="flex justify-between items-center mb-1 text-xs">
                         <span class="text-rose-400 font-semibold flex items-center gap-1">
@@ -876,22 +992,13 @@
                         <div id="loot-risk-bar" class="bg-gradient-to-r from-orange-500 to-rose-600 h-full transition-all duration-100" style="width: 0%"></div>
                     </div>
                 </div>
-
-                <!-- Minigame Interactive Stage -->
                 <div class="relative w-full h-64 bg-slate-950/80 rounded-xl overflow-hidden flex items-center justify-center border border-white/5" id="loot-stage-container">
-                    
-                    <!-- Minigame A: Scratchcard Canvas -->
                     <canvas id="scratch-canvas" class="absolute inset-0 cursor-crosshair touch-none w-full h-full hidden" width="460" height="256"></canvas>
                     <div id="scratch-items-container" class="absolute inset-0 pointer-events-none flex flex-wrap items-center justify-center p-4 gap-4"></div>
-
-                    <!-- Minigame B: Digging Grid -->
                     <div id="dig-grid" class="grid grid-cols-3 gap-2 w-full h-full p-4 hidden"></div>
-
-                    <!-- Minigame C: Chest Lockpicking -->
                     <div id="chest-lock" class="flex flex-col items-center justify-center w-full h-full p-4 hidden">
                         <div class="relative w-40 h-40 rounded-full border-4 border-slate-700 flex items-center justify-center" id="lock-ring">
                             <div class="absolute w-2 h-2 rounded-full bg-amber-400" id="lock-center"></div>
-                            <!-- Rotating selector pointer -->
                             <div class="absolute w-1 h-20 bg-rose-500 origin-bottom bottom-1/2 rounded transition-transform" id="lock-pointer" style="transform: rotate(0deg);"></div>
                         </div>
                         <button id="lock-pick-btn" class="mt-4 px-6 py-2.5 bg-amber-500 hover:bg-amber-600 text-slate-950 font-black rounded-lg transition-colors shadow-lg active:scale-95" type="button">
@@ -899,8 +1006,6 @@
                         </button>
                     </div>
                 </div>
-
-                <!-- Interactive Game Actions -->
                 <div class="w-full flex gap-3">
                     <button id="loot-claim-btn" class="flex-1 py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl transition-all shadow-lg shadow-emerald-900/10 active:scale-95 flex items-center justify-center gap-2" type="button">
                         <i class="ph-bold ph-hand-bag"></i>
@@ -3653,31 +3758,39 @@ window.fetchOrGenerateCompanion = fetchOrGenerateCompanion;
 
 function openCompanionModal() {
     if (!playerState) return;
-    const comp = playerState.active_companion || {
-        name: "洛夏 (Lox)",
-        archetype: "傲嬌機械兔人",
-        visual: "🐰",
-        personality: "外表冷漠毒舌，其實非常重視夥伴，一聞到烤肉香味就會耳朵發抖。",
-        dialogue_quirk: "「才、才不是特意幫你改裝零件的...只是工具放著會生鏽而已！」",
-        perk: { name: "廢品拆解", description: "搜刮廢墟時有 35% 機率額外收穫金屬廢料與零件。" },
-        affinity: 20
-    };
+    const comp = playerState.active_companion;
+    if (!comp) {
+        if (dom.compModalVisual) dom.compModalVisual.textContent = '🎒';
+        if (dom.compModalName) dom.compModalName.textContent = '孤身漫遊 (Solo Journey)';
+        if (dom.compModalArchetype) dom.compModalArchetype.textContent = '獨自探險中';
+        if (dom.compModalAffinityVal) dom.compModalAffinityVal.textContent = '0';
+        if (dom.compModalAffinityTag) dom.compModalAffinityTag.textContent = '孤狼獨行';
+        if (dom.compModalDialogue) dom.compModalDialogue.textContent = '「這是一段屬於你一人的未知征途。路漫漫其修遠兮，在前方的城鎮、營地、林間茶肆或劇情奇遇中，你將有機會邂逅動人心弦的美少女旅伴。」';
+        if (dom.compModalPersonality) dom.compModalPersonality.textContent = '你目前正隻身一人探索世界。尚未在旅程中遇見並招募隨行同伴。';
+        if (dom.compModalPerkName) dom.compModalPerkName.textContent = '【孤狼專注】';
+        if (dom.compModalPerkDesc) dom.compModalPerkDesc.textContent = '獨自一人行動時心無旁騖，精力消耗更加謹慎。';
+        if (dom.companionProfileModal) {
+            openModal(dom.companionProfileModal);
+        }
+        return;
+    }
 
-    if (dom.compModalVisual) dom.compModalVisual.textContent = comp.visual || '🎒';
-    if (dom.compModalName) dom.compModalName.textContent = comp.name || '隨行夥伴';
-    if (dom.compModalArchetype) dom.compModalArchetype.textContent = comp.archetype || '旅行旅伴';
+    if (dom.compModalVisual) dom.compModalVisual.textContent = comp.visual?.slice(0, 2) || '🌸';
+    if (dom.compModalName) dom.compModalName.textContent = comp.name || '隨行旅伴';
+    if (dom.compModalArchetype) dom.compModalArchetype.textContent = comp.archetype || '心動女伴';
     if (dom.compModalAffinityVal) dom.compModalAffinityVal.textContent = comp.affinity !== undefined ? comp.affinity : 20;
     
     const affinityNum = comp.affinity !== undefined ? comp.affinity : 20;
-    let affinityTag = '同行旅伴';
-    if (affinityNum >= 80) affinityTag = '生死之交 (Soulmate)';
-    else if (affinityNum >= 50) affinityTag = '默契搭檔 (Partner)';
-    else if (affinityNum >= 30) affinityTag = '信賴夥伴 (Friend)';
+    let affinityTag = '🌱 旅途初遇 (Acquaintance)';
+    if (affinityNum >= 90) affinityTag = '💖 生死相許·專屬羈絆 (Soulmate)';
+    else if (affinityNum >= 60) affinityTag = '🌸 芳心暗許·親密無間 (Beloved)';
+    else if (affinityNum >= 40) affinityTag = '✨ 相互信賴·默契搭檔 (Partner)';
+    else if (affinityNum >= 20) affinityTag = '🍃 結伴同行 (Companion)';
     if (dom.compModalAffinityTag) dom.compModalAffinityTag.textContent = affinityTag;
 
-    if (dom.compModalDialogue) dom.compModalDialogue.textContent = comp.dialogue_quirk || '「今天也是適合漫遊的好天氣呢。」';
+    if (dom.compModalDialogue) dom.compModalDialogue.textContent = comp.dialogue_quirk || '「今天也是適合漫遊的好天氣呢……不過有你在身邊，感覺風景更美了。」';
     if (dom.compModalPersonality) dom.compModalPersonality.textContent = comp.personality || '隨性漫遊，喜歡路邊的舊時代小事物。';
-    if (dom.compModalPerkName) dom.compModalPerkName.textContent = comp.perk ? comp.perk.name : '旅途默契';
+    if (dom.compModalPerkName) dom.compModalPerkName.textContent = comp.perk ? comp.perk.name : '心有靈犀';
     if (dom.compModalPerkDesc) dom.compModalPerkDesc.textContent = comp.perk ? comp.perk.description : '在探索與露營時提供額外心情與精力加成。';
 
     if (dom.companionProfileModal) {
@@ -3692,11 +3805,15 @@ async function interactCompanionAction(actionType) {
         closeModal(dom.companionProfileModal);
     }
 
-    const comp = playerState?.active_companion || { name: '夥伴', affinity: 20 };
+    const comp = playerState?.active_companion;
+    if (!comp) {
+        showNotification('你目前正在孤身一人漫遊，尚未結識同伴。可在城鎮、營地或劇情中尋找旅伴。', 'info');
+        return;
+    }
     const compName = comp.name || '夥伴';
 
     if (actionType === 'chat') {
-        const choiceText = `與夥伴「${compName}」隨行閒聊，分享漫遊路上的日常與瑣事`;
+        const choiceText = `與隨行女伴「${compName}」並肩閒聊，分享漫遊路上的日常趣事與心動細節`;
         processPlayerChoice(choiceText);
     } else if (actionType === 'share_food') {
         let foodItem = null;
@@ -3713,18 +3830,34 @@ async function interactCompanionAction(actionType) {
         comp.affinity = Math.min(100, (comp.affinity || 20) + 5);
         if (typeof syncGameState === 'function') syncGameState(playerState);
         
-        const foodName = foodItem ? (typeof foodItem === 'string' ? foodItem : foodItem.name) : '烤乾糧與熱茶';
-        const choiceText = `拿出隨身攜帶的【${foodName}】，與夥伴「${compName}」一同分食享受美味餐點`;
+        const foodName = foodItem ? (typeof foodItem === 'string' ? foodItem : foodItem.name) : '烤乾糧與溫熱甜茶';
+        const choiceText = `拿出隨身攜帶的【${foodName}】，溫柔地遞給「${compName}」一同分食，享受靜謐美好的二人時光`;
         showNotification(`🍲 與 ${compName} 分享了美食！好感度 +5%（當前：${comp.affinity}%）`, 'success');
         processPlayerChoice(choiceText);
     } else if (actionType === 'gift') {
         comp.affinity = Math.min(100, (comp.affinity || 20) + 8);
         if (typeof syncGameState === 'function') syncGameState(playerState);
-        const choiceText = `將旅途中收集到的精巧舊時代紀念品贈送給「${compName}」`;
-        showNotification(`🎁 成功贈送禮物給 ${compName}！好感度 +8%（當前：${comp.affinity}%）`, 'success');
+        const choiceText = `將旅途中精心收集的精美小飾物贈送給「${compName}」，觀察她臉頰泛紅的羞怯反應`;
+        showNotification(`🎁 成功贈送心意給 ${compName}！好感度 +8%（當前：${comp.affinity}%）`, 'success');
         processPlayerChoice(choiceText);
     } else if (actionType === 'camp_story') {
-        const choiceText = `在營火旁與「${compName}」圍爐夜話，聆聽彼此過去的旅行故事與未來的夢想`;
+        comp.affinity = Math.min(100, (comp.affinity || 20) + 5);
+        if (typeof syncGameState === 'function') syncGameState(playerState);
+        const choiceText = `在溫暖的營火旁與「${compName}」圍爐夜話，靠在一起傾聽彼此過去的秘密與未來的約定`;
+        processPlayerChoice(choiceText);
+    } else if (actionType === 'bandage') {
+        comp.affinity = Math.min(100, (comp.affinity || 20) + 6);
+        let hpBar = playerState?.player_status?.status_bars?.find(b => b.type === 'hp');
+        if (hpBar) hpBar.value = Math.min(hpBar.max_value || 100, (hpBar.value || 100) + 15);
+        if (typeof syncGameState === 'function') syncGameState(playerState);
+        const choiceText = `在樹蔭下為「${compName}」細心包紮戰鬥中的微小擦傷，近距離感受彼此溫熱的吐息與心跳`;
+        showNotification(`🩹 溫柔為 ${compName} 包紮傷口！好感度 +6%（當前：${comp.affinity}%），生命值微量恢復`, 'success');
+        processPlayerChoice(choiceText);
+    } else if (actionType === 'intimate') {
+        comp.affinity = Math.min(100, (comp.affinity || 20) + 7);
+        if (typeof syncGameState === 'function') syncGameState(playerState);
+        const choiceText = `放慢腳步，溫柔凝視「${compName}」的眼眸，輕聲對她說出令人心跳加速的誇讚與感謝`;
+        showNotification(`💖 溫柔注視著 ${compName}，她的耳尖泛起了淡淡緋紅！好感度 +7%（當前：${comp.affinity}%）`, 'success');
         processPlayerChoice(choiceText);
     }
 }
@@ -3754,13 +3887,19 @@ function initUnifiedDecisionFlow() {
 
     if (dom.capsuleBtnScavenge) {
         dom.capsuleBtnScavenge.addEventListener('click', () => {
-            processPlayerChoice('搜刮四周的廢墟物資與舊時代殘骸');
+            if (typeof ScavengeSystem !== 'undefined' && ScavengeSystem.openExploreModal) {
+                ScavengeSystem.openExploreModal();
+            } else {
+                processPlayerChoice('搜刮四周的廢墟物資與舊時代殘骸');
+            }
         });
     }
 
     if (dom.capsuleBtnTravel) {
         dom.capsuleBtnTravel.addEventListener('click', () => {
-            processPlayerChoice('啟程前往下一個未知的探索區域');
+            const loc = playerState?.world_state?.current_location;
+            const dest = loc ? `啟程離開「${loc}」，前往下一個未知的探索區域` : '啟程前往下一個未知的探索區域';
+            processPlayerChoice(dest);
         });
     }
 
@@ -3818,6 +3957,12 @@ function initUnifiedDecisionFlow() {
     }
     if (dom.compActionCampStoryBtn) {
         dom.compActionCampStoryBtn.addEventListener('click', () => interactCompanionAction('camp_story'));
+    }
+    if (dom.compActionBandageBtn) {
+        dom.compActionBandageBtn.addEventListener('click', () => interactCompanionAction('bandage'));
+    }
+    if (dom.compActionIntimateBtn) {
+        dom.compActionIntimateBtn.addEventListener('click', () => interactCompanionAction('intimate'));
     }
 }
 window.initUnifiedDecisionFlow = initUnifiedDecisionFlow;
@@ -3925,27 +4070,55 @@ function applySurvivalTurnDecay() {
 
     let notices = [];
 
-    // 2. Weakness (SP === 0): Attribute decrease & Option selection warning
+    // 2. Weakness & Burn (SP === 0): Attribute decrease, auto apply exhaustion, and burns life directly!
     if (spBar.value <= 0) {
-        notices.push(currentLang === 'zh-TW' 
-            ? '⚠️ 你精疲力竭！精力歸零導致屬性下降 30%，行動容易受阻。' 
-            : '⚠️ You are exhausted! SP is 0, reducing attributes by 30%.');
+        applyDebuff(status, 'exhaustion');
+        if (hpBar && hpBar.value > 0) {
+            const exhaustionHpBurn = 8;
+            hpBar.value = Math.max(0, hpBar.value - exhaustionHpBurn);
+            notices.push(currentLang === 'zh-TW' 
+                ? `⚠️ <strong class="text-red-400">精力徹底竭盡！</strong>因過度疲憊氣血枯竭，肉身直接扣減 <strong class="text-rose-400 font-mono">-${exhaustionHpBurn} HP</strong>！` 
+                : `⚠️ <strong class="text-red-400">Total Exhaustion!</strong> Suffering <strong class="text-rose-400 font-mono">-${exhaustionHpBurn} HP</strong> due to severe fatigue!`);
+            triggerVisualEffect('danger_flash');
+        }
     }
 
-    // 3. Hunger or Thirst <= 20: Critical threat to health
-    if (hungerBar.value <= 20 || thirstBar.value <= 20) {
-        notices.push(currentLang === 'zh-TW'
-            ? '⚠️ 極度飢餓或脫水！最大生命值下降 25%，每回合有機率扣減生命。'
-            : '⚠️ Starving or dehydrated! Max HP reduced by 25%.');
-        
-        // Apply damage chance: 20% chance to lose 3-5 HP if starving
-        if (hpBar && Math.random() < 0.20) {
-            const damage = Math.floor(Math.random() * 3) + 3;
-            hpBar.value = Math.max(1, hpBar.value - damage); // Don't kill directly in non-combat decay, leave them with 1 HP
+    // 3. Hunger or Thirst <= 20 or <= 0: Direct, lethal threat to health
+    if (hungerBar.value <= 0) {
+        const starveDmg = Math.floor(Math.random() * 6) + 16; // 16-21 direct HP loss
+        if (hpBar && hpBar.value > 0) {
+            hpBar.value = Math.max(0, hpBar.value - starveDmg);
             notices.push(currentLang === 'zh-TW'
-                ? `💔 飢寒交迫使你流失了 ${damage} 點生命值。`
-                : `💔 Starvation caused you to lose ${damage} HP.`);
+                ? `🍖 <strong class="text-red-500 font-bold">極度飢餓空腹！</strong>你因飢荒內臟絞痛，直接損失 <strong class="text-rose-400 font-mono">-${starveDmg} HP</strong>！`
+                : `🍖 <strong class="text-red-500 font-bold">Starving to death!</strong> Lost <strong class="text-rose-400 font-mono">-${starveDmg} HP</strong>!`);
             triggerVisualEffect('danger_flash');
+        }
+    } else if (hungerBar.value <= 20) {
+        const hungerDmg = Math.floor(Math.random() * 4) + 6; // 6-9 HP
+        if (hpBar && hpBar.value > 0) {
+            hpBar.value = Math.max(0, hpBar.value - hungerDmg);
+            notices.push(currentLang === 'zh-TW'
+                ? `🍖 飢餓難耐，體力不支，損失 ${hungerDmg} 點生命值。`
+                : `🍖 Hunger weakened you, losing ${hungerDmg} HP.`);
+        }
+    }
+
+    if (thirstBar.value <= 0) {
+        const thirstDmg = Math.floor(Math.random() * 6) + 18; // 18-23 direct HP loss
+        if (hpBar && hpBar.value > 0) {
+            hpBar.value = Math.max(0, hpBar.value - thirstDmg);
+            notices.push(currentLang === 'zh-TW'
+                ? `💧 <strong class="text-red-500 font-bold">重度脫水垂死！</strong>咽喉如焚高熱虛脫，直接損失 <strong class="text-rose-400 font-mono">-${thirstDmg} HP</strong>！`
+                : `💧 <strong class="text-red-500 font-bold">Dying of thirst!</strong> Lost <strong class="text-rose-400 font-mono">-${thirstDmg} HP</strong>!`);
+            triggerVisualEffect('danger_flash');
+        }
+    } else if (thirstBar.value <= 20) {
+        const thirstDmg = Math.floor(Math.random() * 4) + 8; // 8-11 HP
+        if (hpBar && hpBar.value > 0) {
+            hpBar.value = Math.max(0, hpBar.value - thirstDmg);
+            notices.push(currentLang === 'zh-TW'
+                ? `💧 口乾舌燥嚴重缺水，損失 ${thirstDmg} 點生命值。`
+                : `💧 Dehydration takes a toll, losing ${thirstDmg} HP.`);
         }
     }
 
@@ -3955,6 +4128,18 @@ function applySurvivalTurnDecay() {
             adventureLog.push(`<span class="text-orange-400 font-semibold">${note}</span>`);
         });
         showNotification(currentLang === 'zh-TW' ? '生存狀態堪憂！請儘快露營休整。' : 'Survival conditions are critical! Please camp to rest.', 'warning');
+    }
+
+    // 4. Tick active debuffs (bleed, poison, curse, exhaustion, etc.)
+    const debuffNotices = tickDebuffs(status);
+    if (debuffNotices && debuffNotices.length > 0) {
+        debuffNotices.forEach(msg => adventureLog.push(msg));
+    }
+
+    // 5. Check if HP reached 0 from debuffs/poison/starvation
+    if (hpBar && hpBar.value <= 0) {
+        playerState.is_dead = true;
+        adventureLog.push(i18nData[currentLang]['game.gameOverMessage']);
     }
 }
 
@@ -5003,6 +5188,8 @@ compActionChatBtn: document.getElementById('comp-action-chat-btn'),
 compActionShareFoodBtn: document.getElementById('comp-action-share-food-btn'),
 compActionGiftBtn: document.getElementById('comp-action-gift-btn'),
 compActionCampStoryBtn: document.getElementById('comp-action-camp-story-btn'),
+compActionBandageBtn: document.getElementById('comp-action-bandage-btn'),
+compActionIntimateBtn: document.getElementById('comp-action-intimate-btn'),
             };
 
 function calculateStandardValue(name, type, score = 0) {
@@ -5037,16 +5224,18 @@ function applyShopPriceRules(shopData) {
 }
 
 
-function calculateMonsterStats(rankTag, playerState) {
+function calculateMonsterStats(rankTag, state) {
     const rankKey = (rankTag || 'NORMAL').toUpperCase();
     const config = MONSTER_RANKS[rankKey] || MONSTER_RANKS['NORMAL'];
     
-    // 1. 取得玩家數據
-    const pStats = calculatePlayerStats(playerState.player_status);
-    const pAtk = pStats.derived.atk;
-    const pDef = pStats.derived.def;
-    const pMaxHp = playerState.player_status.status_bars.find(b => b.type === 'hp')?.max_value || 100;
-    const currentScore = playerState.hidden_score || 0;
+    // 1. 取得玩家數據 (防呆處理)
+    const pState = state || playerState || {};
+    const pStatus = pState.player_status || {};
+    const pStats = calculatePlayerStats(pStatus);
+    const pAtk = (pStats && pStats.derived && pStats.derived.atk) ? pStats.derived.atk : 15;
+    const pDef = (pStats && pStats.derived && pStats.derived.def) ? pStats.derived.def : 5;
+    const pMaxHp = (pStatus.status_bars && Array.isArray(pStatus.status_bars)) ? (pStatus.status_bars.find(b => b.type === 'hp')?.max_value || 100) : 100;
+    const currentScore = pState.hidden_score || 0;
 
     // 2. 計算積分係數 (Fate Multiplier) - 每 100 分增加 1 倍強度
     const fateMult = 1.0 + (currentScore / 100);
@@ -5059,9 +5248,9 @@ function calculateMonsterStats(rankTag, playerState) {
     // 4. 計算攻擊力 (ATK) = 玩家防禦 + (玩家血量 * 威脅係數)
     const finalAtk = Math.floor(pDef + (pMaxHp * config.threat));
 
-    // 5. 計算經驗值 (XP)
-    const level = playerState.player_status.level || 1;
-    const finalXp = Math.ceil(10 * level * config.xpMult);
+    // 5. 計算經驗值 (XP - 難度調整：降低升級速度)
+    const level = pStatus.level || 1;
+    const finalXp = Math.ceil(8 * level * config.xpMult);
 
     return {
         hp: Math.max(10, finalHp),
@@ -5088,6 +5277,10 @@ function calculateGoldDrop(rankTag, level) {
 
 // [新增] 屬性衍生計算機 (強制修正血量/魔力上限)
 function recalculateVitals(playerStatus) {
+    if (!playerStatus) {
+        if (playerState && playerState.player_status) playerStatus = playerState.player_status;
+        else return;
+    }
     const level = playerStatus.level || 1;
     // 防呆預設值
     const attrs = playerStatus.attributes || { strength: 10, vitality: 10, dexterity: 10 };
@@ -5095,21 +5288,26 @@ function recalculateVitals(playerStatus) {
     // 1. 計算標準 HP 上限
     // 公式：(體質 * 5) + (等級 * 10) + 基礎 50
     // 例如 Lv1, Vit 10 => 50 + 10 + 50 = 110
-    const calculatedMaxHp = Math.floor((attrs.vitality * 5) + (level * 10) + 50);
+    const calculatedMaxHp = Math.floor(((attrs.vitality || 10) * 5) + (level * 10) + 50);
     
     // 2. 計算標準 MP/SP 上限 (視為一種能量資源)
     // 公式：(敏捷 * 3) + (等級 * 5) + 基礎 30
-    const calculatedMaxResource = Math.floor((attrs.dexterity * 3) + (level * 5) + 30);
+    const calculatedMaxResource = Math.floor(((attrs.dexterity || 10) * 3) + (level * 5) + 30);
 
     // 3. 強制更新狀態條
+    const activeDebuffs = getPlayerDebuffs(playerStatus);
+    const hasResSickness = activeDebuffs.some(d => d.id === 'resurrection_sickness');
+
     if (playerStatus.status_bars) {
         playerStatus.status_bars.forEach(bar => {
             // 處理 HP
             if (bar.type === 'hp') {
-                // 如果 AI 給的數值太離譜 (例如 Lv1 給 500)，強制修正為計算值
-                // 這裡我們容許 AI 有 20% 的浮動空間，超過就修正
-                if (Math.abs(bar.max_value - calculatedMaxHp) > calculatedMaxHp * 0.2) {
-                    bar.max_value = calculatedMaxHp;
+                let targetMaxHp = calculatedMaxHp;
+                if (hasResSickness) {
+                    targetMaxHp = Math.floor(targetMaxHp * 0.70); // 死生虛弱生命上限扣減 30%
+                }
+                if (Math.abs(bar.max_value - targetMaxHp) > targetMaxHp * 0.2 || (hasResSickness && bar.max_value > targetMaxHp)) {
+                    bar.max_value = targetMaxHp;
                 }
                 // 確保當前血量不超過新的上限
                 if (bar.value > bar.max_value) bar.value = bar.max_value;
@@ -5123,13 +5321,253 @@ function recalculateVitals(playerStatus) {
             }
         });
     }
+
+    // 4. 平衡升級曲線：防止升級過快，Lv1 基礎升級經驗值調整為 250
+    if (playerStatus.experience) {
+        if (!playerStatus.experience.max || playerStatus.experience.max < 250) {
+            playerStatus.experience.max = 250;
+        }
+    }
+
     processInventorySurvivalItems();
 }
 
+// ==========================================
+// ★ 負面狀態 (Debuffs) 與異常減益系統 (直觀致命與實質血量扣減)
+// ==========================================
+const STANDARD_DEBUFFS = {
+    'bleed': {
+        id: 'bleed',
+        name: '重度負傷',
+        name_en: 'Bleeding',
+        name_ja: '重傷出血',
+        icon: '🩸',
+        desc: '傷口撕裂開溢血！立即受到 15 點直接創傷，防禦力降低 30%，每回合持續流失 16 點生命。',
+        duration: 3,
+        instant_hp: 15,
+        hp_drain: 16,
+        sp_drain: 4,
+        def_penalty_pct: 0.30
+    },
+    'poison': {
+        id: 'poison',
+        name: '劇毒侵蝕',
+        name_en: 'Poisoned',
+        name_ja: '劇毒浸食',
+        icon: '☠️',
+        desc: '猛毒深入臟腑！立即損失 12 點生命與 10 點體力，每回合流失 18 點生命與 8 點體力。',
+        duration: 4,
+        instant_hp: 12,
+        instant_sp: 10,
+        hp_drain: 18,
+        sp_drain: 8
+    },
+    'exhaustion': {
+        id: 'exhaustion',
+        name: '深度力竭',
+        name_en: 'Exhaustion',
+        name_ja: '深刻な疲労',
+        icon: '🥀',
+        desc: '氣血徹底透支！全攻擊與防禦腰斬 (-45%)，每回合額外損耗 10 點生命與 15 點體力。',
+        duration: 3,
+        instant_sp: 15,
+        hp_drain: 10,
+        sp_drain: 15,
+        atk_penalty_pct: 0.45,
+        def_penalty_pct: 0.45
+    },
+    'trauma': {
+        id: 'trauma',
+        name: '心神受創',
+        name_en: 'Mental Trauma',
+        name_ja: '精神的打撃',
+        icon: '😵',
+        desc: '驚駭欲絕，心智重創！每回合扣除 12 點生命與 12 點魔力/精神，敏捷-6，攻擊降低 25%。',
+        duration: 4,
+        instant_hp: 10,
+        hp_drain: 12,
+        sp_drain: 12,
+        atk_penalty_pct: 0.25,
+        dex_penalty: 6
+    },
+    'burn': {
+        id: 'burn',
+        name: '烈焰灼傷',
+        name_en: 'Burn',
+        name_ja: '火傷',
+        icon: '🔥',
+        desc: '烈火焚體！立即受到 18 點火焰傷害，防禦降低 30%，每回合受到 16 點灼痛傷害。',
+        duration: 3,
+        instant_hp: 18,
+        hp_drain: 16,
+        def_penalty_pct: 0.30
+    },
+    'frostbite': {
+        id: 'frostbite',
+        name: '極寒凍僵',
+        name_en: 'Frostbite',
+        name_ja: '凍傷',
+        icon: '🧊',
+        desc: '關節壞死麻痹！立即扣除 12 點生命與 10 點體力，每回合流失 12 點生命，受到傷害加深 35%。',
+        duration: 3,
+        instant_hp: 12,
+        instant_sp: 10,
+        hp_drain: 12,
+        sp_drain: 6,
+        dex_penalty: 6,
+        atk_penalty_pct: 0.30
+    },
+    'curse': {
+        id: 'curse',
+        name: '幽冥詛咒',
+        name_en: 'Curse',
+        name_ja: '呪縛',
+        icon: '🔮',
+        desc: '死神黑霧纏身！立即受到 15 點靈魂傷害，每回合扣除 14 點生命，受到敵人傷害加深 35%。',
+        duration: 4,
+        instant_hp: 15,
+        hp_drain: 14,
+        luc_penalty: 8,
+        atk_penalty_pct: 0.20,
+        def_penalty_pct: 0.25
+    },
+    'resurrection_sickness': {
+        id: 'resurrection_sickness',
+        name: '死生虛弱',
+        name_en: 'Resurrection Sickness',
+        name_ja: '蘇生衰弱',
+        icon: '💫',
+        desc: '強行重聚殘魂的殘酷代價！最大生命降低 30%，全攻防下降 35%，每回合肉身耗損 8 點生命。',
+        duration: 5,
+        hp_drain: 8,
+        atk_penalty_pct: 0.35,
+        def_penalty_pct: 0.35
+    }
+};
+
+function getPlayerDebuffs(status) {
+    if (!status) return [];
+    if (!Array.isArray(status.debuffs)) {
+        status.debuffs = [];
+    }
+    return status.debuffs;
+}
+
+function applyDebuff(status, debuffOrKey) {
+    if (!status) return;
+    const debuffs = getPlayerDebuffs(status);
+    let def = null;
+    if (typeof debuffOrKey === 'string') {
+        def = STANDARD_DEBUFFS[debuffOrKey] || {
+            id: debuffOrKey,
+            name: debuffOrKey,
+            icon: '⚠️',
+            desc: '負面狀態效果',
+            duration: 3,
+            hp_drain: 12
+        };
+    } else if (typeof debuffOrKey === 'object' && debuffOrKey !== null) {
+        const base = STANDARD_DEBUFFS[debuffOrKey.id] || {};
+        def = { ...base, ...debuffOrKey };
+    }
+    if (!def || !def.id) return;
+
+    const hpBar = status.status_bars ? status.status_bars.find(b => b.type === 'hp') : null;
+    const spBar = status.status_bars ? status.status_bars.find(b => b.type === 'sp') : null;
+
+    // ★ 立即直接扣血與體力爆發（直觀痛感）
+    let instantMsg = '';
+    if (def.instant_hp && hpBar && hpBar.value > 0) {
+        const instantDmg = Math.min(hpBar.value, def.instant_hp);
+        hpBar.value = Math.max(0, hpBar.value - instantDmg);
+        instantMsg += ` 遭受【${def.name}】直接重創，立即扣除 <strong class="text-red-300 font-mono">-${instantDmg} HP</strong>！`;
+        triggerVisualEffect('danger_flash');
+    }
+    if (def.instant_sp && spBar && spBar.value > 0) {
+        const instantSp = Math.min(spBar.value, def.instant_sp);
+        spBar.value = Math.max(0, spBar.value - instantSp);
+        instantMsg += ` 體力嚴重耗損 -${instantSp} SP！`;
+    }
+
+    const existingIdx = debuffs.findIndex(d => d.id === def.id || d.name === def.name);
+    if (existingIdx >= 0) {
+        debuffs[existingIdx].duration = Math.max(debuffs[existingIdx].duration, def.duration || 3);
+    } else {
+        debuffs.push({ ...def });
+    }
+
+    if (instantMsg && typeof adventureLog !== 'undefined') {
+        adventureLog.push(`<div class="text-rose-400 font-bold text-xs bg-red-950/70 border border-red-500/50 p-2 rounded my-1 shadow-[0_0_12px_rgba(239,68,68,0.4)] animate-pulse">💥 ${def.icon || '⚠️'}${instantMsg}</div>`);
+    }
+
+    if (hpBar && hpBar.value <= 0 && playerState) {
+        playerState.is_dead = true;
+    }
+}
+
+function removeDebuff(status, debuffId) {
+    if (!status || !Array.isArray(status.debuffs)) return;
+    status.debuffs = status.debuffs.filter(d => d.id !== debuffId && d.name !== debuffId);
+}
+
+function tickDebuffs(status) {
+    if (!status || !Array.isArray(status.debuffs) || status.debuffs.length === 0) return [];
+    const notices = [];
+    const active = [];
+    const hpBar = status.status_bars ? status.status_bars.find(b => b.type === 'hp') : null;
+    const spBar = status.status_bars ? status.status_bars.find(b => b.type === 'sp') : null;
+
+    let totalHpLost = 0;
+
+    for (let i = 0; i < status.debuffs.length; i++) {
+        const d = status.debuffs[i];
+        let hpDrained = 0;
+        let spDrained = 0;
+
+        // ★ 計算實質扣血 (直觀致命，若生命不足將直接死亡)
+        if (d.hp_drain && hpBar && hpBar.value > 0) {
+            hpDrained = Math.min(hpBar.value, d.hp_drain);
+            hpBar.value = Math.max(0, hpBar.value - hpDrained);
+            totalHpLost += hpDrained;
+        }
+        if (d.sp_drain && spBar && spBar.value > 0) {
+            spDrained = Math.min(spBar.value, d.sp_drain);
+            spBar.value = Math.max(0, spBar.value - spDrained);
+        } else if (d.sp_drain && spBar && spBar.value <= 0 && hpBar && hpBar.value > 0) {
+            // 如果精力耗盡，精力扣減轉化為雙倍生命傷害！
+            const extraHp = Math.min(hpBar.value, Math.ceil(d.sp_drain * 1.5));
+            hpBar.value = Math.max(0, hpBar.value - extraHp);
+            hpDrained += extraHp;
+            totalHpLost += extraHp;
+        }
+
+        d.duration = (d.duration || 1) - 1;
+
+        if (hpDrained > 0 || spDrained > 0) {
+            notices.push(`<div class="text-rose-400 font-bold text-xs font-mono my-1 px-2.5 py-1.5 bg-red-950/70 border border-red-500/50 rounded flex items-center justify-between shadow-[0_0_10px_rgba(239,68,68,0.25)]"><span>[負面噬體] ${d.icon || '⚠️'} <strong>${d.name}</strong>：</span><span class="flex items-center gap-2">${hpDrained > 0 ? `<span class="text-red-300 font-black">💔 生命 -${hpDrained} HP</span>` : ''}${spDrained > 0 ? `<span class="text-amber-300 font-bold">⚡ 精力 -${spDrained} SP</span>` : ''}<span class="text-slate-400 text-[11px]">(剩 ${d.duration} 回合)</span></span></div>`);
+        }
+
+        if (d.duration <= 0) {
+            notices.push(`<div class="text-emerald-400 text-xs font-mono my-1 px-2.5 py-1 bg-emerald-950/40 border border-emerald-500/30 rounded flex items-center gap-1.5">[狀態解除] ✨「${d.name}」已完全消退。</div>`);
+        } else {
+            active.push(d);
+        }
+    }
+
+    if (totalHpLost > 0) {
+        triggerVisualEffect('danger_flash');
+    }
+
+    status.debuffs = active;
+    return notices;
+}
+
 function calculatePlayerStats(status) {
-    let str = (status.attributes && status.attributes.strength) ? status.attributes.strength : 10;
-    let luc = (status.attributes && status.attributes.vitality) ? status.attributes.vitality : 10;
-    let dex = (status.attributes && status.attributes.dexterity) ? status.attributes.dexterity : 10;
+    status = status || (playerState ? playerState.player_status : null) || {};
+    const attrs = (status && status.attributes) ? status.attributes : { strength: 10, vitality: 10, dexterity: 10 };
+    let str = attrs.strength || 10;
+    let luc = attrs.vitality || 10;
+    let dex = attrs.dexterity || 10;
     const level = status.level || 1;
 
     // Apply SP weakness penalty (30% reduction) if SP is 0
@@ -5165,8 +5603,22 @@ function calculatePlayerStats(status) {
     const bonusAtk = Math.floor(weaponAtk + (accBonus * 0.5));
     const bonusDef = Math.floor(armorDef + (accBonus * 0.5));
 
-    const atk = Math.floor((str * 2.5) + (luc * 0.5) + (level * 2) + bonusAtk);
-    const def = Math.floor((dex * 2.0) + (level * 2) + bonusDef);
+    let atk = Math.floor((str * 2.5) + (luc * 0.5) + (level * 2) + bonusAtk);
+    let def = Math.floor((dex * 2.0) + (level * 2) + bonusDef);
+
+    // 套用負面狀態 (Debuffs) 對攻防與屬性的扣減
+    const activeDebuffs = getPlayerDebuffs(status);
+    if (activeDebuffs.length > 0) {
+        activeDebuffs.forEach(d => {
+            if (d.atk_penalty_pct) atk = Math.round(atk * (1 - d.atk_penalty_pct));
+            if (d.def_penalty_pct) def = Math.round(def * (1 - d.def_penalty_pct));
+            if (d.dex_penalty) dex = Math.max(1, dex - d.dex_penalty);
+            if (d.str_penalty) str = Math.max(1, str - d.str_penalty);
+            if (d.luc_penalty) luc = Math.max(1, luc - d.luc_penalty);
+        });
+    }
+    atk = Math.max(1, atk);
+    def = Math.max(1, def);
 
     return {
         base: { str, luc, dex },
@@ -5194,18 +5646,43 @@ function calculateProgrammaticDamage(attackerType, playerState, monster) {
     const playerMaxHp = hpBar ? hpBar.max_value : 100;
 
     let damage = 0;
-    let isCrit = Math.random() < 0.1;
-    let critMultiplier = isCrit ? 1.5 : 1.0;
+    let isCrit = false;
+    let critMultiplier = 1.0;
 
     if (attackerType === 'player') {
+        isCrit = Math.random() < 0.12;
+        critMultiplier = isCrit ? 1.5 : 1.0;
         const rawDamage = (playerAtk - monsterDef) * critMultiplier;
-        damage = Math.max(Math.floor(playerAtk * 0.1), Math.floor(rawDamage));
+        damage = Math.max(Math.floor(playerAtk * 0.15), Math.floor(rawDamage));
         damage = Math.floor(damage * (0.9 + Math.random() * 0.2));
     } else {
-        const rawDamage = (monsterAtk - playerDef) * critMultiplier;
-        damage = Math.max(1, Math.floor(rawDamage));
+        const monsterRank = (monster.rank || 'NORMAL').toUpperCase();
+        const rankConf = (typeof MONSTER_RANKS !== 'undefined' && MONSTER_RANKS[monsterRank]) ? MONSTER_RANKS[monsterRank] : { critChance: 0.15 };
+        isCrit = Math.random() < (rankConf.critChance || 0.15);
+        critMultiplier = isCrit ? 1.5 : 1.0;
 
-        const damageCap = Math.floor(playerMaxHp * 0.20);
+        const rawDamage = (monsterAtk - playerDef) * critMultiplier;
+        // 敵人至少造成 8% 最大生命值的實質肉身傷害
+        damage = Math.max(Math.floor(playerMaxHp * 0.08), Math.floor(rawDamage));
+
+        // 負面狀態易傷加深 (詛咒、凍傷、死生虛弱)
+        const activeDebuffs = getPlayerDebuffs(playerState.player_status);
+        let debuffVulnerability = 1.0;
+        activeDebuffs.forEach(d => {
+            if (d.id === 'curse') debuffVulnerability += 0.35;
+            if (d.id === 'frostbite') debuffVulnerability += 0.35;
+            if (d.id === 'resurrection_sickness') debuffVulnerability += 0.25;
+        });
+        damage = Math.round(damage * debuffVulnerability);
+
+        // 難度加強：根據怪物位階放寬致死傷害上限（菁英可達 90%，Boss 具備完全致死斬殺能力）
+        let capPct = 0.65;
+        if (monsterRank === 'MINION') capPct = 0.45;
+        else if (monsterRank === 'NORMAL') capPct = 0.75;
+        else if (monsterRank === 'ELITE') capPct = 0.90;
+        else if (monsterRank === 'BOSS') capPct = 1.00;
+
+        const damageCap = Math.floor(playerMaxHp * capPct);
         if (damage > damageCap) damage = damageCap;
     }
 
@@ -5403,6 +5880,7 @@ Task: Analyze the description and generate a "Level 1 Character Sheet" JSON.
 }
 
 function renderCharacterPreview(data) {
+    if (!data) return;
     const t = i18nData[currentLang];
     
     // 定義標籤翻譯
@@ -5413,10 +5891,16 @@ function renderCharacterPreview(data) {
     };
     const localLbl = labels[currentLang] || labels['en'];
 
-// 1. 填入名稱
+    // 確保 attributes 存在
+    const attrs = data.attributes || (data.player_status && data.player_status.attributes) || { strength: 10, vitality: 10, dexterity: 10 };
+    data.attributes = attrs;
+
+    // 1. 填入名稱
     const nameInput = document.getElementById('preview-char-name');
-    nameInput.value = data.name || localLbl.defaultName;
-    nameInput.className = 'w-full px-3 py-2 text-xl font-bold outline-none transition-colors rounded-lg input-high-contrast';
+    if (nameInput) {
+        nameInput.value = data.name || (data.player_status && data.player_status.name) || localLbl.defaultName;
+        nameInput.className = 'w-full px-3 py-2 text-xl font-bold outline-none transition-colors rounded-lg input-high-contrast';
+    }
 
     // 2. 填入屬性 (根據遊戲類型調整標籤)
     const settings = getGenreSettings(dom.gameGenreSelect.value);
@@ -5424,18 +5908,20 @@ function renderCharacterPreview(data) {
     const statsGrid = document.getElementById('preview-stats-grid');
     
     // 定義屬性映射
-    const statMap = [
-        { key: 'strength', label: gl.str, val: data.attributes.strength, color: 'text-red-400' },
-        { key: 'vitality', label: gl.vit, val: data.attributes.vitality, color: 'text-green-400' },
-        { key: 'dexterity', label: gl.dex, val: data.attributes.dexterity, color: 'text-blue-400' }
-    ];
+    if (statsGrid) {
+        const statMap = [
+            { key: 'strength', label: gl.str, val: attrs.strength !== undefined ? attrs.strength : 10, color: 'text-red-400' },
+            { key: 'vitality', label: gl.vit, val: attrs.vitality !== undefined ? attrs.vitality : 10, color: 'text-green-400' },
+            { key: 'dexterity', label: gl.dex, val: attrs.dexterity !== undefined ? attrs.dexterity : 10, color: 'text-blue-400' }
+        ];
 
-    statsGrid.innerHTML = statMap.map(s => `
-        <div class="stat-box">
-            <div class="stat-label">${s.label}</div>
-            <div class="stat-value ${s.color}">${s.val}</div>
-        </div>
-    `).join('');
+        statsGrid.innerHTML = statMap.map(s => `
+            <div class="stat-box">
+                <div class="stat-label">${s.label}</div>
+                <div class="stat-value ${s.color}">${s.val}</div>
+            </div>
+        `).join('');
+    }
 
 // 3. 填入特質 (Traits)
     const traitsList = document.getElementById('preview-traits-list');
@@ -6637,29 +7123,38 @@ Make a concrete event happen (e.g., an NPC arrives, an enemy attacks, a location
                 window.nextEventThreshold = Math.floor(Math.random() * 6) + 7;
                 const fateRoll = Math.floor(Math.random() * 10) + 1;
                 const t_Prefix = "[SYSTEM OVERRIDE: DIRECTOR EVENT TRIGGERED]";
-                const safetyLock = "**SAFETY RULE:** You CANNOT inflict HP damage directly via text description. Narrative tension ONLY. If this is a physical threat, you MUST initiate a COMBAT encounter using \`start_combat\`.";
+                const hazardNote = "**REAL CONSEQUENCE RULE:** If the player triggers a trap or hazard recklessly, you may apply status penalties (-10 to -35 HP/SP) or inflict debuffs (bleed, poison, exhaustion, trauma). Do NOT force endless monster battles.";
 
                 switch (fateRoll) {
                     case 1:
-                        directorInstruction = `${t_Prefix}\n**FATE ROLL: 1 (CATASTROPHE - 極大危機)**\n* **Intensity:** Extreme / Boss Fight.\n* **Instruction:** A major disaster or Boss Enemy appears immediately.\n* **Action:** You MUST return \`start_combat\` with rank "BOSS" or "ELITE".`;
+                        directorInstruction = `${t_Prefix}\n**FATE ROLL: 1 (DILEMMA & ENVIRONMENTAL HAZARD - 險境考驗)**\n* **Intensity:** High.\n* **Instruction:** A treacherous collapsed path, toxic gas vent, rickety bridge, or severe ethical predicament. If the player makes a poor choice, inflict realistic HP loss or a debuff.\n* ${hazardNote}`;
                         break;
                     case 2:
-                        directorInstruction = `${t_Prefix}\n**FATE ROLL: 2 (MAJOR SETBACK - 重大挫折)**\n* **Intensity:** High.\n* **Instruction:** Something goes significantly wrong. A key route is blocked or a valuable item is lost.\n* ${safetyLock}`;
+                        directorInstruction = `${t_Prefix}\n**FATE ROLL: 2 (MAJOR SETBACK - 重大挫折與意外)**\n* **Intensity:** High.\n* **Instruction:** A supply bag is damaged, a key tool breaks, an NPC becomes suspicious, or bad weather halts progress. Provide challenging recovery choices.`;
                         break;
                     case 3:
-                        directorInstruction = `${t_Prefix}\n**FATE ROLL: 3 (SUDDEN DANGER - 突發危機)**\n* **Type:** Reflex / Timing Challenge.\n* **Scenario:** A trap triggers, a rock falls, an arrow flies, or a thief tries to snatch a purse.\n* **Action:** You **MUST** return \`start_minigame: { "type": "reflex_strike", "title": "⚡ REFLEX CHECK", "description": "Dodge the danger immediately!" }\`.\n* **Narrative:** Describe the sudden threat but stop right before the impact.`;
+                        directorInstruction = `${t_Prefix}\n**FATE ROLL: 3 (SUDDEN DANGER - 突發敏捷考驗)**\n* **Type:** Reflex / Timing Challenge.\n* **Scenario:** A trap triggers, a rock falls, an arrow flies, or a thief tries to snatch a purse.\n* **Action:** You **MUST** return \`start_minigame: { "type": "reflex_strike", "title": "⚡ REFLEX CHECK", "description": "Dodge the danger immediately!" }\`.\n* **Narrative:** Describe the sudden threat but stop right before the impact.`;
                         break;
                     case 4:
-                        directorInstruction = `${t_Prefix}\n**FATE ROLL: 4 (WAGER OF FATE - 命運賭局)**\n* **Scenario:** A gambler challenges the player, a drinking contest, or luck challenge.`;
+                        directorInstruction = `${t_Prefix}\n**FATE ROLL: 4 (VIBRANT SOCIAL ENCOUNTER - 市井人情與奇遇)**\n* **Scenario:** Meet a lively, charming, or eccentric NPC (e.g. an argumentative merchant, a flirtatious tavern girl, a traveling companion, or a street bard). Offer rich social dialogue, playful banter, teasing, and varied options.`;
+                        break;
+                    case 5:
+                        directorInstruction = `${t_Prefix}\n**FATE ROLL: 5 (DAILY LIFE & LEISURE - 悠閒時光與風土體驗)**\n* **Scenario:** A warm break from the journey: discovering a cozy roadside tea stall, tasting local exotic delicacies, fishing by a stream, soaking in natural hot springs, or campfire storytelling.`;
+                        break;
+                    case 6:
+                        directorInstruction = `${t_Prefix}\n**FATE ROLL: 6 (CURIOSITY & EXPERIMENTATION - 奇趣嘗試與探索)**\n* **Scenario:** Encounter an odd device, an unlabeled strange potion, a fortune-telling stall, or an enigmatic rumor. Offer options to experiment, joke around, or investigate curiously.`;
+                        break;
+                    case 7:
+                        directorInstruction = `${t_Prefix}\n**FATE ROLL: 7 (HIDDEN SECRET - 隱藏機緣與解謎)**\n* **Type:** Puzzle / Decryption.\n* **Scenario:** A locked chest, a cipher puzzle, a secret compartment, or ancient runes.\n* **Action:** You **MUST** return \`start_minigame: { "type": "code_crack", "title": "🔓 SECRET LOCK", "description": "Crack the code to open it." }\`.`;
                         break;
                     case 8:
-                        directorInstruction = `${t_Prefix}\n**FATE ROLL: 8 (GOOD FORTUNE - 好運)**\n* **Intensity:** High.\n* **Instruction:** A significant stroke of luck. Finding a useful item or healing.\n* **Action:** Grant a small amount of HP/SP recovery or a decent Item.`;
+                        directorInstruction = `${t_Prefix}\n**FATE ROLL: 8 (GOOD FORTUNE - 意想不到的善意)**\n* **Scenario:** An NPC offers helpful advice, a warm meal, or a useful herb after a friendly conversation.`;
                         break;
                     case 9:
-                        directorInstruction = `${t_Prefix}\n**FATE ROLL: 9 (GREAT FORTUNE - 大吉)**\n* **Intensity:** Very High.\n* **Instruction:** A major reward! Discovering a treasure chest or a secret passage.\n* **Action:** You MUST reward the player with something valuable.`;
+                        directorInstruction = `${t_Prefix}\n**FATE ROLL: 9 (GREAT FORTUNE - 機緣造化)**\n* **Scenario:** Uncovering a well-hidden pouch, discovering a lost path, or winning high praise.`;
                         break;
                     case 10:
-                        directorInstruction = `${t_Prefix}\n**FATE ROLL: 10 (MIRACLE - 奇蹟)**\n* **Intensity:** Legendary.\n* **Instruction:** Divine intervention or legendary relic.`;
+                        directorInstruction = `${t_Prefix}\n**FATE ROLL: 10 (MIRACLE - 奇蹟時刻)**\n* **Scenario:** A moment of deep insight, an extraordinary serendipitous encounter, or discovering an ancient relic.`;
                         break;
                 }
             }
@@ -6749,34 +7244,23 @@ ${pacingPrompt}
                 else if (oc.tier === 'BarelySuccess') resultColor = 'text-orange-400 border-orange-500/30 bg-orange-500/10';
 
                 const rollCardHtml = `
-                <div class="my-3 p-3 sm:p-4 rounded-lg border flex flex-col gap-2 ${resultColor} select-none animate-fade-in">
-                    <div class="flex items-center justify-between border-b border-white/5 pb-1.5">
-                        <span class="font-bold text-xs uppercase tracking-wider flex items-center gap-1.5">
-                            <i class="ph-fill ph-dice-six text-lg"></i> 命運屬性判定 (Fate Attribute Check)
+                <div class="my-2 p-2.5 sm:p-3 rounded-lg border ${resultColor} bg-black/40 backdrop-blur-sm select-none animate-fade-in text-xs font-mono">
+                    <div class="flex items-center justify-between border-b border-white/10 pb-1.5">
+                        <span class="font-bold flex items-center gap-1.5 text-xs text-slate-200">
+                            <i class="ph-fill ph-dice-six text-base text-amber-400"></i> ${oc.checkTitle || '關鍵判定'}
                         </span>
-                        <span class="font-mono text-xs font-bold px-1.5 py-0.5 rounded bg-black/30 border border-white/10">DC ${oc.DC}</span>
+                        <span class="px-2 py-0.5 rounded bg-black/50 border border-white/10 text-[11px] font-bold text-slate-300">DC ${oc.DC}</span>
                     </div>
-                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs text-slate-300 font-mono">
-                        <div class="bg-black/20 p-1.5 rounded text-center">
-                            <div class="text-[10px] text-slate-500 uppercase">d20 骰值</div>
-                            <div class="text-sm font-bold text-white">${oc.roll}</div>
+                    <div class="flex items-center justify-between pt-1.5 flex-wrap gap-2 text-slate-300 text-[11px]">
+                        <div>
+                            <span>d20(<strong>${oc.roll}</strong>)</span>
+                            ${oc.modifier ? `<span> + 屬性(${oc.modifier >= 0 ? '+' : ''}${oc.modifier})</span>` : ''}
+                            ${oc.itemBonus ? `<span> + 道具(+${oc.itemBonus})</span>` : ''}
+                            <span> = <strong class="text-white text-xs">${oc.score}</strong></span>
                         </div>
-                        <div class="bg-black/20 p-1.5 rounded text-center">
-                            <div class="text-[10px] text-slate-500 uppercase">屬性修正</div>
-                            <div class="text-sm font-bold text-white">+${oc.modifier}</div>
+                        <div class="font-bold tracking-wider text-xs px-2 py-0.5 rounded bg-black/50 border border-white/10">
+                            <span>判定結果：</span><span class="underline underline-offset-2">${oc.tierZh}</span>
                         </div>
-                        <div class="bg-black/20 p-1.5 rounded text-center">
-                            <div class="text-[10px] text-slate-500 uppercase">道具加成</div>
-                            <div class="text-sm font-bold text-white">+${oc.itemBonus}</div>
-                        </div>
-                        <div class="bg-black/20 p-1.5 rounded text-center">
-                            <div class="text-[10px] text-slate-500 uppercase">總和得分</div>
-                            <div class="text-sm font-bold text-white">${oc.score}</div>
-                        </div>
-                    </div>
-                    <div class="text-center font-bold text-sm sm:text-base tracking-widest mt-1 border-t border-white/5 pt-2 flex items-center justify-center gap-2">
-                        <span>判定結果：</span>
-                        <span class="underline underline-offset-4 decoration-2">${oc.tierZh}</span>
                     </div>
                 </div>
                 `;
@@ -6816,7 +7300,8 @@ ${pacingPrompt}
             }
 
             if (gameUpdate.experience_gained && typeof gameUpdate.experience_gained === 'number' && playerState.player_status.experience) {
-                let xpGained = Math.ceil(gameUpdate.experience_gained * pendingXpMultiplier);
+                // 難度平衡：放緩經驗值獲取速率 (降低 55%)，防止角色過快升級
+                let xpGained = Math.ceil(gameUpdate.experience_gained * pendingXpMultiplier * 0.45);
                 xpGained = Math.floor(xpGained * (0.9 + Math.random() * 0.2)); 
                 if (gameUpdate.experience_gained > 0 && xpGained < 1) xpGained = 1; 
                 pendingXpMultiplier = 1.0; 
@@ -6848,8 +7333,8 @@ ${pacingPrompt}
                     }
 
                     const leftoverXp = playerState.player_status.experience.current - playerState.player_status.experience.max;
-                    playerState.player_status.experience.max = Math.floor(playerState.player_status.experience.max * 1.5);
-                    playerState.player_status.experience.current = leftoverXp;
+                    playerState.player_status.experience.max = Math.floor(playerState.player_status.experience.max * 1.8);
+                    playerState.player_status.experience.current = Math.max(0, leftoverXp);
 
                     const levelUpMessage = i18nData[currentLang]['game.level_up'].replace('{level}', playerState.player_status.level);
                     adventureLog.push(`<div class="text-center font-bold text-yellow-400 my-4 py-2 border-y-2 border-yellow-400">${levelUpMessage}</div>`);
@@ -7958,7 +8443,26 @@ document.getElementById('item-confirm-yes-btn').addEventListener('click', () => 
                 const subj = subjectMap[currentLang] || 'You';
                 const vrb = verbMap[currentLang] || 'used';
                 
-                const logMessage = `<span class="text-green-400 font-bold">${subj} ${vrb} ${itemData.name}，${targetBar.name} +${actualHealed} (${targetBar.value}/${targetBar.max_value})</span>`;
+                let curedMsg = '';
+                const n = (itemData.name || '').toLowerCase();
+                let curedList = [];
+                if (n.includes('草藥') || n.includes('繃帶') || n.includes('止血') || n.includes('bandage') || n.includes('herb')) {
+                    removeDebuff(playerState.player_status, 'bleed');
+                    curedList.push('重度負傷');
+                }
+                if (n.includes('解毒') || n.includes('清心') || n.includes('antidote') || n.includes('detox')) {
+                    removeDebuff(playerState.player_status, 'poison');
+                    curedList.push('劇毒侵蝕');
+                }
+                if (n.includes('聖水') || n.includes('萬能藥') || n.includes('靈藥') || n.includes('elixir') || n.includes('panacea')) {
+                    playerState.player_status.debuffs = [];
+                    curedList.push('全部異常減益');
+                }
+                if (curedList.length > 0) {
+                    curedMsg = ` <span class="text-emerald-400 font-bold">[狀態治癒] ✨ 解除了「${curedList.join(', ')}」！</span>`;
+                }
+
+                const logMessage = `<span class="text-green-400 font-bold">${subj} ${vrb} ${itemData.name}，${targetBar.name} +${actualHealed} (${targetBar.value}/${targetBar.max_value})</span>${curedMsg}`;
                 
                 adventureLog.push(logMessage);
                 renderAdventureLog();
@@ -9087,6 +9591,28 @@ function renderPlayerHUD() {
         });
     }
 
+    // --- [新增] 異常狀態與負面減益 (Debuffs) 渲染 ---
+    const activeDebuffs = getPlayerDebuffs(status);
+    if (activeDebuffs.length > 0) {
+        let debuffHtml = `<div class="mt-3 p-2.5 rounded-lg border border-red-500/40 bg-red-950/40 shadow-inner">
+            <div class="flex items-center justify-between text-xs font-bold text-red-300 mb-1.5">
+                <span class="flex items-center gap-1"><i class="ph-fill ph-warning-octagon text-red-400"></i> 異常減益 (${activeDebuffs.length})</span>
+                <span class="text-[10px] text-red-400/80 font-mono">負面狀態生效中</span>
+            </div>
+            <div class="flex flex-wrap gap-1.5">`;
+        activeDebuffs.forEach(d => {
+            const drainText = d.hp_drain ? `-${d.hp_drain} HP/T` : (d.sp_drain ? `-${d.sp_drain} SP/T` : '');
+            debuffHtml += `<div class="group relative px-2.5 py-1 bg-red-950/90 border border-red-500/60 rounded flex items-center gap-1.5 text-xs text-red-200 shadow-[0_0_8px_rgba(239,68,68,0.35)] animate-pulse" title="${d.desc || ''}">
+                <span class="text-sm">${d.icon || '⚠️'}</span>
+                <span class="font-bold text-red-200">${d.name}</span>
+                ${drainText ? `<span class="px-1 bg-red-800/90 text-[10px] font-mono font-black text-rose-100 rounded">${drainText}</span>` : ''}
+                <span class="px-1 bg-black/60 rounded text-[10px] font-mono text-red-300 border border-red-500/30">${d.duration}T</span>
+            </div>`;
+        });
+        debuffHtml += `</div></div>`;
+        dom.statusBarsContainer.innerHTML += debuffHtml;
+    }
+
     // --- 裝備列表 (微調字體) ---
     dom.equipmentList.innerHTML = '';
     if (status.equipment && Object.keys(status.equipment).length > 0) {
@@ -9422,90 +9948,76 @@ function renderQuestItem(quest, t) {
                         }
                     }
 
-                    // --- 判定徽章與提示渲染 ---
+                    // --- 判定徽章與提示渲染 (僅在關鍵時刻：戰鬥比拼、偷竊潛行、運氣賭博、絕境避險，或選項明確要求 check 時顯示) ---
                     let badgeHtml = '';
                     let hintHtml = '';
+                    let isCritical = false;
+                    let checkAttr = 'strength';
+                    let checkDC = 10;
+                    let checkTypeLabel = '關鍵判定';
+                    let badgeColor = 'bg-amber-500/20 text-amber-300 border-amber-500/30';
+                    let hintText = '';
+
                     if (typeof choice === 'object' && choice.check) {
+                        isCritical = true;
                         const check = choice.check;
-                        const attr = check.attribute || 'strength';
-                        const DC = check.difficulty || 10;
+                        checkAttr = check.attribute || 'strength';
+                        checkDC = parseInt(check.difficulty || '10', 10);
                         const type = choice.type || 'normal';
 
-                        let typeZh = '一般';
-                        let typeColor = 'bg-gray-500/20 text-gray-300 border-gray-500/30';
-                        if (type === 'aggressive') { typeZh = '激進'; typeColor = 'bg-red-500/20 text-red-300 border-red-500/30'; }
-                        else if (type === 'cautious') { typeZh = '謹慎'; typeColor = 'bg-green-500/20 text-green-300 border-green-500/30'; }
-                        else if (type === 'smart') { typeZh = '智慧'; typeColor = 'bg-blue-500/20 text-blue-300 border-blue-500/30'; }
-                        else if (type === 'social') { typeZh = '社交'; typeColor = 'bg-purple-500/20 text-purple-300 border-purple-300/30'; }
+                        if (type === 'aggressive') { checkTypeLabel = '⚔️ 戰鬥比拼'; badgeColor = 'bg-red-500/20 text-red-300 border-red-500/30'; }
+                        else if (type === 'cautious') { checkTypeLabel = '🛡️ 謹慎防禦'; badgeColor = 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30'; }
+                        else if (type === 'smart') { checkTypeLabel = '🧠 機智破解'; badgeColor = 'bg-blue-500/20 text-blue-300 border-blue-500/30'; }
+                        else if (type === 'social') { checkTypeLabel = '💬 社交交涉'; badgeColor = 'bg-purple-500/20 text-purple-300 border-purple-300/30'; }
+                        else { checkTypeLabel = check.title || '🎲 關鍵判定'; badgeColor = 'bg-amber-500/20 text-amber-300 border-amber-500/30'; }
 
-                        let attrZh = '力量';
-                        if (attr === 'strength') attrZh = '力量';
-                        else if (attr === 'vitality') attrZh = '體質';
-                        else if (attr === 'dexterity') attrZh = '敏捷';
-
-                        badgeHtml = `<span class="inline-flex items-center gap-1 text-[10px] uppercase tracking-wider font-bold border rounded px-1.5 py-0.5 mr-1.5 ${typeColor}">${typeZh} | ${attrZh} 判定 (DC ${DC})</span>`;
-                        
                         if (check.required_item) {
                             badgeHtml += `<span class="inline-flex items-center text-[10px] font-bold border border-emerald-500/30 bg-emerald-500/20 text-emerald-300 rounded px-1.5 py-0.5 mr-1.5">🔑 已持有: ${check.required_item}</span>`;
                         }
                         if (check.consequence_hint) {
-                            hintHtml = `<div class="text-[11px] text-slate-400 mt-0.5 italic font-normal leading-tight select-none">📌 ${choice.check.consequence_hint}</div>`;
+                            hintText = check.consequence_hint;
                         }
                     } else if (choiceText) {
-                        // Generate dynamic choice check representation for ALL simple options
-                        let sum = 0;
-                        for (let i = 0; i < choiceText.length; i++) sum += choiceText.charCodeAt(i);
-                        
-                        let checkType = 'normal';
-                        let attrName = 'strength';
-                        let typeZh = '一般';
-                        let attrZh = '力量/體魄';
-                        let typeColor = 'bg-gray-500/20 text-slate-300 border-gray-500/30';
-                        let hintText = '可能導致局勢變化。';
-
                         const textLower = choiceText.toLowerCase();
-                        if (/[打殺衝闖強攻奪擊戰攻破]/.test(choiceText) || /attack|fight|rush|charge|strike|break|aggressive/.test(textLower)) {
-                            checkType = 'aggressive'; attrName = 'strength'; typeZh = '激進'; attrZh = '力量/體魄';
-                            typeColor = 'bg-red-500/20 text-red-300 border-red-500/30';
-                            hintText = '失敗可能導致：受到物理傷害、防具受損、驚動敵人。';
-                        } else if (/[避躲藏防守等走避忍低觀察盯]/.test(choiceText) || /hide|sneak|dodge|wait|guard|observe|cautious/.test(textLower)) {
-                            checkType = 'cautious'; attrName = 'vitality'; typeZh = '謹慎'; attrZh = '生命力/體質';
-                            typeColor = 'bg-green-500/20 text-green-300 border-green-500/30';
-                            hintText = '失敗可能導致：體力耗盡、錯失良機、陷入被動處境。';
-                        } else if (/[研究解剖析讀用學法咒智慧具理思考]/.test(choiceText) || /study|analyze|read|spell|device|hack|tool|smart|intelligent/.test(textLower)) {
-                            checkType = 'smart'; attrName = 'dexterity'; typeZh = '智慧'; attrZh = '敏捷/靈巧';
-                            typeColor = 'bg-blue-500/20 text-blue-300 border-blue-500/30';
-                            hintText = '失敗可能導致：工具損壞、精神受創、引發異常。';
-                        } else if (/[說談騙服社交話交涉親善盟魅力]/.test(choiceText) || /talk|persuade|deceive|negotiate|charm|npc|social/.test(textLower)) {
-                            checkType = 'social'; attrName = 'charisma'; typeZh = '社交'; attrZh = '社交/魅力';
-                            typeColor = 'bg-purple-500/20 text-purple-300 border-purple-300/30';
-                            hintText = '失敗可能導致：NPC好感降低、價格上漲、陷入孤立。';
-                        } else {
-                            const idx = sum % 4;
-                            if (idx === 0) {
-                                checkType = 'aggressive'; attrName = 'strength'; typeZh = '激進'; attrZh = '力量/體魄';
-                                typeColor = 'bg-red-500/20 text-red-300 border-red-500/30';
-                                hintText = '失敗可能導致：受到物理傷害、防具受損。';
-                            } else if (idx === 1) {
-                                checkType = 'cautious'; attrName = 'vitality'; typeZh = '謹慎'; attrZh = '生命力/體質';
-                                typeColor = 'bg-green-500/20 text-green-300 border-green-500/30';
-                                hintText = '失敗可能導致：體力耗盡、錯失良機。';
-                            } else if (idx === 2) {
-                                checkType = 'smart'; attrName = 'dexterity'; typeZh = '智慧'; attrZh = '敏捷/靈巧';
-                                typeColor = 'bg-blue-500/20 text-blue-300 border-blue-500/30';
-                                hintText = '失敗可能導致：道具損壞、引發異常。';
-                            } else {
-                                checkType = 'social'; attrName = 'charisma'; typeZh = '社交'; attrZh = '社交/魅力';
-                                typeColor = 'bg-purple-500/20 text-purple-300 border-purple-300/30';
-                                hintText = '失敗可能導致：NPC好感降低、孤立無援。';
-                            }
+                        if (/[拼死搏殺|強行突圍|破陣斬首|絕命反擊|生死決鬥|蓄力一擊|致命一擊|近身搏鬥|正面硬拼|拔刀相向]/.test(choiceText) || /duel|deathmatch|desperate strike|breakthrough|assassinate/i.test(textLower)) {
+                            isCritical = true;
+                            checkAttr = 'strength';
+                            checkTypeLabel = '⚔️ 戰鬥比拼';
+                            badgeColor = 'bg-red-500/20 text-red-300 border-red-500/30';
+                            hintText = '關鍵對決：成敗將直接影響戰局與損傷。';
+                        } else if (/[偷竊|竊取|扒竊|撬鎖|潛入|竊聽|摸索口袋|暗中順走]/.test(choiceText) || /steal|pickpocket|lockpick|sneak|infiltrate/i.test(textLower)) {
+                            isCritical = true;
+                            checkAttr = 'dexterity';
+                            checkTypeLabel = '🤫 偷竊/潛行';
+                            badgeColor = 'bg-indigo-500/20 text-indigo-300 border-indigo-500/30';
+                            hintText = '關鍵比拼：失敗可能驚動目標或被抓捕。';
+                        } else if (/[賭博|擲骰賭命|孤注一擲|生死一抽|運氣比拼|命運博弈|以命相搏|全押]/.test(choiceText) || /gamble|bet all|luck duel|fate gamble/i.test(textLower)) {
+                            isCritical = true;
+                            checkAttr = 'vitality';
+                            checkTypeLabel = '🎲 運氣比拼';
+                            badgeColor = 'bg-purple-500/20 text-purple-300 border-purple-300/30';
+                            hintText = '關鍵比拼：勝負純憑天命與孤注一擲。';
+                        } else if (/[拆除陷阱|解除機關|驚險飛躍|抵抗致命劇毒|躲避致命陷阱]/.test(choiceText) || /disarm trap|defuse|resist lethal poison/i.test(textLower)) {
+                            isCritical = true;
+                            checkAttr = 'dexterity';
+                            checkTypeLabel = '⚠️ 險境避險';
+                            badgeColor = 'bg-amber-500/20 text-amber-300 border-amber-500/30';
+                            hintText = '關鍵避險：失手可能觸發陷阱或遭受重創。';
                         }
+                    }
 
+                    if (isCritical) {
                         const chapter = playerState && playerState.camp_state ? (playerState.camp_state.chapter || 1) : 1;
-                        const DC = 8 + (chapter * 2);
+                        const DC = checkDC || (10 + chapter * 2);
+                        let attrZh = '力量';
+                        if (checkAttr === 'strength') attrZh = '力量';
+                        else if (checkAttr === 'vitality') attrZh = '體質';
+                        else if (checkAttr === 'dexterity') attrZh = '敏捷';
 
-                        badgeHtml = `<span class="inline-flex items-center gap-1 text-[10px] uppercase tracking-wider font-bold border rounded px-1.5 py-0.5 mr-1.5 ${typeColor}">${typeZh} | ${attrZh} 判定 (DC ${DC})</span>`;
-                        hintHtml = `<div class="text-[11px] text-slate-400 mt-0.5 italic font-normal leading-tight select-none">📌 ${hintText}</div>`;
+                        badgeHtml = `<span class="inline-flex items-center gap-1 text-[10px] uppercase tracking-wider font-bold border rounded px-1.5 py-0.5 mr-1.5 ${badgeColor}">${checkTypeLabel} (${attrZh} DC ${DC})</span>` + badgeHtml;
+                        if (hintText) {
+                            hintHtml = `<div class="text-[11px] text-slate-400 mt-0.5 italic font-normal leading-tight select-none">📌 ${hintText}</div>`;
+                        }
                     }
 
                     // 組裝 HTML
@@ -9985,7 +10497,7 @@ Example:
 "currency": 0,
 "currency_name": "Gold Coins",
 "attributes": { "strength": 15, "vitality": 12, "dexterity": 10 },
-"experience": { "current": 0, "max": 100 },
+"experience": { "current": 0, "max": 250 },
 "status_bars": [
 { "name": "Health", "value": 100, "max_value": 100, "type": "hp" },
 { "name": "Mana", "value": 50, "max_value": 50, "type": "mp" }
@@ -10030,7 +10542,38 @@ Example:
 
 try {
         const gameData = await callTextAPI(prompt);
-// [優化] 強制載入預覽資料 (Hard Overwrite)
+        if (!gameData || typeof gameData !== 'object') {
+            throw new Error(t['error.parseJSON'] || 'Invalid game response');
+        }
+
+        // [安全防呆] 確保 player_status 存在並具備 attributes 與 status_bars
+        if (!gameData.player_status) {
+            gameData.player_status = {
+                name: currentPreviewData?.name || '冒險者',
+                level: 1,
+                currency: 0,
+                currency_name: '金幣',
+                attributes: currentPreviewData?.attributes || { strength: 10, vitality: 10, dexterity: 10 },
+                status_bars: [
+                    { name: '生命值', value: 100, max_value: 100, type: 'hp' },
+                    { name: '精力值', value: 50, max_value: 50, type: 'sp' }
+                ],
+                inventory: [],
+                skills: currentPreviewData?.skills || [],
+                traits: currentPreviewData?.traits || []
+            };
+        }
+        if (!gameData.player_status.attributes) {
+            gameData.player_status.attributes = currentPreviewData?.attributes || { strength: 10, vitality: 10, dexterity: 10 };
+        }
+        if (!Array.isArray(gameData.player_status.status_bars)) {
+            gameData.player_status.status_bars = [
+                { name: '生命值', value: 100, max_value: 100, type: 'hp' },
+                { name: '精力值', value: 50, max_value: 50, type: 'sp' }
+            ];
+        }
+
+        // [優化] 強制載入預覽資料 (Hard Overwrite)
         // 確保玩家確認的數值絕對不會被 AI 修改
         if (currentPreviewData && gameData.player_status) {
             console.log("[System] Enforcing Locked Character Data...");
@@ -10045,7 +10588,7 @@ try {
             if (Array.isArray(c.traits)) p.traits = JSON.parse(JSON.stringify(c.traits));
             if (Array.isArray(c.skills)) p.skills = JSON.parse(JSON.stringify(c.skills));
 
-// 3. [修正版] 強制覆蓋裝備 (包含資料清洗與物品轉移)
+            // 3. [修正版] 強制覆蓋裝備 (包含資料清洗與物品轉移)
             if (c.equipment) {
                 // 深拷貝一份裝備資料
                 let cleanEq = JSON.parse(JSON.stringify(c.equipment));
@@ -10063,74 +10606,42 @@ try {
                 if (isJunk(cleanEq.accessory)) cleanEq.accessory = "None";
 
                 // ★★★ 關鍵修正：將 items 從裝備欄移除，轉移至物品欄 ★★★
-                // 這樣可以避免裝備欄出現 "items: 無" 或 "Item: 無" 的奇怪顯示
                 if (Array.isArray(cleanEq.items)) {
                     const validItems = cleanEq.items.filter(item => !isJunk(item));
                     
-                    // 將有效物品加入玩家背包 (如果背包存在)
                     if (p.inventory && Array.isArray(p.inventory)) {
                         validItems.forEach(itemName => {
-                            // 檢查背包內是否已經有同名物品，避免重複
                             const exists = p.inventory.some(i => (typeof i === 'string' ? i : i.name) === itemName);
                             if (!exists) {
-                                // 統一轉為物件格式存入背包
                                 p.inventory.push({ 
                                     name: itemName, 
-                                    type: 'consumable', // 預設標記為消耗品
+                                    type: 'consumable',
                                     description: 'Initial Supply' 
                                 });
                             }
                         });
                     }
-                    
-                    // [重點] 從裝備物件中 "刪除" items 屬性，確保 HUD 不會把它當成裝備部位渲染
                     delete cleanEq.items;
                 }
 
-                // [防呆] 刪除可能被 AI 生成的 "Item" 或 "item" 鍵值
                 if (cleanEq.Item) delete cleanEq.Item;
                 if (cleanEq.item) delete cleanEq.item;
 
-                // 將處理後的乾淨資料寫入玩家狀態
                 p.equipment = cleanEq;
             }
         }
-        if (gameData.shop_cache) {
-            currentShopData = gameData.shop_cache;
-            applyShopPriceRules(currentShopData);
-            shopGeneratedAtActionCount = 0;
-            console.log("[System] Initial Shop Cache Loaded");
-        }
-// [插入] 初始戰鬥數值注入
-if (gameData.start_combat) {
-    const stats = calculateMonsterStats(gameData.start_combat.rank, playerState);
-    gameData.start_combat.hp = stats.hp;
-    gameData.start_combat.maxHp = stats.maxHp;
-    gameData.start_combat.atk = stats.atk;
-    gameData.start_combat.def = stats.def;
-    gameData.start_combat.xp_reward = stats.xp;
-pendingCombatEncounter = gameData.start_combat;
-    console.log(`[System] Monster Generated: ${gameData.start_combat.name} (${stats.rank}) HP:${stats.hp}`);
-}
-        if (gameData.player_status && gameData.player_status.status_bars) {
 
-            // 1. 取得當前遊戲類型的「詳細體質」屬性名稱清單 (例如: ["魅力", "心機", "氣運", "影響力", "城府"])
+        if (gameData.player_status && gameData.player_status.status_bars) {
             const currentSettings = getGenreSettings(dom.gameGenreSelect.value);
             const forbiddenNames = Object.values(currentSettings.labels);
             
-            // 2. 過濾掉任何名稱與「詳細體質」重疊的狀態條
             gameData.player_status.status_bars = gameData.player_status.status_bars.filter(bar => {
-                // 如果狀態條名稱 (如 "心機") 包含在靜態屬性清單中，視為重複，予以移除
-                const isDuplicate = forbiddenNames.some(attrName => bar.name.includes(attrName));
+                const isDuplicate = forbiddenNames.some(attrName => bar.name && bar.name.includes(attrName));
                 return !isDuplicate;
             });
         }
-        // ▲▲▲ 【修復結束】 ▲▲▲
 
-        adventureLog = [gameData.narrative];
-
-        // ... (以下為原本的程式碼) ...
-        // ▼▼▼ 【新增】儲存大綱與回合限制到 playerState ▼▼▼
+        // [初始化 playerState] 先行建立 playerState，確保後續戰鬥與衍生數值計算正確
         const defaultRoadmap = Array.from({length: 10}, (_, i) => `Stage ${i+1}: Story Progression`);
         const roadmap = (gameData.story_roadmap && Array.isArray(gameData.story_roadmap) && gameData.story_roadmap.length >= 5) 
                         ? gameData.story_roadmap 
@@ -10141,11 +10652,31 @@ pendingCombatEncounter = gameData.start_combat;
             is_dead: false,
             is_game_over: false,
             last_choices: gameData.choices || [],
-            story_roadmap: roadmap, // 儲存 AI 生成的大綱
-            total_turn_limit: gameData.total_turn_limit || 80, // 儲存 AI 設定的總回合
-            current_stage_index: 0 // 初始化在第 0 階段
+            story_roadmap: roadmap,
+            total_turn_limit: gameData.total_turn_limit || 80,
+            current_stage_index: 0
         };
-        // ▲▲▲ 【新增結束】 ▲▲▲
+
+        if (gameData.shop_cache) {
+            currentShopData = gameData.shop_cache;
+            applyShopPriceRules(currentShopData);
+            shopGeneratedAtActionCount = 0;
+            console.log("[System] Initial Shop Cache Loaded");
+        }
+
+        // [初始戰鬥數值注入] 此時 playerState 已安全就緒
+        if (gameData.start_combat) {
+            const stats = calculateMonsterStats(gameData.start_combat.rank, playerState);
+            gameData.start_combat.hp = stats.hp;
+            gameData.start_combat.maxHp = stats.maxHp;
+            gameData.start_combat.atk = stats.atk;
+            gameData.start_combat.def = stats.def;
+            gameData.start_combat.xp_reward = stats.xp;
+            pendingCombatEncounter = gameData.start_combat;
+            console.log(`[System] Monster Generated: ${gameData.start_combat.name} (${stats.rank}) HP:${stats.hp}`);
+        }
+
+        adventureLog = [gameData.narrative || '冒險開始了……'];
 
         time_of_day = gameData.time_of_day || 'day';
         turnsUntilCycleChange = Math.floor(Math.random() * 4) + 7;
@@ -10183,23 +10714,69 @@ async function processPlayerChoice(choice, selectedChoiceObject = null) {
         shouldLogAction = false;
     }
 
-    // ▼▼▼ 復活與結局的優先攔截邏輯 ▼▼▼
+    // ▼▼▼ 復活與結局的優先攔截邏輯 (極度嚴苛的死亡懲罰機制) ▼▼▼
     if (choice === 'RESURRECT_BY_GODDESS') {
+        // 1. 生命與體能僅勉強吊住一絲殘息 (35% 生命，30% 體力，40% 溫飽)
         if (playerState.player_status && playerState.player_status.status_bars) {
             playerState.player_status.status_bars.forEach(bar => {
-                bar.value = bar.max_value;
+                if (bar.type === 'hp') bar.value = Math.floor(bar.max_value * 0.35);
+                else if (bar.type === 'sp') bar.value = Math.floor(bar.max_value * 0.30);
+                else if (bar.type === 'hunger' || bar.type === 'thirst') bar.value = Math.min(bar.value, Math.floor(bar.max_value * 0.40));
+                else bar.value = Math.floor(bar.max_value * 0.35);
             });
         }
-        
+
+        // 2. 扣除 50% 金幣（最少扣除 10 金幣或全部）
+        let goldLost = 0;
+        if (playerState.player_status.currency && playerState.player_status.currency > 0) {
+            goldLost = Math.min(playerState.player_status.currency, Math.max(10, Math.floor(playerState.player_status.currency * 0.50)));
+            playerState.player_status.currency = Math.max(0, playerState.player_status.currency - goldLost);
+        }
+
+        // 3. 扣除 40% 當前累積經驗值 (死亡代價)
+        let xpLost = 0;
+        if (playerState.player_status.experience && playerState.player_status.experience.current > 0) {
+            xpLost = Math.floor(playerState.player_status.experience.current * 0.40);
+            playerState.player_status.experience.current = Math.max(0, playerState.player_status.experience.current - xpLost);
+        }
+
+        // 4. 遺失背包物資：在死亡墜落深淵時，隨機損毀/遺落 1~2 件未裝備的物品
+        let lostItemNames = [];
+        if (playerState.player_status.inventory && Array.isArray(playerState.player_status.inventory) && playerState.player_status.inventory.length > 0) {
+            const inv = playerState.player_status.inventory;
+            const itemsToLoseCount = Math.min(inv.length, Math.floor(Math.random() * 2) + 1);
+            for (let k = 0; k < itemsToLoseCount; k++) {
+                if (inv.length === 0) break;
+                const randIdx = Math.floor(Math.random() * inv.length);
+                const removed = inv.splice(randIdx, 1)[0];
+                const rName = typeof removed === 'object' ? (removed.name || removed.item_name) : removed;
+                if (rName) lostItemNames.push(rName);
+            }
+        }
+
+        // 5. 施加極度沉重的「死生虛弱」負面狀態 (持續 5 回合，攻防腰斬 -35%，每回合噬體 -8 HP)
+        applyDebuff(playerState.player_status, 'resurrection_sickness');
+
         playerState.is_dead = false;
         playerState.is_game_over = false;
         isInCombat = false;
         combatTarget = { name: '', hp: -1, maxHp: 0 };
 
-        triggerVisualEffect('level_up_glow');
+        triggerVisualEffect('danger_flash');
         
-        // 顯示系統提示框 (原本就有的黃色框框)
-        adventureLog.push(`<div class="text-center font-bold text-yellow-300 my-4 p-3 border-2 border-yellow-500 rounded-lg bg-yellow-900/40 shadow-[0_0_15px_rgba(234,179,8,0.6)] animate-pulse">${t['game.resurrect.log']}</div>`);
+        const cName = playerState.player_status.currency_name || '金幣';
+        const itemLossText = lostItemNames.length > 0 ? `，並在深淵遺失物資：<span class="text-rose-300 font-bold">${lostItemNames.join('、')}</span>` : '';
+        const xpLossText = xpLost > 0 ? `，扣除 <span class="text-amber-300 font-bold">-${xpLost} 經驗值</span>` : '';
+
+        adventureLog.push(`<div class="text-center font-bold text-yellow-300 my-4 p-3.5 border-2 border-red-500/80 rounded-lg bg-red-950/70 shadow-[0_0_20px_rgba(239,68,68,0.5)]">
+            <div class="text-base text-red-200">${t['game.resurrect.log']}</div>
+            <div class="text-xs text-amber-200 mt-2 font-mono font-normal leading-relaxed text-left bg-black/40 p-2.5 rounded border border-red-500/30">
+                <strong class="text-rose-400">【嚴厲的死亡沉重代價】</strong><br>
+                • 殘魂勉力拼湊，生命僅恢復至 <strong class="text-red-300">35%</strong>，體能 <strong class="text-amber-300">30%</strong>。<br>
+                • 冥河渡魂祭品：損失 <strong class="text-yellow-300">-${goldLost} ${cName}</strong>${xpLossText}${itemLossText}。<br>
+                • 靈魂受損反噬：身負「<strong>死生虛弱</strong>」重創（生命上限-30%，全攻防-35%，每回合肉身耗損 8 HP，持續 5 回合）。
+            </div>
+        </div>`);
 
         // 設定給 AI 的指令
         choice = t['game.resurrect.action_prompt'];
@@ -10307,36 +10884,36 @@ Make a concrete event happen (e.g., an NPC arrives, an enemy attacks, a location
 
         const fateRoll = Math.floor(Math.random() * 10) + 1;
         
-        // 1. 先定義這兩個變數 (這是您指出的缺漏部分)
+        // 1. 定義命運導演指引
 const t_Prefix = "[SYSTEM OVERRIDE: DIRECTOR EVENT TRIGGERED]";
-const safetyLock = "**SAFETY RULE:** You CANNOT inflict HP damage directly via text description. Narrative tension ONLY. If this is a physical threat, you MUST initiate a COMBAT encounter using \`start_combat\`.";
+const hazardNote = "**REAL CONSEQUENCE RULE:** If the player triggers a trap or hazard recklessly, you may apply status penalties (-10 to -35 HP/SP) or inflict debuffs (bleed, poison, exhaustion, trauma). Do NOT force endless monster battles.";
 
-// 2. 接著是新的 switch 邏輯
+// 2. 命運導演事件池 (豐富日常生活、人情世故、趣事調侃與真實險境)
 switch (fateRoll) {
     case 1:
         directorInstruction = `
         ${t_Prefix}
-        **FATE ROLL: 1 (CATASTROPHE - 極大危機)**
-        * **Intensity:** Extreme / Boss Fight.
-        * **Instruction:** A major disaster or Boss Enemy appears immediately.
-        * **Action:** You MUST return \`start_combat\` with rank "BOSS" or "ELITE".
+        **FATE ROLL: 1 (DILEMMA & ENVIRONMENTAL HAZARD - 險境考驗)**
+        * **Intensity:** High Environmental/Social Hazard.
+        * **Instruction:** A sudden natural obstacle, collapsed cliff, poisonous vapor, or moral dilemma. If the player makes a foolish choice, inflict real HP damage or debuffs.
+        * ${hazardNote}
         `;
         break;
     case 2:
         directorInstruction = `
         ${t_Prefix}
-        **FATE ROLL: 2 (MAJOR SETBACK - 重大挫折)**
+        **FATE ROLL: 2 (MAJOR SETBACK - 重大挫折與突發意外)**
         * **Intensity:** High.
-        * **Instruction:** Something goes significantly wrong. A key route is blocked or a valuable item is lost.
-        * ${safetyLock}
+        * **Instruction:** Something goes significantly wrong: supplies are soaked by rain, an essential tool snaps, or an NPC catches the player in a compromising mistake.
+        * Provide tough recovery options.
         `;
         break;
     case 3:
         directorInstruction = `
         ${t_Prefix}
-        **FATE ROLL: 3 (SUDDEN DANGER - 突發危機)**
+        **FATE ROLL: 3 (SUDDEN DANGER - 突發危機與敏捷反應)**
         * **Type:** Reflex / Timing Challenge.
-        * **Scenario:** A trap triggers, a rock falls, an arrow flies, or a thief tries to snatch a purse.
+        * **Scenario:** A hidden dart trap triggers, a tumbling boulder, or a nimble thief tries to pickpocket the player.
         * **Action:** You **MUST** return \`start_minigame: { "type": "reflex_strike", "title": "⚡ REFLEX CHECK", "description": "Dodge the danger immediately!" }\`.
         * **Narrative:** Describe the sudden threat but stop right before the impact.
         `;
@@ -10344,65 +10921,62 @@ switch (fateRoll) {
     case 4:
         directorInstruction = `
         ${t_Prefix}
-        **FATE ROLL: 4 (WAGER OF FATE - 命運賭局)**
-        * **Type:** Chance / Competition.
-        * **Scenario:** A gambler challenges the player, a drinking contest, or a situation requiring pure luck.
-        * **Action:** You **MUST** return \`start_minigame: { "type": "dice_duel", "title": "🎲 FATE WAGER", "description": "Win the challenge to proceed." }\`.
-        * **Narrative:** Describe the opponent or the high-stakes situation setup.
+        **FATE ROLL: 4 (VIBRANT SOCIAL ENCOUNTER - 市井人情與奇遇互動)**
+        * **Type:** Social / Banter / Romance / Teasing.
+        * **Scenario:** Meet a charming, colorful, or eccentric NPC (e.g., a flirtatious traveling merchant, a witty tavern maiden, an argumentative martial artist, or a mysterious wanderer).
+        * **Instruction:** Provide lively dialogue, playful banter, teasing/flirting options, and non-combat choices!
         `;
         break;
     case 5:
         directorInstruction = `
         ${t_Prefix}
-        **FATE ROLL: 5 (UNEASE - 不安)**
-        * **Intensity:** Atmospheric.
-        * **Instruction:** Shift the tone to be unsettling or eerie. Create suspense.
-        * ${safetyLock}
+        **FATE ROLL: 5 (DAILY LIFE & LEISURE - 悠閒生活與風土逸趣)**
+        * **Intensity:** Warm & Refreshing.
+        * **Instruction:** A moment of relaxation and daily life flavor: sampling local specialty cuisine, enjoying warm tea at a roadside stall, bathing at a natural hot spring, or camping by starlight.
         `;
         break;
     case 6:
         directorInstruction = `
         ${t_Prefix}
-        **FATE ROLL: 6 (RESPITE - 喘息)**
-        * **Intensity:** Low.
-        * **Instruction:** A moment of calm. The player finds a safe spot or a beautiful view.
+        **FATE ROLL: 6 (CURIOSITY & PLAYFUL EXPERIMENTATION - 奇趣嘗試與探索)**
+        * **Type:** Curiosity / Experimentation.
+        * **Scenario:** An odd invention, a strange unlabeled elixir, a fortune-teller's tent, or a quirky street rumor.
+        * **Instruction:** Encourage the player to try weird actions, joke around, investigate, or take silly/bold chances.
         `;
         break;
     case 7:
         directorInstruction = `
         ${t_Prefix}
-        **FATE ROLL: 7 (HIDDEN SECRET - 隱藏機緣)**
+        **FATE ROLL: 7 (HIDDEN SECRET - 隱藏機緣與解密)**
         * **Type:** Puzzle / Decryption.
-        * **Scenario:** A locked chest, a magical seal, a hacking terminal, or an ancient mechanism is found.
+        * **Scenario:** An ancient puzzle box, a coded letter, a hidden compartment, or a magic locking mechanism.
         * **Action:** You **MUST** return \`start_minigame: { "type": "code_crack", "title": "🔓 SECRET LOCK", "description": "Crack the code to open it." }\`.
-        * **Narrative:** Describe the mysterious object blocking the reward.
+        * **Narrative:** Describe the mysterious mechanism awaiting a sharp mind.
         `;
         break;
     case 8:
         directorInstruction = `
         ${t_Prefix}
-        **FATE ROLL: 8 (GOOD FORTUNE - 好運)**
+        **FATE ROLL: 8 (GOOD FORTUNE - 意想不到的善意與幸運)**
         * **Intensity:** High.
-        * **Instruction:** A significant stroke of luck. Finding a useful item or healing.
-        * **Action:** Grant a small amount of HP/SP recovery or a decent Item.
+        * **Instruction:** A kind gesture from a local, receiving a helpful secret tip, or gathering rare soothing herbs.
+        * **Action:** Grant slight HP/SP recovery or a useful item.
         `;
         break;
     case 9:
         directorInstruction = `
         ${t_Prefix}
-        **FATE ROLL: 9 (GREAT FORTUNE - 大吉)**
+        **FATE ROLL: 9 (GREAT FORTUNE - 豐厚機緣)**
         * **Intensity:** Very High.
-        * **Instruction:** A major reward! Discovering a treasure chest or a secret passage.
-        * **Action:** You MUST reward the player with something valuable.
+        * **Instruction:** Discovering an untouched traveler's stash, gaining a trusted acquaintance's favor, or finding a secret passage.
         `;
         break;
     case 10:
         directorInstruction = `
         ${t_Prefix}
-        **FATE ROLL: 10 (MIRACLE - 奇蹟)**
+        **FATE ROLL: 10 (MIRACLE - 奇蹟時刻)**
         * **Intensity:** Legendary.
-        * **Instruction:** Divine intervention, a legendary relic, or a sudden surge of power.
-        * **Action:** This should be a memorable highlight.
+        * **Instruction:** A dramatic turn of destiny, uncovering a legendary relic, or an extraordinary stroke of fate.
         `;
         break;
 }
@@ -10721,34 +11295,23 @@ b. **★★★ NO RE-NARRATION (HIGHEST PRIORITY):**
             else if (oc.tier === 'BarelySuccess') resultColor = 'text-orange-400 border-orange-500/30 bg-orange-500/10';
 
             const rollCardHtml = `
-            <div class="my-3 p-3 sm:p-4 rounded-lg border flex flex-col gap-2 ${resultColor} select-none animate-fade-in">
-                <div class="flex items-center justify-between border-b border-white/5 pb-1.5">
-                    <span class="font-bold text-xs uppercase tracking-wider flex items-center gap-1.5">
-                        <i class="ph-fill ph-dice-six text-lg"></i> 命運屬性判定 (Fate Attribute Check)
+            <div class="my-2 p-2.5 sm:p-3 rounded-lg border ${resultColor} bg-black/40 backdrop-blur-sm select-none animate-fade-in text-xs font-mono">
+                <div class="flex items-center justify-between border-b border-white/10 pb-1.5">
+                    <span class="font-bold flex items-center gap-1.5 text-xs text-slate-200">
+                        <i class="ph-fill ph-dice-six text-base text-amber-400"></i> ${oc.checkTitle || '關鍵判定'}
                     </span>
-                    <span class="font-mono text-xs font-bold px-1.5 py-0.5 rounded bg-black/30 border border-white/10">DC ${oc.DC}</span>
+                    <span class="px-2 py-0.5 rounded bg-black/50 border border-white/10 text-[11px] font-bold text-slate-300">DC ${oc.DC}</span>
                 </div>
-                <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs text-slate-300 font-mono">
-                    <div class="bg-black/20 p-1.5 rounded text-center">
-                        <div class="text-[10px] text-slate-500 uppercase">d20 骰值</div>
-                        <div class="text-sm font-bold text-white">${oc.roll}</div>
+                <div class="flex items-center justify-between pt-1.5 flex-wrap gap-2 text-slate-300 text-[11px]">
+                    <div>
+                        <span>d20(<strong>${oc.roll}</strong>)</span>
+                        ${oc.modifier ? `<span> + 屬性(${oc.modifier >= 0 ? '+' : ''}${oc.modifier})</span>` : ''}
+                        ${oc.itemBonus ? `<span> + 道具(+${oc.itemBonus})</span>` : ''}
+                        <span> = <strong class="text-white text-xs">${oc.score}</strong></span>
                     </div>
-                    <div class="bg-black/20 p-1.5 rounded text-center">
-                        <div class="text-[10px] text-slate-500 uppercase">屬性修正</div>
-                        <div class="text-sm font-bold text-white">+${oc.modifier}</div>
+                    <div class="font-bold tracking-wider text-xs px-2 py-0.5 rounded bg-black/50 border border-white/10">
+                        <span>判定結果：</span><span class="underline underline-offset-2">${oc.tierZh}</span>
                     </div>
-                    <div class="bg-black/20 p-1.5 rounded text-center">
-                        <div class="text-[10px] text-slate-500 uppercase">道具加成</div>
-                        <div class="text-sm font-bold text-white">+${oc.itemBonus}</div>
-                    </div>
-                    <div class="bg-black/20 p-1.5 rounded text-center">
-                        <div class="text-[10px] text-slate-500 uppercase">總和得分</div>
-                        <div class="text-sm font-bold text-white">${oc.score}</div>
-                    </div>
-                </div>
-                <div class="text-center font-bold text-sm sm:text-base tracking-widest mt-1 border-t border-white/5 pt-2 flex items-center justify-center gap-2">
-                    <span>判定結果：</span>
-                    <span class="underline underline-offset-4 decoration-2">${oc.tierZh}</span>
                 </div>
             </div>
             `;
@@ -10792,16 +11355,29 @@ const changeSummaries = [];
                         finalChange = parseInt(update.value, 10) - bar.value;
                     }
 
-if (isHealth && finalChange < 0 && !isInCombat && !gameUpdate.start_combat) { const dangerKeywords = [ '受傷', '傷害', '陷阱', '中毒', '跌倒', '痛', '流血', '攻擊', '襲擊', '爆炸', '燒傷', 'damage', 'hurt', 'trap', 'poison', 'fall', 'pain', 'attack', 'ambush', 'blood', 'wound', 'cut', 'burn', '怪我', 'ダメージ', '罠', '毒', '落下', '攻撃', '襲撃', '爆発', '火傷', '出血', 'トラップ']; const narrativeLower = (gameUpdate.narrative || "").toLowerCase(); const hasDanger = dangerKeywords.some(kw =>narrativeLower.includes(kw)); if (!hasDanger) { console.warn(`[Safety Guard] Prevented phantom damage: ${finalChange}`); finalChange = 0; } }
+                    if (isHealth && finalChange < 0 && !isInCombat && !gameUpdate.start_combat) {
+                        const dangerKeywords = [
+                            '受傷', '傷害', '陷阱', '中毒', '跌倒', '痛', '流血', '攻擊', '襲擊', '爆炸', '燒傷', '挫傷', '骨折', '反噬', '失誤', '失敗', '詛咒', '厄運', '懲罰', '墜落', '重創', '死', '噬', '崩',
+                            'damage', 'hurt', 'trap', 'poison', 'fall', 'pain', 'attack', 'ambush', 'blood', 'wound', 'cut', 'burn', 'fail', 'curse', 'fatal', 'perish', 'collapse', 'penalty', 'strike',
+                            '怪我', 'ダメージ', '罠', '毒', '落下', '攻撃', '襲撃', '爆発', '火傷', '出血', '失敗', '呪い'
+                        ];
+                        const narrativeLower = (gameUpdate.narrative || "").toLowerCase();
+                        const hasDanger = dangerKeywords.some(kw => narrativeLower.includes(kw));
+                        const isRiskyAction = (currentSelectedChoiceTag === 'RISKY' || currentSelectedChoiceTag === 'BAD');
+                        if (!hasDanger && !gameUpdate.new_debuffs && !isRiskyAction) {
+                            console.warn(`[Safety Guard] Prevented phantom damage: ${finalChange}`);
+                            finalChange = 0;
+                        }
+                    }
 
                     if (isHealth && finalChange < 0) {
                         const originalDamage = Math.abs(finalChange);
                         const maxHp = bar.max_value;
-                        const damageCap = Math.floor(maxHp * 0.20); 
-                        let calculatedDamage = originalDamage;
-
-                        if (calculatedDamage > damageCap) {
-                            calculatedDamage = Math.floor(maxHp * (0.10 + Math.random() * 0.05));
+                        // 難度加強：危險事件、陷阱與嚴苛懲罰造成高達 90% 的致死創傷；若血量已低於 20% 則允許直接致命處決
+                        const damageCap = Math.floor(maxHp * 0.90); 
+                        let calculatedDamage = Math.min(originalDamage, damageCap);
+                        if (bar.value <= Math.floor(maxHp * 0.20)) {
+                            calculatedDamage = originalDamage; // 瀕死殘血不再受保護，直接引發死亡
                         }
                         finalChange = -calculatedDamage;
                     }
@@ -10816,6 +11392,21 @@ if (isHealth && finalChange < 0 && !isInCombat && !gameUpdate.start_combat) { co
                     
                     bar.value = newBarValue;
                 }
+            });
+        }
+
+        // [新增] 處理來自事件或劇情的負面減益 (Debuffs)
+        if (gameUpdate.new_debuffs && Array.isArray(gameUpdate.new_debuffs)) {
+            gameUpdate.new_debuffs.forEach(deb => {
+                applyDebuff(playerState.player_status, deb);
+                const debName = typeof deb === 'object' ? (deb.name || deb.id) : deb;
+                changeSummaries.push(`<span class="text-rose-400 font-bold">⚠️ 陷入負面狀態：${debName}</span>`);
+            });
+        }
+        if (gameUpdate.removed_debuffs && Array.isArray(gameUpdate.removed_debuffs)) {
+            gameUpdate.removed_debuffs.forEach(debId => {
+                removeDebuff(playerState.player_status, debId);
+                changeSummaries.push(`<span class="text-emerald-400 font-bold">✨ 狀態解除：${debId}</span>`);
             });
         }
 
@@ -10977,43 +11568,43 @@ const sanitizeArrayFromAI = (arr) => {
             changeSummaries.push(`<strong>獲得金錢</strong> +${gameUpdate.currency_gained} ${cName}`);
                    }
         if (gameUpdate.experience_gained && typeof gameUpdate.experience_gained === 'number' && playerState.player_status.experience) {
-        let xpGained = Math.ceil(gameUpdate.experience_gained * pendingXpMultiplier);
-        xpGained = Math.floor(xpGained * (0.9 + Math.random() * 0.2)); 
-        if (gameUpdate.experience_gained > 0 && xpGained < 1) xpGained = 1; 
-        pendingXpMultiplier = 1.0; 
+            // 難度平衡：放緩經驗值獲取速率 (降低 55%)，防止角色過快升級
+            let xpGained = Math.ceil(gameUpdate.experience_gained * pendingXpMultiplier * 0.45);
+            xpGained = Math.floor(xpGained * (0.9 + Math.random() * 0.2)); 
+            if (gameUpdate.experience_gained > 0 && xpGained < 1) xpGained = 1; 
+            pendingXpMultiplier = 1.0; 
 
-        playerState.player_status.experience.current += xpGained;
-        changeSummaries.push(`<strong>經驗值</strong> +${xpGained}`);
+            playerState.player_status.experience.current += xpGained;
+            changeSummaries.push(`<strong>經驗值</strong> +${xpGained}`);
 
-        if (playerState.player_status.experience.current >= playerState.player_status.experience.max) {
-            playerState.player_status.level += 1;
+            if (playerState.player_status.experience.current >= playerState.player_status.experience.max) {
+                playerState.player_status.level += 1;
 
-            // [修正 4] 升級獎勵：每次升級給予大量「頓悟積分」
-            // 確保玩家隨著變強，一定能領悟新技能
-            if (!playerState.hidden_score) playerState.hidden_score = 0;
-            playerState.hidden_score += 10; // 升級 +10 分，保證累積進度
-            if (playerState.hidden_score >= EUREKA_THRESHOLD) {
-                playerState.is_eureka_ready = true;
-            }
+                // [修正 4] 升級獎勵：每次升級給予「頓悟積分」
+                if (!playerState.hidden_score) playerState.hidden_score = 0;
+                playerState.hidden_score += 10;
+                if (playerState.hidden_score >= EUREKA_THRESHOLD) {
+                    playerState.is_eureka_ready = true;
+                }
 
-            if (playerState.player_status.status_bars) {
-                playerState.player_status.status_bars.forEach(bar => {
-                    bar.max_value = Math.floor(bar.max_value * 1.2);
-                    let newValue = Math.floor(bar.value * 1.2);
-                    bar.value = Math.min(newValue, bar.max_value);
-                });
-            }
-            if (playerState.player_status.attributes) { 
-                const attrs = playerState.player_status.attributes; 
-                attrs.strength = (attrs.strength || 10) + 1;
-                attrs.vitality = (attrs.vitality || 10) + 1; 
-                attrs.dexterity = (attrs.dexterity || 10) + 1; 
-                changeSummaries.push(`<strong>全屬性 (Stats)</strong> +1`); 
-            }
+                if (playerState.player_status.status_bars) {
+                    playerState.player_status.status_bars.forEach(bar => {
+                        bar.max_value = Math.floor(bar.max_value * 1.2);
+                        let newValue = Math.floor(bar.value * 1.2);
+                        bar.value = Math.min(newValue, bar.max_value);
+                    });
+                }
+                if (playerState.player_status.attributes) { 
+                    const attrs = playerState.player_status.attributes; 
+                    attrs.strength = (attrs.strength || 10) + 1;
+                    attrs.vitality = (attrs.vitality || 10) + 1; 
+                    attrs.dexterity = (attrs.dexterity || 10) + 1; 
+                    changeSummaries.push(`<strong>全屬性 (Stats)</strong> +1`); 
+                }
 
-            const leftoverXp = playerState.player_status.experience.current - playerState.player_status.experience.max;
-            playerState.player_status.experience.max = Math.floor(playerState.player_status.experience.max * 1.5);
-            playerState.player_status.experience.current = leftoverXp;
+                const leftoverXp = playerState.player_status.experience.current - playerState.player_status.experience.max;
+                playerState.player_status.experience.max = Math.floor(playerState.player_status.experience.max * 1.8);
+                playerState.player_status.experience.current = Math.max(0, leftoverXp);
 
             const levelUpMessage = t['game.level_up'].replace('{level}', playerState.player_status.level);
             adventureLog.push(`<div class="text-center font-bold text-yellow-400 my-4 py-2 border-y-2 border-yellow-400">${levelUpMessage}</div>`);
@@ -11255,6 +11846,15 @@ if (choice.includes('攻擊') || choice.includes('Attack') || choice.includes('�
             monsterDmgResult = calculateProgrammaticDamage('monster', playerState, combatTarget);
             actualPlayerDamageTaken = monsterDmgResult.damage;
             turnResultContext += `[System Log] ${combatTarget.name} survived and counter-attacked, dealing ${actualPlayerDamageTaken} damage to Player. (Critical: ${monsterDmgResult.isCrit}).`;
+            
+            // 敵人暴擊或強力反擊有機率施加負面狀態 (流血或心神受創)
+            if (monsterDmgResult.isCrit) {
+                const debuffId = Math.random() < 0.5 ? 'bleed' : 'trauma';
+                applyDebuff(playerState.player_status, debuffId);
+                const debInfo = STANDARD_DEBUFFS[debuffId];
+                turnResultContext += ` Player was afflicted with ${debInfo.name} due to heavy critical damage!`;
+                adventureLog.push(`<div class="text-rose-400 font-bold text-xs font-mono my-1">[嚴重負傷] 敵人的暴擊重創使你陷入了「${debInfo.name}」！</div>`);
+            }
         } else {
             isMonsterDeadOverride = true;
             turnResultContext += `[System Log] ${combatTarget.name} has been defeated (HP reduced to 0).`;
@@ -11294,25 +11894,20 @@ ${choice.startsWith('[System:') ? `* **System Event:** "${choice}" (Apply this e
 3. Only the JSON keys (like "text", "action", "cost") remain in English. The VALUES must be in ${currentLang === 'zh-TW' ? '繁體中文' : (currentLang === 'ja' ? '日本語' : 'English')}.
 4. If the generated content is in English, it will be considered a SYSTEM FAILURE. 
 
-    **★★★ HYBRID INTENT ANALYSIS (NEW PRIORITY) ★★★:**
-    1. Analyze the "Player's Choice" text intensity.
-    2. **Instant Kill / Ultimate Check:** If the player describes a "Finishing Move", "Instant Kill", "Decapitation", or "Fatal Strike" (e.g., "必殺", "斬首", "Ultimate"), you are authorized to **OVERRIDE** the System Log damage.
-       - **Action:** Set \`monster_damage_taken\` to match the monster's remaining HP (or higher).
-       - **Action:** Set \`is_monster_dead: true\`.
-       - **Action:** Set \`visual_effect: "critical_hit"\`.
-    3. **Strong Move Check:** If it describes a powerful skill, you may boost the System Damage by 1.5x to 2.0x.
-4. **Skill Awakening (Creative Bonus):** Check if the "Player's Choice" mentions a specific Move/Technique Name (e.g. "Secret Art: Void Slash") that is NOT in the \`Current Player Status\` skills list. - **Condition:** If the description is creative, desperate, or fits the character's growth... - **Action:** You MUST add this new skill name to the \`new_skills\` array. - **Narrative:** Describe the moment of epiphany/awakening where the player learns this move mid-combat.
+    **★★★ INTENT & COMBAT RULES ★★★:**
+    1. Analyze the "Player's Choice" action.
+    2. **Tactical Precision (NO CHEAP INSTANT KILLS):** Do NOT allow the player to instantly kill a monster simply by typing "必殺" or "斬首". Maintain high tension and tactical challenge. If the move is well-described or uses a skill, you may grant up to 1.25x damage, but NEVER bypass the monster's real HP.
+    3. **Skill Awakening (Creative Bonus):** Check if the "Player's Choice" mentions a specific Move/Technique Name that fits character growth and isn't already known. If creative and desperate, add it to \`new_skills\`.
 
     **COMBAT GM RULES:**
-    1.  **Analyze Stats & Action:** Describe the scene based on the **[System Log]** and **[Intent Analysis]**.
-        - If "defeated" or "Instant Kill", describe the monster's death vividly.
-    2.  **★★★ DAMAGE VALUES (CONDITIONAL):**
+    1.  **Analyze Stats & Action:** Describe the scene based on the **[System Log]**.
+        - If "defeated", describe the monster's death vividly.
+    2.  **DAMAGE VALUES:**
         - **DEFAULT:** You MUST set \`monster_damage_taken\` to the value in **[System Log]** (${playerDmgResult.damage}).
-        - **OVERRIDE:** IF (and ONLY IF) "Hybrid Intent Analysis" triggered an Ultimate/Kill, you MUST use the lethal damage value instead.
-        - **PLAYER DAMAGE:** Set player damage in \`status_updates\` based on **[System Log]** (-${actualPlayerDamageTaken}), unless the player's Instant Kill prevented the counter-attack.
-    3.  **Check Monster Death:** If \`is_monster_dead: true\` (from Log or Override), describe the kill.
-    4.  **Monster Counter-Attack:** If monster survives, describe its counter-attack vividly.
-    5.  **★★★ (CRITICAL) PLAYER DEATH CHECK ★★★:** Check if player's '生命力' (Health) - ${actualPlayerDamageTaken} <= 0. If so, set \`is_dead: true\`.
+        - **PLAYER DAMAGE:** Set player damage in \`status_updates\` based on **[System Log]** (-${actualPlayerDamageTaken}).
+    3.  **Check Monster Death:** If \`is_monster_dead: true\` (from Log), describe the kill.
+    4.  **Monster Counter-Attack:** If monster survives, describe its counter-attack vividly and dangerously.
+    5.  **★★★ (CRITICAL) PLAYER DEATH CHECK ★★★:** Check if player's '生命力' (Health) - ${actualPlayerDamageTaken} <= 0. If so, set \`is_dead: true\`. If the player is reduced to 0 HP, do NOT grant victory; they have fallen in battle.
     6.  **Handle "Flee" (MERCY RULE):**
         - If action was "Flee" or "逃跑":
         - If the narrative context implies the player has failed to flee multiple times, you **MUST** let them escape this time.
@@ -11522,7 +12117,7 @@ if ((combatTarget.hp <= 0 || gameUpdate.is_monster_dead) && playerState.player_s
         }
 
         if (gameUpdate.experience_gained && typeof gameUpdate.experience_gained === 'number' && playerState.player_status.experience) {
-            const xpGained = gameUpdate.experience_gained;
+            const xpGained = Math.ceil(gameUpdate.experience_gained * 0.45);
             playerState.player_status.experience.current += xpGained;
             changeSummaries.push(`<strong>經驗值</strong> +${xpGained}`);
 
@@ -11535,11 +12130,11 @@ if ((combatTarget.hp <= 0 || gameUpdate.is_monster_dead) && playerState.player_s
                         bar.value = Math.min(newValue, bar.max_value);
                     });
                 }
-if (playerState.player_status.attributes) { const attrs = playerState.player_status.attributes; attrs.strength = (attrs.strength || 10) + 1; attrs.vitality = (attrs.vitality || 10) + 1; attrs.dexterity = (attrs.dexterity || 10) + 1; changeSummaries.push(`<strong>全屬性 (Stats)</strong> +1`); }
+                if (playerState.player_status.attributes) { const attrs = playerState.player_status.attributes; attrs.strength = (attrs.strength || 10) + 1; attrs.vitality = (attrs.vitality || 10) + 1; attrs.dexterity = (attrs.dexterity || 10) + 1; changeSummaries.push(`<strong>全屬性 (Stats)</strong> +1`); }
 
                 const leftoverXp = playerState.player_status.experience.current - playerState.player_status.experience.max;
-                playerState.player_status.experience.max = Math.floor(playerState.player_status.experience.max * 1.5);
-                playerState.player_status.experience.current = leftoverXp;
+                playerState.player_status.experience.max = Math.floor(playerState.player_status.experience.max * 1.8);
+                playerState.player_status.experience.current = Math.max(0, leftoverXp);
 
                 const levelUpMessage = t['game.level_up'].replace('{level}', playerState.player_status.level);
                 adventureLog.push(`<div class="text-center font-bold text-yellow-400 my-4 py-2 border-y-2 border-yellow-400">${levelUpMessage}</div>`);
@@ -11656,7 +12251,7 @@ if (playerState.player_status.attributes) { const attrs = playerState.player_sta
                 let systemXp = combatTarget.xp_reward; 
                 if (!systemXp) {
                     const rankConf = MONSTER_RANKS[combatTarget.rank] || MONSTER_RANKS['NORMAL'];
-                    systemXp = Math.ceil(10 * level * rankConf.xpMult);
+                    systemXp = Math.ceil(8 * level * rankConf.xpMult);
                 }
                 
                 playerState.player_status.experience.current += systemXp;
@@ -11683,7 +12278,7 @@ if (playerState.player_status.attributes) { const attrs = playerState.player_sta
                     }
                     
                     const leftoverXp = playerState.player_status.experience.current - playerState.player_status.experience.max;
-                    playerState.player_status.experience.max = Math.floor(playerState.player_status.experience.max * 1.5);
+                    playerState.player_status.experience.max = Math.floor(playerState.player_status.experience.max * 1.8);
                     playerState.player_status.experience.current = Math.max(0, leftoverXp);
 
                     const levelUpMessage = t['game.level_up'].replace('{level}', playerState.player_status.level);
