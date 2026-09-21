@@ -907,6 +907,37 @@ Respond strictly with valid JSON conforming to this schema (no extra explanation
     }
 
     // ==========================================
+    // 3.45 NPC 狀態與好感持久化 (NPC State & Favor Sync)
+    // ==========================================
+    if (pathname === '/api/npc/sync' && req.method === 'POST') {
+        try {
+            const authHeader = req.headers['authorization'];
+            const token = authHeader && authHeader.startsWith('Bearer ') ? authHeader.slice(7) : '';
+            const body = await parseJsonBody(req);
+            const { npc_favor, npc_state } = body;
+
+            if (token) {
+                const session = dbCache.sessions[token];
+                if (session && session.type === 'user') {
+                    const user = dbCache.users.find(u => u.id === session.userId);
+                    if (user) {
+                        if (npc_favor) user.npc_favor = npc_favor;
+                        if (npc_state) user.npc_state = npc_state;
+                        saveDb();
+                        return sendJson(res, 200, { success: true, npc_favor: user.npc_favor, npc_state: user.npc_state });
+                    }
+                }
+                if (!dbCache.guest_npc_state) dbCache.guest_npc_state = {};
+                dbCache.guest_npc_state[token] = { npc_favor, npc_state };
+                saveDb();
+            }
+            return sendJson(res, 200, { success: true, npc_favor, npc_state });
+        } catch (e) {
+            return sendError(res, 500, e.message);
+        }
+    }
+
+    // ==========================================
     // 3.5 密碼解鎖校驗 (Minigame Verification)
     // ==========================================
     if (pathname === '/api/minigame/verify' && req.method === 'POST') {
@@ -2070,10 +2101,11 @@ Respond strictly with valid JSON conforming to this schema (no extra explanation
                         checkType = selectedChoice.type || 'normal';
                         checkTitle = check.title || (selectedChoice.type === 'aggressive' ? '生死搏杀判定' : '关键属性判定');
                     } else if (!isSafeAction) {
-                        // 仅在明确标记为高风险(RISKY/BAD)，且包含明确生死关头/极度危险关键词时才触发判定！
+                        // 判定高危、致命即死、拼死搏杀等关键情境
                         const t = checkText;
                         const textLower = t.toLowerCase();
-                        const isRisky = selectedChoice.tag === 'RISKY' || selectedChoice.tag === 'BAD';
+                        const isFatal = (selectedChoice.tag === 'FATAL' || selectedChoice.tag === 'LETHAL' || selectedChoice.tag === 'DEADLY' || /(?:☠️|即死|致命|自杀|自殺|直视古神|跳入火海|饮毒自尽|徒手硬接|粉碎重锤)/.test(t));
+                        const isRisky = isFatal || selectedChoice.tag === 'RISKY' || selectedChoice.tag === 'BAD';
                         
                         // 正确使用捕获组/非捕获组 (?:...)，杜绝 [...] 单字符误匹配！
                         const isCombatClash = /(?:拼死搏殺|拼死搏杀|拼死一搏|拼死突圍|拼死突围|強行突圍|强行突围|破陣斬首|破阵斩首|絕命反擊|绝命反击|生死決鬥|生死决斗|拔刀死戰|拔刀死战)/.test(t) || /(?:duel to death|desperate strike|breakthrough assault|assassinate boss)/i.test(textLower);
@@ -2082,9 +2114,16 @@ Respond strictly with valid JSON conforming to this schema (no extra explanation
                         const isHazard = /(?:拆除致命陷阱|解除致命機關|解除致命机关|飛躍萬丈深淵|飞跃万丈深渊|抵禦致死劇毒|抵御致死剧毒)/.test(t) || /(?:disarm lethal trap|leap across abyss|resist deadly poison)/i.test(textLower);
 
                         const chapter = playerState.camp_state?.chapter || 1;
-                        const balancedDC = Math.min(14, 9 + chapter);
+                        // 大幅度提高判定难度：基础 DC 随着章节与险境加成提升
+                        const balancedDC = Math.min(18, 12 + chapter * 2);
 
-                        if (isCombatClash && (isRisky || t.includes('拼死') || t.includes('生死'))) {
+                        if (isFatal) {
+                            isChecking = true;
+                            checkType = 'cautious';
+                            attrName = 'vitality';
+                            checkTitle = '☠️ 生死一线·即死危机判定';
+                            DC = Math.min(20, 15 + chapter * 2);
+                        } else if (isCombatClash && (isRisky || t.includes('拼死') || t.includes('生死'))) {
                             isChecking = true;
                             checkType = 'aggressive';
                             attrName = 'strength';
@@ -2169,14 +2208,14 @@ Respond strictly with valid JSON conforming to this schema (no extra explanation
                     const roll = Math.floor(Math.random() * 20) + 1;
                     const score = roll + modifier + itemBonus + statusPenalty;
 
-                    // 5. Determine 5 Outcome Tiers
+                    // 5. Determine 5 Outcome Tiers (大幅增加高难度挑战下的失败与大失败概率)
                     let tier = 'Success';
                     let tierZh = '成功 (Success)';
 
                     if (roll === 20 || score >= DC + 6) {
                         tier = 'CriticalSuccess';
                         tierZh = '大成功 (Critical Success)';
-                    } else if (roll === 1 || score < DC - 7) {
+                    } else if (roll === 1 || score < DC - 4) {
                         tier = 'CriticalFailure';
                         tierZh = '大失败 (Critical Failure)';
                     } else if (score >= DC) {
@@ -2216,6 +2255,8 @@ Respond strictly with valid JSON conforming to this schema (no extra explanation
                     const typeLabels = { aggressive: '激进决对 (Aggressive)', cautious: '谨慎周旋 (Cautious)', smart: '机智应对 (Intelligent)', social: '交涉斡旋 (Social)' };
                     const typeLabel = typeLabels[checkType] || checkType;
 
+                    const isFatalChoice = (selectedChoice?.tag === 'FATAL' || selectedChoice?.tag === 'LETHAL' || selectedChoice?.tag === 'DEADLY' || (checkText && /(?:☠️|即死|致命选项|致命選擇|自杀|自殺|直视古神|跳入火海|饮毒自尽|粉碎重锤)/.test(checkText)));
+
                     sysMessage = `
 🔴 SYSTEM AUTHORITATIVE OUTCOME DETERMINATION (CRITICAL DO NOT CHANGE) 🔴
 The player executed action/choice: "${checkText}"
@@ -2228,15 +2269,16 @@ The backend has run the dice roll challenge with the following authoritative res
 - Challenge Target (DC): ${DC}
 - Final Calculated Score: ${score}
 - **AUTHORITATIVE DETERMINED OUTCOME**: **${tier}** (${tierZh})
+${isFatalChoice ? '- **FATAL BLUNDER RISK**: This was an explicit FATAL / LETHAL blunder choice!' : ''}
 
 You MUST strictly adapt the narrative to conform to this outcome "**${tier}**" and update the JSON structure according to these rules:
-1. **CriticalSuccess (大成功)**: Absolute perfect success. Highlight their expertise, describe a flawless outcome, provide a bonus item in "new_items" or high gold gain, and favorable NPC attitude.
-2. **Success (成功)**: Clean standard success. They get exactly what they intended safely.
-3. **BarelySuccess (勉强成功)**: Narrow escape. They achieve the goal, but pay a modest price. Deduct 3-6 HP, SP, or MP in "status_updates" (e.g. { "name": "生命力", "change": -4 }) and describe their struggle.
-4. **Failure (失败)**: They fail. Deduct 6-10 HP or resources in "status_updates". Describe the setback, obstacle, or minor loss, without causing instant player death.
-5. **CriticalFailure (大失败)**: Serious setback. Deduct 12-16 HP or trigger a combat encounter. Describe a dangerous complication or trap springing.
+1. **CriticalSuccess (大成功)**: Miraculous, glorious breakthrough against overwhelming odds. Grant valuable items in "new_items", high currency, or profound narrative acclaim.
+2. **Success (成功)**: Solid tactical success. The player achieves the goal through prowess and avoids disaster.
+3. **BarelySuccess (勉强成功)**: Blood-soaked survival. They achieve the goal at heavy cost: deduct 15-25 HP, SP, or MP in "status_updates" (e.g. { "name": "生命值", "change": -18 }) and describe agonizing wounds or shattered shields.
+4. **Failure (失败)**: Severe failure with punishing consequences. Deduct 25-50 HP in "status_updates", inflict debuffs ("bleed", "fracture", "poison", "trauma" in "new_debuffs"), or break key tools. ${isFatalChoice ? 'CRITICAL INSTANT DEATH: Because this was a FATAL/LETHAL choice, failure triggers mortality! Set "is_dead": true, reduce HP to 0, and write a vivid tragic demise!' : 'If player HP drops to 0 or below, set "is_dead": true.'}
+5. **CriticalFailure (大失败)**: CATASTROPHIC DISASTER! ${isFatalChoice ? 'CRITICAL INSTANT DEATH: The fatal blunder triggers immediate annihilation. Set "is_dead": true, deduct lethal HP (-999 or all remaining HP), and write a dramatic Bad End!' : 'If in high hazard, trigger INSTANT DEATH (set "is_dead": true, HP: 0). Otherwise inflict lethal-tier damage (-50 to -85 HP in "status_updates"), destroy equipment, or inflict debilitating curses/fractures.'}
 
-Your JSON fields "status_updates", "new_items", "removed_items", "start_combat", etc., MUST match this outcome. Do NOT contradict this result in your story!
+Your JSON fields "status_updates", "new_items", "removed_items", "is_dead", "start_combat", etc., MUST match this outcome. Do NOT contradict this result in your story!
 `;
                     outcomeCalculated = {
                         roll,
@@ -2381,8 +2423,9 @@ Your JSON fields "status_updates", "new_items", "removed_items", "start_combat",
                 const narrativeTonePrompt = `
 --- NARRATIVE TONE & DIVERSE LIFE / FAILURE CONSEQUENCES RULES (拒绝无尽战斗，拥抱鲜活日常与真实危机) ---
 ★ USER CORE DIRECTIVE:
-1. 【拒绝无尽战斗，丰富生活与日常互动】:
-   - 剧情与选项绝不能一直在战斗！战斗仅占 10%~15% 的高潮时刻。
+1. 【拒绝无尽战斗与被动追杀，终结战斗循环】:
+   - 剧情与选项绝对不能一直在战斗或被追杀！战斗仅占 10%~15% 的高潮时刻。
+   - **绝对终结被动追杀与怪物循环**：如果之前剧情里一直有人在追杀主角、或频繁有怪物偷袭、或一直在战斗，**现在这些追杀与敌对危机必须立刻画下句点**！追击者已经彻底跟丢、怪物已散去、或者主角已安然逃入绝对安全的聚落、村镇或幽静的安顿庇护所。
    - 大量充实：日常生活、探索考察、城镇市井、旅途奇闻、美少女/伙伴与NPC互动、调情与戏谑(调戏/逗弄/开玩笑)、尝试奇特事物、烹饪露营、民俗风情与心动日常。
    - 选项设计必须多元：提供对话调侃、机智观察、友好赠礼、尝试恶作剧、浪漫互动、谨慎撤退、探索细节等，绝不能 3 个选项全是“拔剑攻击”。
 2. 【严格控制升级速度，经验获取细水长流】:
@@ -2405,6 +2448,18 @@ Your JSON fields "status_updates", "new_items", "removed_items", "start_combat",
    - NPC 絕非單純提供幫助的善意工具人，具有真實的人性弱點、自私動機與生存本能。
    - 當 NPC 好感度低於 20%，或團隊處於極度資源匱乏、飢渴力竭、生死邊緣的險境時，部分 NPC 可能顯露惡意或背叛：暗中行竊偷拿玩家的口糧、藥物或金幣；在關鍵情報上弄虛作假；危難關頭棄隊自保或坐地起價；甚至設下欺瞞陷阱圖謀物資。
    - 劇情應自然描寫玩家察覺背包異狀、暗中盯防、對峙質問或反制衝突的緊張過程，並在選項中提供洞察盤查、當面揭發、搜查行囊、威懾警告或分道揚鑣等應對策略。
+6. ★★★【游戏难度大幅度升级与追加即死性选项 (Lethal Choices & Instant Death)】★★★:
+   - 大幅度提升世界残酷度与挑战深度！彻底剥离虚假的无敌光环与安全保底。
+   - 凡处于险境（如古老机关、剧毒沼泽、深渊断崖、强敌驻地、禁忌仪式、暴怒凶兽、审讯死牢等）：
+     * 周期性在 choices 选项列表中设计 1 个极具致命性甚至即死性的高危选项，tag 标记为 "FATAL" 或 "DEADLY"（例如带有骷髅标识：☠️ 毫不设防纵身跃下万丈深渊、☠️ 徒手直取封印魔刃、☠️ 直视古神虚空真身、☠️ 一饮而尽幽冥腐骨剧毒、☠️ 徒手硬接巨兽粉碎重锤）。
+     * 若玩家狂妄或盲目选择了此类 "FATAL" / "DEADLY" 选项，绝不可违背物理与世界法则强行圆场，必须坚决执行致命后果：直接判定即死（is_dead: true，HP直接归0），并以极具震撼力与文学悲壮感的笔触描绘惨烈暴毙或 Bad End 终局！
+7. ★★★【高伤害惩罚与多分支战败剧情 (High-Damage Blunders & Defeat Storylines)】★★★:
+   - 错误选项（tag 标记为 "BAD" 或低智盲目的 "RISKY"）在险恶关头必须给予极高直观伤害（直接扣减 35% ~ 80% HP，施加骨折、撕裂流血、剧毒、重创诅咒），伴随装备毁损或重要物资流失。
+   - 当玩家生命归零或在战斗/险境中遭遇败北濒死时，严禁苍白敷衍，必须依据情境输出生动震撼的【战败剧情分支】：
+     * 【战败被俘】：被敌人夺走武器、锁上沉重铁链押入潮湿阴暗的死牢或地牢深处，沦为待决囚犯，由此展开惊心动魄的地牢逃生与生存线；
+     * 【同伴舍身相救】：若有随行同伴，同伴舍生忘死拼杀出一条血路，背负浑身浴血、昏迷不醒的主角逃入荒野隐秘洞窟，在篝火旁泣不成声彻夜包扎抢救；
+     * 【幽冥血契复苏】：濒死坠入冥河深渊，与不可名状的古老存在达成黑暗血契，以灵魂诅咒或永恒代价换取破碎肉身的重铸苏醒；
+     * 【饮恨长眠 Bad End】：肉身湮灭于风雪尘埃，写下英雄陨落的长眠悲歌。
 `;
 
                 let historyPrompt = `
@@ -2482,15 +2537,21 @@ Add the earned rewards or items into "new_items" or "status_updates" (e.g. addin
                         isUnintelligible = true;
                     }
 
-                    if (playerState && playerState.world_state) {
-                        if (parsed.world_state) {
-                            Object.assign(playerState.world_state, parsed.world_state);
+                    if (playerState) {
+                        const comp = parsed.active_companion || (parsed.world_state && parsed.world_state.active_companion);
+                        if (comp !== undefined) {
+                            playerState.active_companion = comp;
                         }
-                        if (parsed.mode) {
-                            playerState.world_state.mode = parsed.mode;
-                        }
-                        if (parsed.can_advance_campaign !== undefined) {
-                            playerState.world_state.can_advance_campaign = !!parsed.can_advance_campaign;
+                        if (playerState.world_state) {
+                            if (parsed.world_state) {
+                                Object.assign(playerState.world_state, parsed.world_state);
+                            }
+                            if (parsed.mode) {
+                                playerState.world_state.mode = parsed.mode;
+                            }
+                            if (parsed.can_advance_campaign !== undefined) {
+                                playerState.world_state.can_advance_campaign = !!parsed.can_advance_campaign;
+                            }
                         }
                     }
                 }

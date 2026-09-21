@@ -427,7 +427,13 @@ const rawData = {
     "camp.noticeboard.submit": "提交物资委托",
     "camp.terminal.title": "📟 旧终端机 (解锁世界记录)",
     "camp.bed.confirm": "是否消耗 1 根木材在此处深度睡眠休息？\n(这将完全回复您的 HP 与 SP，并使生存天数+1，且会安全保存您的进度)",
-    "camp.facility.upgraded": "✨ 升级成功！您的装备属性获得了提升！"
+    "camp.facility.upgraded": "✨ 升级成功！您的装备属性获得了提升！",
+    "capsule.camp": "露营休整",
+    "capsule.inventory": "整理行囊",
+    "capsule.scavenge": "搜刮四周",
+    "capsule.travel": "启程漫游",
+    "capsule.companion": "伙伴互动",
+    "capsule.custom": "自由输入"
 },
     'zh-TW': {
     "title": "Text RPG Generator",
@@ -854,7 +860,13 @@ const rawData = {
     "camp.noticeboard.submit": "提交物資委託",
     "camp.terminal.title": "📟 舊終端機 (解鎖世界記錄)",
     "camp.bed.confirm": "是否消耗 1 根木材在此處深度睡眠休息？\n(這將完全回復您的 HP 與 SP，並使生存天數+1，且會安全保存您的進度)",
-    "camp.facility.upgraded": "✨ 升級成功！您的裝備屬性獲得了提升！"
+    "camp.facility.upgraded": "✨ 升級成功！您的裝備屬性獲得了提升！",
+    "capsule.camp": "露營休整",
+    "capsule.inventory": "整理行囊",
+    "capsule.scavenge": "搜刮四周",
+    "capsule.travel": "啟程漫遊",
+    "capsule.companion": "夥伴互動",
+    "capsule.custom": "自由輸入"
 },
     'en': {
     "title": "Text RPG Generator",
@@ -1281,7 +1293,13 @@ const rawData = {
     "camp.noticeboard.submit": "Submit Supplies Bounty",
     "camp.terminal.title": "📟 Vintage Terminal (Decrypt Records)",
     "camp.bed.confirm": "Spend 1 wood to sleep deeply here?\n(This fully restores your HP & SP, increments days survived by 1, and securely saves progress)",
-    "camp.facility.upgraded": "✨ Upgrade Successful! Your equipment stats have been boosted!"
+    "camp.facility.upgraded": "✨ Upgrade Successful! Your equipment stats have been boosted!",
+    "capsule.camp": "Camp & Rest",
+    "capsule.inventory": "Manage Gear",
+    "capsule.scavenge": "Scavenge Spot",
+    "capsule.travel": "Travel On",
+    "capsule.companion": "Banter/NPC",
+    "capsule.custom": "Custom Input"
 },
     'ja': {
     "title": "Text RPG Generator",
@@ -1708,7 +1726,13 @@ const rawData = {
     "camp.noticeboard.submit": "物資依頼を提出",
     "camp.terminal.title": "📟 旧型端末 (世界記録のデコード)",
     "camp.bed.confirm": "木材を1本消費して、ここで深く眠り休息しますか？\n(HPとSPが全回復し、経過日数が+1され、進捗が安全にセーブされます)",
-    "camp.facility.upgraded": "✨ 強化成功！装備のステータスが向上しました！"
+    "camp.facility.upgraded": "✨ 強化成功！装備のステータスが向上しました！",
+    "capsule.camp": "露営休息",
+    "capsule.inventory": "荷物整理",
+    "capsule.scavenge": "周囲探索",
+    "capsule.travel": "旅立ち",
+    "capsule.companion": "仲間会話",
+    "capsule.custom": "自由入力"
 }
 };
 
