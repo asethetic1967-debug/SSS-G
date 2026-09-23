@@ -3,11 +3,31 @@ const http = require('http');
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
+const { GoogleGenAI } = require('@google/genai');
 
 const PORT = 3000;
 const DATA_DIR = path.join(__dirname, 'data');
 const DB_FILE = path.join(DATA_DIR, 'db.json');
 const PUBLIC_DIR = path.join(__dirname, 'public');
+
+// Initialize shared Gemini SDK client
+const defaultAi = new GoogleGenAI({
+    apiKey: process.env.GEMINI_API_KEY || '',
+    httpOptions: {
+        headers: {
+            'User-Agent': 'aistudio-build'
+        }
+    }
+});
+
+function sanitizeModel(model) {
+    if (!model) return 'gemini-3.8-flash';
+    const m = String(model).trim();
+    if (m === 'gemini-2.5-flash' || m === 'gemini-1.5-flash' || m === 'gemini-2.0-flash' || m.startsWith('gemini-1.') || m.startsWith('gemini-2.0')) {
+        return 'gemini-3.8-flash';
+    }
+    return m;
+}
 
 // --- 数据库初始化与安全读写 ---
 if (!fs.existsSync(DATA_DIR)) {
@@ -43,7 +63,7 @@ function getInitialDb() {
             default_visitor_actions: 15,
             default_general_actions: 25,
             global_api_key: '',
-            default_model: 'gemini-2.5-flash',
+            default_model: 'gemini-3.8-flash',
             custom_proxy_url: '',
             site_notice: '欢迎游玩 AI 文字冒险游戏产生器！新玩家注册即赠送 25 次行动。'
         },
@@ -691,7 +711,7 @@ const server = http.createServer(async (req, res) => {
             const { genre = 'Post-Apocalyptic', characterDesc = '', language = 'zh-CN', apiKey, model } = body;
 
             const activeKey = (apiKey || dbCache.settings.global_api_key || process.env.GEMINI_API_KEY || '').trim();
-            const activeModel = model || dbCache.settings.default_model || 'gemini-2.5-flash';
+            const activeModel = sanitizeModel(model || dbCache.settings.default_model);
 
             const companionPrompt = `You are an expert game narrative and character designer specialized in creating captivating, charming, and memorable "Bishoujo & Gap-Moe Heroines" (高魅力美少女/反差萌女伴) for a story-rich adventure RPG.
 Genre: ${genre}
@@ -731,29 +751,18 @@ Respond strictly with valid JSON conforming to this schema (no extra explanation
             if (activeKey) {
                 try {
                     let aiText = '';
-                    if (activeKey.startsWith('AIzaSy')) {
-                        const targetUrl = `https://generativelanguage.googleapis.com/v1beta/models/${activeModel}:generateContent?key=${activeKey}`;
-                        const response = await fetch(targetUrl, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ contents: [{ parts: [{ text: companionPrompt }] }] })
+                    const aiClient = (activeKey === process.env.GEMINI_API_KEY && defaultAi)
+                        ? defaultAi
+                        : new GoogleGenAI({
+                            apiKey: activeKey,
+                            httpOptions: { headers: { 'User-Agent': 'aistudio-build' } }
                         });
-                        if (response.ok) {
-                            const result = await response.json();
-                            aiText = result.candidates?.[0]?.content?.parts?.[0]?.text || '';
-                        }
-                    } else {
-                        const directUrl = `https://generativelanguage.googleapis.com/v1beta/models/${activeModel}:generateContent`;
-                        const res = await fetch(directUrl, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json', 'x-goog-api-key': activeKey },
-                            body: JSON.stringify({ contents: [{ parts: [{ text: companionPrompt }] }] })
-                        });
-                        if (res.ok) {
-                            const result = await res.json();
-                            aiText = result.candidates?.[0]?.content?.parts?.[0]?.text || '';
-                        }
-                    }
+
+                    const sdkRes = await aiClient.models.generateContent({
+                        model: activeModel,
+                        contents: companionPrompt
+                    });
+                    aiText = sdkRes.text || '';
 
                     if (aiText) {
                         const match = aiText.match(/```json\s*([\s\S]*?)\s*```/) || aiText.match(/\{[\s\S]*\}/);
@@ -1950,7 +1959,7 @@ Respond strictly with valid JSON conforming to this schema (no extra explanation
                 return sendError(res, 400, '未配置 API Key，请在前端设置中填写金钥或由管理员配置全局 Key');
             }
 
-            const activeModel = model || dbCache.settings.default_model || 'gemini-2.5-flash';
+            const activeModel = sanitizeModel(model || dbCache.settings.default_model);
 
             // --- 選擇後果與隨機判定系統核心 (Backend Outcome Interception System) ---
             let sysMessage = "";
@@ -2595,37 +2604,11 @@ Add the earned rewards or items into "new_items" or "status_updates" (e.g. addin
             };
 
             // 智能判断 Key 类型：
-            // A. Google 官方原生 Key (以 AIzaSy 开头)
-            if (activeKey.startsWith('AIzaSy')) {
-                const targetUrl = `https://generativelanguage.googleapis.com/v1beta/models/${activeModel}:generateContent?key=${activeKey}`;
-                const payload = {
-                    contents: [{ parts: [{ text: prompt }] }]
-                };
-                if (safetySettings) payload.safetySettings = safetySettings;
-
-                const response = await fetch(targetUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-
-                if (!response.ok) {
-                    const errText = await response.text();
-                    return sendError(res, response.status, `Google API 错误: ${errText}`);
-                }
-
-                const result = await response.json();
-                const content = result.candidates?.[0]?.content?.parts?.[0]?.text || '';
-                return successResponse(content);
-            }
-
-            // B. 针对第三方转发、OpenAI 格式或代理 Key (例如用户提供的 AQ.Ab8... / sk-...)
-            const proxyBase = dbCache.settings.custom_proxy_url || 'https://generativelanguage.googleapis.com';
-            
-            // 尝试 1: 如果是第三方代理兼容 OpenAI Chat Completions 规范
-            if (proxyBase.includes('/v1') || activeKey.startsWith('sk-') || activeKey.startsWith('AQ.')) {
+            // A. 针对第三方转发或显式 OpenAI Key (以 sk- 开头，或配置了自定义 /v1 代理)
+            const proxyBase = (dbCache.settings.custom_proxy_url || '').trim();
+            if (activeKey.startsWith('sk-') || (proxyBase && proxyBase.includes('/v1'))) {
                 let openaiEndpoint = proxyBase.endsWith('/') ? `${proxyBase}chat/completions` : `${proxyBase}/chat/completions`;
-                if (!proxyBase.includes('/v1')) {
+                if (!proxyBase || !proxyBase.includes('/v1')) {
                     openaiEndpoint = 'https://api.openai.com/v1/chat/completions';
                 }
 
@@ -2649,31 +2632,57 @@ Add the earned rewards or items into "new_items" or "status_updates" (e.g. addin
                         return successResponse(content);
                     }
                 } catch (e) {
-                    console.warn('OpenAI proxy attempt failed, falling back to direct gemini fetch:', e.message);
+                    console.warn('OpenAI proxy attempt failed, falling back to Gemini SDK:', e.message);
                 }
             }
 
-            // 尝试 2: 标准带 Header 转发 Gemini API
-            const directGeminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${activeModel}:generateContent`;
-            const geminiRes = await fetch(directGeminiUrl, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'x-goog-api-key': activeKey
-                },
-                body: JSON.stringify({
-                    contents: [{ parts: [{ text: prompt }] }]
-                })
-            });
+            // B. 官方 Google GenAI SDK (支持 AIzaSy 与 AQ... 以及 process.env.GEMINI_API_KEY)
+            try {
+                const aiClient = (activeKey === process.env.GEMINI_API_KEY && defaultAi)
+                    ? defaultAi
+                    : new GoogleGenAI({
+                        apiKey: activeKey,
+                        httpOptions: {
+                            headers: { 'User-Agent': 'aistudio-build' }
+                        }
+                    });
 
-            if (!geminiRes.ok) {
-                const errText = await geminiRes.text();
-                return sendError(res, geminiRes.status, `AI 生成失败 (${geminiRes.status}): ${errText}`);
+                const reqConfig = {};
+                if (safetySettings) {
+                    reqConfig.safetySettings = safetySettings;
+                }
+
+                const sdkResponse = await aiClient.models.generateContent({
+                    model: activeModel,
+                    contents: prompt,
+                    config: Object.keys(reqConfig).length > 0 ? reqConfig : undefined
+                });
+
+                const content = sdkResponse.text || '';
+                return successResponse(content);
+            } catch (sdkErr) {
+                console.warn('[Backend] GenAI SDK failed, attempting direct fetch fallback:', sdkErr.message);
+
+                // Fallback to direct REST API if needed
+                const targetUrl = `https://generativelanguage.googleapis.com/v1beta/models/${activeModel}:generateContent?key=${activeKey}`;
+                const fallbackRes = await fetch(targetUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{ parts: [{ text: prompt }] }],
+                        ...(safetySettings ? { safetySettings } : {})
+                    })
+                });
+
+                if (!fallbackRes.ok) {
+                    const errText = await fallbackRes.text();
+                    return sendError(res, fallbackRes.status, `AI 生成失败 (${fallbackRes.status}): ${errText}`);
+                }
+
+                const fallbackData = await fallbackRes.json();
+                const content = fallbackData.candidates?.[0]?.content?.parts?.[0]?.text || '';
+                return successResponse(content);
             }
-
-            const geminiData = await geminiRes.json();
-            const geminiContent = geminiData.candidates?.[0]?.content?.parts?.[0]?.text || '';
-            return successResponse(geminiContent);
 
         } catch (e) {
             return sendError(res, 500, 'AI 网关转发异常: ' + e.message);
