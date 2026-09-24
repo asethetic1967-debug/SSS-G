@@ -230,6 +230,8 @@ function isStateRestricted(playerState) {
     const curState = playerState.current_state || playerState.world_state?.current_state;
     if (curState === 'COMBAT' || curState === 'EVENT_LOCKED') return true;
     if (playerState.combat_state || playerState.world_state?.flags?.in_combat || playerState.world_state?.flags?.combat_active) return true;
+    if (playerState.world_state?.flags?.chase_active || playerState.world_state?.flags?.disable_rest) return true;
+    if (playerState.isInCombat || (playerState.combatTarget && playerState.combatTarget.hp > 0)) return true;
     return false;
 }
 
@@ -1090,13 +1092,26 @@ Respond strictly with valid JSON conforming to this schema (no extra explanation
                     : '❌ 当前处于受限状态（战斗中或关键事件锁定），无法执行营地休整行动！');
             }
 
+            // Extract environmental factors
+            const loc = (ws.location || ws.current_location || '').toLowerCase();
+            const weather = (ws.weather || ws.climate || '').toLowerCase();
+            const envDesc = (ws.environment || ws.danger || '').toLowerCase();
+            const debuffs = (playerState.player_status?.debuffs || []).map(d => typeof d === 'string' ? d.toLowerCase() : (d.name || '').toLowerCase());
+            
+            const isFreezing = weather.includes('雪') || weather.includes('寒') || weather.includes('冰') || loc.includes('雪') || loc.includes('冰') || loc.includes('极地') || envDesc.includes('寒') || debuffs.some(d => d.includes('寒') || d.includes('失温'));
+            const isToxic = loc.includes('毒') || loc.includes('瘴') || loc.includes('辐射') || loc.includes('腐蚀') || envDesc.includes('毒') || envDesc.includes('辐射') || debuffs.some(d => d.includes('毒') || d.includes('辐射'));
+            const isUnderground = loc.includes('洞') || loc.includes('地牢') || loc.includes('地下') || loc.includes('矿坑') || loc.includes('墓') || loc.includes('牢') || loc.includes('下水道') || loc.includes('石室') || playerState.explore_state?.zone_type === 'maze';
+            const isStormy = weather.includes('暴雨') || weather.includes('台风') || weather.includes('飓风') || weather.includes('雷暴') || envDesc.includes('暴雨');
+            const isLavaOrDesert = loc.includes('熔岩') || loc.includes('火山') || loc.includes('火海') || loc.includes('沙漠') || loc.includes('荒漠') || loc.includes('戈壁');
+            const isWaterOrCliff = loc.includes('水下') || loc.includes('深海') || loc.includes('悬崖') || loc.includes('绝壁') || loc.includes('绳索');
+
             let hpBar = playerState.player_status?.status_bars?.find(b => b.type === 'hp' || b.name === 'HP' || b.name === '生命值');
             const maxHp = hpBar?.max || 100;
             let logMessage = '';
             let ambushed = false;
 
             if (action === 'rest') {
-                // Short Rest: costs 5 hunger, 5 hydration -> gains 30% stamina (30 SP), 15 HP
+                // Short Rest: costs 5 hunger, 5 hydration -> gains 30% stamina (30 SP)
                 ws.hunger = Math.max(0, (ws.hunger || 100) - 5);
                 ws.hydration = Math.max(0, (ws.hydration || 100) - 5);
                 const maxSp = ws.max_stamina || 100;
@@ -1105,64 +1120,128 @@ Respond strictly with valid JSON conforming to this schema (no extra explanation
                 playerState.stamina = ws.stamina;
                 const spBar = playerState.player_status?.status_bars?.find(b => b.type === 'sp' || b.name === '精力' || b.name === '體力');
                 if (spBar) spBar.value = ws.stamina;
-                if (hpBar) hpBar.value = Math.min(maxHp, (hpBar.value || 0) + 15);
 
-                // Small chance of gathering 1 wild berry/food if foraging in safe zone
-                let bonus = '';
-                if (Math.random() < 0.25) {
-                    resData.food += 1;
-                    bonus = isEn ? ' (Found +1 Wild Ration nearby!)' : isJa ? ' (周辺で野生の食料を1個採取しました！)' : '（在營地周邊順手採集了 1 份野果口糧！）';
+                // Environmental penalty check during rest
+                if (isFreezing && !camp.campfire_lit && (camp.shelter_level || 0) < 2) {
+                    const coldDmg = 12;
+                    if (hpBar) hpBar.value = Math.max(1, (hpBar.value || 100) - coldDmg);
+                    if (!playerState.player_status.debuffs) playerState.player_status.debuffs = [];
+                    if (!playerState.player_status.debuffs.some(d => (typeof d === 'string' ? d : d.name).includes('失温'))) {
+                        playerState.player_status.debuffs.push({ name: '失温受冻', desc: '寒风刺骨且未点燃篝火，体温过低' });
+                    }
+                    logMessage = isEn
+                        ? `❄️ Harsh freezing cold! Without a lit campfire or fortified shelter, you suffered -${coldDmg} cold exposure damage during rest.`
+                        : `❄️【极寒侵袭】周围寒风刺骨且无营火或避风所，你在休整中遭受了 ${coldDmg} 寒冷失温伤害！`;
+                } else if (isToxic && (camp.shelter_level || 0) < 2) {
+                    const toxDmg = 10;
+                    if (hpBar) hpBar.value = Math.max(1, (hpBar.value || 100) - toxDmg);
+                    logMessage = isEn
+                        ? `☣️ Toxic miasma penetrated! Suffered -${toxDmg} poison damage during rest.`
+                        : `☣️【毒瘴渗透】有毒气体侵入休整处，造成了 ${toxDmg} 点毒蚀伤害！`;
+                } else {
+                    if (hpBar) hpBar.value = Math.min(maxHp, (hpBar.value || 0) + 15);
+                    // Small chance of gathering 1 wild berry/food if foraging in safe zone
+                    let bonus = '';
+                    if (!isToxic && !isUnderground && Math.random() < 0.25) {
+                        resData.food += 1;
+                        bonus = isEn ? ' (Found +1 Wild Ration nearby!)' : isJa ? ' (周辺で野生の食料を1個採取しました！)' : '（在營地周邊順手採集了 1 份野果口糧！）';
+                    }
+                    logMessage = isEn
+                        ? `⛺ Short Rest completed. Restored +${spGain} Stamina, +15 HP (Cost: -5 Hunger, -5 Hydration).${bonus}`
+                        : isJa
+                        ? `⛺ 軽い休息をとりました。スタミナ+${spGain}、HP+15回復（消費: 空腹度-5、水分-5）。${bonus}`
+                        : `⛺ 在營地稍作休整，恢復了 ${spGain} 點精力（30%）與 15 點生命值（消耗：飽腹度 -5，水分 -5）。${bonus}`;
                 }
-
-                logMessage = isEn
-                    ? `⛺ Short Rest completed. Restored +${spGain} Stamina, +15 HP (Cost: -5 Hunger, -5 Hydration).${bonus}`
-                    : isJa
-                    ? `⛺ 軽い休息をとりました。スタミナ+${spGain}、HP+15回復（消費: 空腹度-5、水分-5）。${bonus}`
-                    : `⛺ 在營地稍作休整，恢復了 ${spGain} 點精力（30%）與 15 點生命值（消耗：飽腹度 -5，水分 -5）。${bonus}`;
             } else if (action === 'sleep') {
-                // Long Sleep / Camp Overnight: advances day +1, costs 15 hunger & hydration, restores full stamina & 50 HP
+                // Long Sleep / Camp Overnight: advances day +1, costs 15 hunger & hydration
                 camp.days = (camp.days || 1) + 1;
                 ws.time = isEn ? `Day ${camp.days}` : isJa ? `第 ${camp.days} 日` : `第 ${camp.days} 天`;
 
                 ws.hunger = Math.max(0, (ws.hunger || 100) - 15);
                 ws.hydration = Math.max(0, (ws.hydration || 100) - 15);
-                ws.stamina = ws.max_stamina || 100;
-                playerState.stamina = ws.stamina;
+
                 const spBar = playerState.player_status?.status_bars?.find(b => b.type === 'sp' || b.name === '精力' || b.name === '體力');
-                if (spBar) spBar.value = ws.stamina;
-                if (hpBar) hpBar.value = Math.min(maxHp, (hpBar.value || 0) + 50);
 
-                // Calculate Ambush Risk
-                // Base: 35%. Bonfire lit: -15%. Shelter Lv2: -15%. Shelter Lv3: 0% ambush
-                let ambushChance = 35;
-                if (camp.campfire_lit) ambushChance -= 15;
-                if (camp.shelter_level === 2) ambushChance -= 15;
-                if (camp.shelter_level >= 3) ambushChance = 0;
+                // Check environmental penalties when sleeping
+                let envSuffered = false;
+                if (isFreezing && !camp.campfire_lit && (camp.shelter_level || 0) < 2) {
+                    envSuffered = true;
+                    const coldDmg = 22;
+                    if (hpBar) hpBar.value = Math.max(1, (hpBar.value || 100) - coldDmg);
+                    ws.stamina = Math.min(ws.max_stamina || 100, Math.round((ws.max_stamina || 100) * 0.4));
+                    if (spBar) spBar.value = ws.stamina;
+                    playerState.stamina = ws.stamina;
 
-                const roll = Math.random() * 100;
-                if (roll < ambushChance) {
-                    ambushed = true;
-                    // Ambushed at night!
-                    const hpLoss = 15;
-                    if (hpBar) hpBar.value = Math.max(1, (hpBar.value || 100) - hpLoss);
-                    if (resData.food > 0) resData.food -= 1;
-                    camp.campfire_lit = false;
+                    if (!playerState.player_status.debuffs) playerState.player_status.debuffs = [];
+                    if (!playerState.player_status.debuffs.some(d => (typeof d === 'string' ? d : d.name).includes('失温'))) {
+                        playerState.player_status.debuffs.push({ name: '极寒失温', desc: '寒夜无篝火与庇护所，身患冻伤失温' });
+                    }
+                    logMessage = isEn
+                        ? `❄️ [HYPOTHERMIA NIGHTMARE] Sub-zero blizzard raging! Without fire or shelter, you suffered -${coldDmg} hypothermia damage and woke up shivering!`
+                        : `❄️【极寒刺骨恶梦！】夜间暴雪严寒，在未生营火且无坚固庇护所的环境下休眠，造成了 ${coldDmg} 点失温冻伤，精力仅微量恢复！`;
+                } else if (isToxic && (camp.shelter_level || 0) < 2) {
+                    envSuffered = true;
+                    const toxDmg = 18;
+                    if (hpBar) hpBar.value = Math.max(1, (hpBar.value || 100) - toxDmg);
+                    ws.stamina = Math.min(ws.max_stamina || 100, Math.round((ws.max_stamina || 100) * 0.5));
+                    if (spBar) spBar.value = ws.stamina;
+                    playerState.stamina = ws.stamina;
 
                     logMessage = isEn
-                        ? `⚠️ [NIGHT AMBUSH!] Hostile prowlers raided the camp while sleeping! Lost 1 Food Ration, suffered -${hpLoss} HP damage!`
-                        : isJa
-                        ? `⚠️ [夜間襲撃！] 睡眠中に敵の襲撃を受けました！食料1個を奪われ、HPが${hpLoss}減少しました！`
-                        : `⚠️【深夜夜襲警報！】徘徊的野獸或掠奪者襲擊了未完全防禦的營地！損失了 1 份食物，生命值受到 ${hpLoss} 點偷襲傷害！`;
-                } else {
-                    // Safe night
-                    camp.campfire_lit = false; // Fire goes out by morning
-                    logMessage = isEn
-                        ? `🌙 Spent a peaceful night at camp. Advanced to Day ${camp.days}! Stamina fully restored to 100%, HP +50.`
-                        : isJa
-                        ? `🌙 平穏な夜を過ごしました。第${camp.days}日になりました！スタミナが全快し、HP+50回復。`
-                        : `🌙 一夜安眠，晨光微熹。時間推進至【第 ${camp.days} 天】！精力完全恢復至 100%，生命值大幅回升。`;
+                        ? `☣️ [TOXIC INHALATION] Lethal miasma settled overnight! Sustained -${toxDmg} poison damage from exposure.`
+                        : `☣️【剧毒空气渗入！】毒瘴在夜间浓聚，未封闭防毒导致毒气渗入体内（HP -${toxDmg}），休眠效果大打折扣！`;
+                }
+
+                // Check Starvation / Dehydration while sleeping
+                if (ws.hunger <= 0 || ws.hydration <= 0) {
+                    const starveDmg = 15;
+                    if (hpBar) hpBar.value = Math.max(1, (hpBar.value || 100) - starveDmg);
+                    logMessage += isEn
+                        ? ` ⚠️ Starvation/dehydration took a toll (-${starveDmg} HP)!`
+                        : ` ⚠️ 腹中空空且严重缺水，机能枯竭（生命值 -${starveDmg}）！`;
+                }
+
+                if (!envSuffered) {
+                    ws.stamina = ws.max_stamina || 100;
+                    playerState.stamina = ws.stamina;
+                    if (spBar) spBar.value = ws.stamina;
+                    if (hpBar) hpBar.value = Math.min(maxHp, (hpBar.value || 0) + 40);
+
+                    // Calculate Ambush Risk
+                    let ambushChance = 35;
+                    if (camp.campfire_lit) ambushChance -= 15;
+                    if (camp.shelter_level === 2) ambushChance -= 15;
+                    if (camp.shelter_level >= 3) ambushChance = 0;
+
+                    const roll = Math.random() * 100;
+                    if (roll < ambushChance) {
+                        ambushed = true;
+                        const hpLoss = 15;
+                        if (hpBar) hpBar.value = Math.max(1, (hpBar.value || 100) - hpLoss);
+                        if (resData.food > 0) resData.food -= 1;
+                        camp.campfire_lit = false;
+
+                        logMessage = isEn
+                            ? `⚠️ [NIGHT AMBUSH!] Hostile prowlers raided the camp while sleeping! Lost 1 Food Ration, suffered -${hpLoss} HP damage!`
+                            : isJa
+                            ? `⚠️ [夜間襲撃！] 睡眠中に敵の襲撃を受けました！食料1個を奪われ、HPが${hpLoss}減少しました！`
+                            : `⚠️【深夜夜襲警報！】徘徊的野獸或掠奪者襲擊了未完全防禦的營地！損失了 1 份食物，生命值受到 ${hpLoss} 點偷襲傷害！`;
+                    } else {
+                        camp.campfire_lit = false; // Fire goes out by morning
+                        logMessage = isEn
+                            ? `🌙 Spent a peaceful night at camp. Advanced to Day ${camp.days}! Stamina fully restored, HP +40.`
+                            : isJa
+                            ? `🌙 平穏な夜を過ごしました。第${camp.days}日になりました！スタミナ全快、HP回復。`
+                            : `🌙 一夜安眠，晨光微熹。時間推進至【第 ${camp.days} 天】！精力完全恢復至 100%，生命值得到修養。`;
+                    }
                 }
             } else if (action === 'stoke_fire') {
+                if (isWaterOrCliff) {
+                    return sendError(res, 400, '水下或绝壁险恶环境中无法点燃营火！');
+                }
+                if (isStormy && (camp.shelter_level || 0) < 1) {
+                    return sendError(res, 400, '狂风暴雨呼啸无遮蔽，火苗刚引燃便被扑灭！需先搭建遮雨避难所。');
+                }
                 if ((resData.wood || 0) < 1) {
                     return sendError(res, 400, isEn ? 'Requires 1 Wood to stoke the bonfire!' : isJa ? '焚き火を起こすには木材が1個必要です！' : '生火或添柴需要消耗 1 份木材！');
                 }
@@ -1174,6 +1253,9 @@ Respond strictly with valid JSON conforming to this schema (no extra explanation
                     ? '🔥 焚き火を灯しました！暖かな炎が寒さを防ぎ、夜間襲撃の危険を大幅に低減します。'
                     : '🔥 點燃了營火！溫暖的火光驅散了寒冷與黑暗，夜間遭遇夜襲的危險顯著降低。';
             } else if (action === 'upgrade_shelter') {
+                if (isWaterOrCliff || playerState.explore_state?.zone_type === 'maze') {
+                    return sendError(res, 400, '当前险恶地形或未知迷宫通道无法修筑长期据点！');
+                }
                 const curLvl = camp.shelter_level || 1;
                 if (curLvl >= 3) {
                     return sendError(res, 400, isEn ? 'Shelter is already at maximum rank (Lv3 Outpost)!' : isJa ? '避難所は既に最高レベル（Lv3 前哨基地）です！' : '庇護所已達最高防禦等級（Lv3 堅固前哨基地）！');
@@ -1205,6 +1287,9 @@ Respond strictly with valid JSON conforming to this schema (no extra explanation
                         : '🏰 營地加固升級為【Lv3 堅固前哨基地】！徹底杜絕夜間偷襲，獲得全方位庇護所結界加成！';
                 }
             } else if (action === 'chop_wood') {
+                if (isUnderground || isLavaOrDesert || isWaterOrCliff) {
+                    return sendError(res, 400, `🚫 当前环境（${ws.location || '地下洞窟/荒漠/水域'}）缺乏林木植被，无法在此伐木！`);
+                }
                 if ((ws.stamina || 0) < 8) {
                     return sendError(res, 400, isEn ? 'Not enough stamina (need 8 SP) to chop wood!' : isJa ? 'スタミナ不足（8 SP必要）のため伐採できません！' : '精力不足（需要 8 點精力），無法進行伐木！');
                 }
@@ -1248,6 +1333,9 @@ Respond strictly with valid JSON conforming to this schema (no extra explanation
                     ? `🪓 キャンプ周辺で木を伐採しました（-8 SP）。獲得: 木材+${woodCount}${bonusText}！`
                     : `🪓 揮斧砍伐營地周遭枯木柴火（消耗 8 精力），成功採集了 ${woodCount} 份【乾燥木材】${bonusText}！`;
             } else if (action === 'forage_food_water') {
+                if (isToxic || isLavaOrDesert) {
+                    return sendError(res, 400, `🚫 当前地带（${ws.location || '危险污染区'}）受严重毒化侵蚀或水源枯竭，采集物不可食用！`);
+                }
                 if ((ws.stamina || 0) < 6) {
                     return sendError(res, 400, isEn ? 'Not enough stamina (need 6 SP) to forage!' : isJa ? 'スタミナ不足（6 SP必要）のため採集できません！' : '精力不足（需要 6 點精力），無法進行覓食與打水！');
                 }
@@ -1320,6 +1408,9 @@ Respond strictly with valid JSON conforming to this schema (no extra explanation
                     ? `💰 [${itemName}] を売却し、+${sellValue} ${cName} を獲得しました。`
                     : `💰 成功出售【${itemName}】，獲得了 +${sellValue} ${cName}！`;
             } else if (action === 'forage') {
+                if (isToxic || isLavaOrDesert) {
+                    return sendError(res, 400, `🚫 当前地带（${ws.location || '危险污染区'}）受严重毒化或环境恶劣，无法在此搜集物资！`);
+                }
                 if ((ws.stamina || 0) < 8) {
                     return sendError(res, 400, isEn ? 'Not enough stamina (need 8 SP) to scavenge!' : isJa ? 'スタミナ不足（8 SP必要）のため採取できません！' : '精力不足（需要 8 點精力），無法進行搜救或採集！');
                 }
@@ -2469,6 +2560,11 @@ Your JSON fields "status_updates", "new_items", "removed_items", "is_dead", "sta
      * 【同伴舍身相救】：若有随行同伴，同伴舍生忘死拼杀出一条血路，背负浑身浴血、昏迷不醒的主角逃入荒野隐秘洞窟，在篝火旁泣不成声彻夜包扎抢救；
      * 【幽冥血契复苏】：濒死坠入冥河深渊，与不可名状的古老存在达成黑暗血契，以灵魂诅咒或永恒代价换取破碎肉身的重铸苏醒；
      * 【饮恨长眠 Bad End】：肉身湮灭于风雪尘埃，写下英雄陨落的长眠悲歌。
+8. ★★★【场景即时交互 (Scene Interactables) 与环境/NPC 动态联动】★★★:
+   - 当前场景的人物与可交互物件绝非一成不变！必须百分之百契合当前环境、剧情与危险状况。
+   - 严禁在荒郊野外、地牢、深海或熔岩险境中突兀出现城镇铁匠、医师或固定告示牌。
+   - 若当前场景中有重要 NPC 登场或驻留，请在 JSON 返回中包含 "scene_npcs": [{ "id": "...", "name": "...", "role": "...", "avatar": "...", "dialogue": "..." }]。
+   - 若当前场景中有特定环境线索、障碍物、古迹或宝藏，请在 JSON 返回中包含 "scene_interactables": [{ "id": "...", "name": "...", "type": "...", "tag": "...", "desc": "..." }]。
 `;
 
                 let historyPrompt = `

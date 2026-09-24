@@ -415,10 +415,10 @@
                                 <span class="text-2xl p-1.5 rounded-xl bg-orange-950/80 border border-orange-500/30 text-orange-400">⛺</span>
                                 <div>
                                     <h2 class="text-sm sm:text-base font-black text-orange-300 flex items-center gap-1.5">
-                                        <span>境地休整与安顿修整</span>
-                                        <span class="text-[10px] px-2 py-0.5 rounded-full bg-orange-500/20 text-orange-300 border border-orange-500/30 font-medium">融入剧本</span>
+                                        <span>营地休整与安顿装备</span>
+                                        <span class="text-[10px] px-2 py-0.5 rounded-full bg-orange-500/20 text-orange-300 border border-orange-500/30 font-medium">融入剧本与环境</span>
                                     </h2>
-                                    <p class="text-[10px] text-slate-400 leading-tight mt-0.5">依据当前冒险环境安顿歇息、护理身心或与同行同伴围炉夜话</p>
+                                    <p class="text-[10px] text-slate-400 leading-tight mt-0.5">依据当前冒险境地安顿装备、护理伤痛，各项功能严格受当时环境与剧本条件制约</p>
                                 </div>
                             </div>
                             <div class="flex items-center gap-1.5">
@@ -439,6 +439,20 @@
                                     <span id="respite-current-time">第 1 天</span>
                                 </div>
                             </div>
+
+                            <!-- Environmental Conditions & Risk Factor -->
+                            <div id="respite-env-condition-card" class="p-2 rounded-lg bg-black/40 border border-white/5 flex flex-col gap-1 text-[11px]">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-slate-400 font-semibold flex items-center gap-1">🌍 环境适宜度研判:</span>
+                                    <span id="respite-env-safety-badge" class="px-2 py-0.5 rounded text-[10px] font-bold font-mono bg-emerald-900/40 text-emerald-300 border border-emerald-500/30">评估中...</span>
+                                </div>
+                                <div id="respite-env-hazard-desc" class="text-[10px] text-amber-200 leading-tight">依据当前地理位置与天气状况进行环境适宜度研判</div>
+                                <div id="respite-env-lock-alert" class="hidden p-1.5 rounded bg-red-950/70 border border-red-500/40 text-red-200 text-[10px] flex items-center gap-1.5">
+                                    <i class="ph-bold ph-warning-circle text-red-400 text-sm flex-shrink-0"></i>
+                                    <span id="respite-env-lock-text" class="leading-tight"></span>
+                                </div>
+                            </div>
+
                             <div class="grid grid-cols-4 gap-1.5 pt-0.5 text-center font-mono text-[10px] sm:text-[11px]">
                                 <div class="p-1.5 rounded-lg bg-rose-950/40 border border-rose-500/20">
                                     <span class="text-rose-400 block text-[9px] font-sans">生命 (HP)</span>
@@ -459,12 +473,29 @@
                             </div>
                             <div id="respite-debuff-banner" class="hidden text-[10px] p-2 rounded-lg bg-red-950/60 border border-red-500/40 text-red-200 flex items-center justify-between">
                                 <span class="flex items-center gap-1.5">⚠️ <span id="respite-debuff-text">受伤中</span></span>
-                                <span class="text-[9px] text-red-300 font-semibold">可通过调理包扎或安睡缓解</span>
+                                <span class="text-[9px] text-red-300 font-semibold">需视环境与药剂对症调理</span>
                             </div>
                         </div>
                             
                             <!-- Rest & Respite Action List (Directly Feeds into Script Narrative) -->
                             <div class="space-y-2 overflow-y-auto max-h-[48vh] pr-1">
+                                <!-- 0. Settle & Manage Equipment -->
+                                <button id="camp-settle-equip-btn" class="w-full p-2.5 sm:p-3 rounded-xl border border-sky-500/30 bg-sky-950/25 hover:bg-sky-900/35 text-left transition-all duration-200 cursor-pointer group active:scale-[0.98] flex items-center justify-between" type="button">
+                                    <div class="flex items-center gap-2.5 sm:gap-3">
+                                        <span class="text-2xl group-hover:scale-110 transition-transform flex-shrink-0">🛡️</span>
+                                        <div>
+                                            <div class="font-bold text-xs sm:text-sm text-sky-200 flex items-center gap-2">
+                                                <span>安顿装备与行囊 (Settle Equipment)</span>
+                                                <span id="camp-equip-status-badge" class="text-[9px] px-1.5 py-0.2 rounded bg-sky-600/30 text-sky-300 font-mono">就地整备</span>
+                                            </div>
+                                            <div class="text-[10px] sm:text-[11px] text-slate-300 mt-0.5 leading-tight">
+                                                检视穿戴武器防具、整理行囊物资与状态。环境恶劣或战斗中无法从容安顿。
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <i class="ph-bold ph-caret-right text-sky-400 text-base sm:text-lg group-hover:translate-x-1 transition-transform flex-shrink-0"></i>
+                                </button>
+
                                 <!-- 1. Deep Sleep / Advance Time -->
                                 <button id="camp-sleep-btn" class="w-full p-2.5 sm:p-3 rounded-xl border border-orange-500/40 bg-orange-950/40 hover:bg-orange-900/50 text-left transition-all duration-200 cursor-pointer group active:scale-[0.98] flex items-center justify-between" type="button">
                                     <div class="flex items-center gap-2.5 sm:gap-3">
@@ -472,10 +503,10 @@
                                         <div>
                                             <div class="font-bold text-xs sm:text-sm text-orange-200 flex items-center gap-2">
                                                 <span data-i18n="camp.sleep.title">深度安顿休整 (Deep Rest)</span>
-                                                <span class="text-[9px] px-1.5 py-0.2 rounded bg-orange-600/40 text-orange-300 font-mono">时间推进 +1 天</span>
+                                                <span id="camp-sleep-status-badge" class="text-[9px] px-1.5 py-0.2 rounded bg-orange-600/40 text-orange-300 font-mono">时间推进 +1 天</span>
                                             </div>
-                                            <div class="text-[10px] sm:text-[11px] text-slate-300 mt-0.5 leading-tight" data-i18n="camp.sleep.desc">
-                                                在当前环境安顿入眠，精力完全回满 (SP 100%)、生命回升 +35，融入剧本夜间事件与晨光描写。消耗 15 饱腹、20 水分。
+                                            <div id="camp-sleep-desc-text" class="text-[10px] sm:text-[11px] text-slate-300 mt-0.5 leading-tight" data-i18n="camp.sleep.desc">
+                                                在当前环境安顿入眠，消耗 15 饱腹与 15 水分。若环境极寒且无营火、或毒瘴弥漫，休整将受环境伤害且精力无法全满！
                                             </div>
                                         </div>
                                     </div>
@@ -491,8 +522,8 @@
                                                 <span data-i18n="camp.fire.title">生起篝火与设防 (Campfire & Guard)</span>
                                                 <span id="camp-fire-status" class="text-[9px] px-1.5 py-0.2 rounded bg-amber-600/30 text-amber-300 font-mono">OFF</span>
                                             </div>
-                                            <div class="text-[10px] sm:text-[11px] text-slate-300 mt-0.5 leading-tight" data-i18n="camp.fire.desc">
-                                                生起温暖篝火或布置防御警戒，驱散阴寒，大幅降低夜间被袭机率。消耗 1 单位木材。
+                                            <div id="camp-fire-desc-text" class="text-[10px] sm:text-[11px] text-slate-300 mt-0.5 leading-tight" data-i18n="camp.fire.desc">
+                                                消耗 1 木材生起篝火驱散严寒并防范夜袭。暴风雨等露天潮湿恶劣环境需先搭建庇护所方可生火。
                                             </div>
                                         </div>
                                     </div>
@@ -508,8 +539,8 @@
                                                 <span>伙伴围炉夜话 (Campfire Banter)</span>
                                                 <span id="respite-companion-badge" class="text-[9px] px-1.5 py-0.2 rounded bg-indigo-600/30 text-indigo-300">同伴同行</span>
                                             </div>
-                                            <div class="text-[10px] sm:text-[11px] text-slate-300 mt-0.5 leading-tight">
-                                                在营火旁与随行同伴促膝长谈，分享口粮与旅途心声，加深彼此信任、触发心动日常互动。
+                                            <div id="camp-companion-desc-text" class="text-[10px] sm:text-[11px] text-slate-300 mt-0.5 leading-tight">
+                                                在营火旁与随行同伴促膝长谈，分享口粮与心声，增进信任与好感。仅在营地内部沉淀，不自动推进主线剧情。
                                             </div>
                                         </div>
                                     </div>
@@ -523,10 +554,10 @@
                                         <div>
                                             <div class="font-bold text-xs sm:text-sm text-emerald-200 flex items-center gap-2">
                                                 <span>调息调理与包扎 (Dress Wounds)</span>
-                                                <span class="text-[9px] px-1.5 py-0.2 rounded bg-emerald-600/30 text-emerald-300 font-mono">缓解负面创伤</span>
+                                                <span id="camp-heal-status-badge" class="text-[9px] px-1.5 py-0.2 rounded bg-emerald-600/30 text-emerald-300 font-mono">对症包扎</span>
                                             </div>
-                                            <div class="text-[10px] sm:text-[11px] text-slate-300 mt-0.5 leading-tight">
-                                                清洗伤口、施用随身草药绷带或静心调息，清除流血、中毒等肉体负面减益，平复心神。
+                                            <div id="camp-heal-desc-text" class="text-[10px] sm:text-[11px] text-slate-300 mt-0.5 leading-tight">
+                                                包扎轻度擦伤。重度创伤（剧毒、辐射、骨折）需背包具备对应急救药剂；处于极寒无火或毒气环境下无法凭空愈合。
                                             </div>
                                         </div>
                                     </div>
@@ -540,10 +571,10 @@
                                         <div>
                                             <div class="font-bold text-xs sm:text-sm text-purple-200 flex items-center gap-2">
                                                 <span>梳理剧本情报与任务 (Ponder Quests)</span>
-                                                <span class="text-[9px] px-1.5 py-0.2 rounded bg-purple-600/30 text-purple-300 font-mono">任务导向</span>
+                                                <span class="text-[9px] px-1.5 py-0.2 rounded bg-purple-600/30 text-purple-300 font-mono">情报盘点</span>
                                             </div>
                                             <div class="text-[10px] sm:text-[11px] text-slate-300 mt-0.5 leading-tight">
-                                                就着微弱火光翻看随身笔记与世界线索，整理当前主线与支线方针，理清下一步冒险行动。
+                                                在营火微光下翻看随身手札与任务线索，在营地内部理清思路，不强制推进主线剧情。
                                             </div>
                                         </div>
                                     </div>
@@ -2344,51 +2375,245 @@ function getNpcWorldviewProfile(npcKey, customGenre) {
 window.getNpcWorldviewProfile = getNpcWorldviewProfile;
 window.getActiveGameGenre = getActiveGameGenre;
 
-function generateBountyQuests() {
-    return [
-        {
-            id: 'quest_wood',
-            name: '尋求多餘木材',
-            name_en: 'Excess Timber Needed',
-            name_ja: '余分な木材の調達',
-            desc: '據點篝火和建設需要充足的木頭儲備。',
-            desc_en: 'The base fire and structure need more wood reserves.',
-            desc_ja: '拠点の焚き火と建設には、十分な木材の備えが必要です。',
-            target_item: 'wood',
-            target_count: 3,
-            reward_gold: 40,
-            reward_favor: 15,
-            completed: false
-        },
-        {
-            id: 'quest_scrap',
-            name: '收集金屬廢料',
-            name_en: 'Collect Metal Scrap',
-            name_ja: '金属スクラップの収集',
-            desc: '鐵匠希望能得到一些可以用來熔煉或修復的廢料。',
-            desc_en: 'The blacksmith needs scrap materials for forging and repairs.',
-            desc_ja: '鍛冶屋は製錬や修理に使用できるスクラップを求めています。',
-            target_item: 'scrap',
-            target_count: 2,
-            reward_gold: 50,
-            reward_favor: 20,
-            completed: false
-        },
-        {
-            id: 'quest_herb',
-            name: '採集野生草藥',
-            name_en: 'Gather Wild Herbs',
-            name_ja: '野生の薬草の採集',
-            desc: '醫師需要草藥來調配野外生存抗毒解藥或生命藥水。',
-            desc_en: 'The medic needs wild herbs to brew survival healing potions.',
-            desc_ja: '医師は野外生存用の抗毒解毒剤や生命ポーションを調合するための薬草を必要としています。',
-            target_item: 'herb',
-            target_count: 2,
-            reward_gold: 60,
-            reward_favor: 15,
-            completed: false
-        }
-    ];
+function generateBountyQuests(genre, chapter, location) {
+    const activeGenre = genre || (typeof getActiveGameGenre === 'function' ? getActiveGameGenre() : '西幻冒險');
+    const chap = chapter || (playerState?.camp_state?.chapter) || 1;
+    const loc = location || (playerState?.world_state?.location || playerState?.world_state?.current_location || '荒野據點');
+    
+    // 依題材流派映射對應任務池
+    const typeMap = {
+        '科幻': 'tech', '賽博龐克': 'tech', '末日生存': 'tech',
+        '宮鬥': 'social', '戀愛': 'social', '現代都市': 'social',
+        '懸疑偵探': 'mystery', '克蘇魯神話': 'mystery', '恐怖': 'mystery', '校園異聞': 'mystery',
+        '修仙': 'wuxia', '武俠': 'wuxia', '玄幻': 'wuxia'
+    };
+    const foundKey = Object.keys(typeMap).find(k => activeGenre.includes(k));
+    const genreType = foundKey ? typeMap[foundKey] : 'fantasy';
+
+    const questPools = {
+        tech: [
+            {
+                id: `quest_tech_data_${chap}`,
+                name: chap === 1 ? '回收破損電路晶片' : '駭入企業次級中繼站',
+                name_en: chap === 1 ? 'Salvage Broken Circuit Chips' : 'Hack Megacorp Subnet',
+                name_ja: chap === 1 ? '破損した回路チップの回収' : '企業サブネットへのハッキング',
+                desc: chap === 1 ? `在【${loc}】附近搜集可用的電路板與能源殘渣。` : `攻破黑市或設施防火牆，提取加密數據核心。`,
+                desc_en: `Search for functional tech salvage near ${loc}.`,
+                desc_ja: `${loc}周辺で利用可能なスクラップやデータを収集する。`,
+                target_item: 'scrap',
+                target_count: 2 + chap,
+                reward_gold: 50 * chap,
+                reward_favor: 15,
+                completed: false
+            },
+            {
+                id: `quest_tech_med_${chap}`,
+                name: '調製高濃度神經舒緩劑',
+                name_en: 'Synthesize Neuro-Stimulant',
+                name_ja: '高濃度神経鎮静剤の調合',
+                desc: '地下診所急需醫療耗材以救治在械鬥中受創的拾荒者。',
+                desc_en: 'The underground clinic urgently requires medical supplies.',
+                desc_ja: '地下診療所は医療物資を緊急に必要としています。',
+                target_item: 'herb',
+                target_count: 2,
+                reward_gold: 60 * chap,
+                reward_favor: 20,
+                completed: false
+            },
+            {
+                id: `quest_tech_drone_${chap}`,
+                name: '清剿失控防衛無人機',
+                name_en: 'Neutralize Corrupted Patrol Drones',
+                name_ja: '暴走防衛ドローンの撃退',
+                desc: `廢棄街區遊蕩著敵對掃描信標，清除威脅以確保撤退路線安全。`,
+                desc_en: `Hostile patrol drones wander near ${loc}. Clear the threat.`,
+                desc_ja: `${loc}付近を徘徊する敵対ドローンを排除せよ。`,
+                target_item: 'wood',
+                target_count: 3,
+                reward_gold: 75 * chap,
+                reward_favor: 25,
+                completed: false
+            }
+        ],
+        mystery: [
+            {
+                id: `quest_myst_clue_${chap}`,
+                name: chap === 1 ? '搜集散落的古籍殘頁' : '破譯不可名狀密文',
+                name_en: chap === 1 ? 'Collect Scattered Manuscript Pages' : 'Decipher Eldritch Cipher',
+                name_ja: chap === 1 ? '散逸した古写本断片の収集' : '名状しがたき暗号の解読',
+                desc: `在【${loc}】的陰暗角落裡尋回失落的密宗手稿以探究真相。`,
+                desc_en: `Retrieve missing occult manuscript pages around ${loc}.`,
+                desc_ja: `${loc}の暗がりから失われた写本の断片を回収する。`,
+                target_item: 'scrap',
+                target_count: 2,
+                reward_gold: 55 * chap,
+                reward_favor: 20,
+                completed: false
+            },
+            {
+                id: `quest_myst_san_${chap}`,
+                name: '採集安神薰香草料',
+                name_en: 'Gather Calming Herbs for Wards',
+                name_ja: '精神安定香草の採集',
+                desc: '驅散深夜幻聽與瘋狂低語所需的特種香草，維持理智防線。',
+                desc_en: 'Special herbs required to burn wards against maddening whispers.',
+                desc_ja: '狂気の囁きを退けるための香草。正気度を保つために必要。',
+                target_item: 'herb',
+                target_count: 2 + chap,
+                reward_gold: 60 * chap,
+                reward_favor: 20,
+                completed: false
+            },
+            {
+                id: `quest_myst_seal_${chap}`,
+                name: '加固古老結界陣眼',
+                name_en: 'Reinforce Ancient Warding Stones',
+                name_ja: '古い結界陣の補強',
+                desc: '搜集堅固石材與硬木以修補出現裂痕的避難所神龕陣眼。',
+                desc_en: 'Repair broken warding seals around the shelter.',
+                desc_ja: '拠点の防護結界を修復するための資材を集める。',
+                target_item: 'wood',
+                target_count: 3,
+                reward_gold: 70 * chap,
+                reward_favor: 25,
+                completed: false
+            }
+        ],
+        wuxia: [
+            {
+                id: `quest_wuxia_herb_${chap}`,
+                name: chap === 1 ? '採摘懸崖紫精芝' : '尋訪千年何首烏',
+                name_en: 'Gather Rare Spirit Herbs',
+                name_ja: '霊草の採集',
+                desc: `前往【${loc}】周邊奇險之處採集滋補經脈的野生靈藥。`,
+                desc_en: `Gather rare spirit herbs near ${loc} to nourish meridians.`,
+                desc_ja: `${loc}周辺で経絡を養う霊草を採取する。`,
+                target_item: 'herb',
+                target_count: 2 + chap,
+                reward_gold: 60 * chap,
+                reward_favor: 20,
+                completed: false
+            },
+            {
+                id: `quest_wuxia_ore_${chap}`,
+                name: '開採玄鐵地底礦石',
+                name_en: 'Mine Deep Cold Iron Ores',
+                name_ja: '玄鉄鉱石の採掘',
+                desc: '鑄劍堂需要精純的金屬廢料與寒鐵重鍛神兵利刃。',
+                desc_en: 'The forge requires refined cold iron scrap to hone weapons.',
+                desc_ja: '鍛冶場は武器を鍛えるために精錬された鉄片を求めています。',
+                target_item: 'scrap',
+                target_count: 2 + chap,
+                reward_gold: 70 * chap,
+                reward_favor: 20,
+                completed: false
+            },
+            {
+                id: `quest_wuxia_wood_${chap}`,
+                name: '砍伐雷擊桃木枝',
+                name_en: 'Chop Lightning-Struck Peach Wood',
+                name_ja: '雷撃桃木枝の伐採',
+                desc: '用以加固陣法篝火，並刻畫辟邪符籙驅散林間瘴氣。',
+                desc_en: 'Gather seasoned timber to maintain camp spirit fires and ward off miasma.',
+                desc_ja: '陣法篝火を維持し瘴気を払うための木材を調達する。',
+                target_item: 'wood',
+                target_count: 3 + chap,
+                reward_gold: 65 * chap,
+                reward_favor: 15,
+                completed: false
+            }
+        ],
+        social: [
+            {
+                id: `quest_social_gift_${chap}`,
+                name: '採集名貴花卉香料',
+                name_en: 'Gather Rare Fragrant Blooms',
+                name_ja: '高貴な香料と花の採取',
+                desc: '社交晚宴與拜訪貴冑所需的精緻薰香與禮盒原料。',
+                desc_en: 'Refined floral materials needed for diplomatic gifts.',
+                desc_ja: '貴族への贈り物に必要な芳香植物を収集する。',
+                target_item: 'herb',
+                target_count: 2,
+                reward_gold: 60 * chap,
+                reward_favor: 25,
+                completed: false
+            },
+            {
+                id: `quest_social_token_${chap}`,
+                name: '搜集精巧首飾金屬件',
+                name_en: 'Procure Jewelry Crafting Metal',
+                name_ja: '装飾用金属パーツの調達',
+                desc: '請巧匠修復破損傳家信物，以備在宮闈宴席上呈遞。',
+                desc_en: 'Procure fine scrap metal to repair an heirloom brooch.',
+                desc_ja: '家宝の装飾品を修復するための金属片。',
+                target_item: 'scrap',
+                target_count: 2,
+                reward_gold: 80 * chap,
+                reward_favor: 20,
+                completed: false
+            },
+            {
+                id: `quest_social_res_${chap}`,
+                name: '籌措驛站修繕硬木',
+                name_en: 'Supply Hardwood for Posthouse',
+                name_ja: '宿場修繕用の硬木供給',
+                desc: '協助整修歇腳驛館與車輦，換取過所通關文書與各方情報。',
+                desc_en: 'Provide construction lumber to earn travel permits and rumors.',
+                desc_ja: '宿場を修繕するための木材を提供し、情報と通行証を得る。',
+                target_item: 'wood',
+                target_count: 3,
+                reward_gold: 70 * chap,
+                reward_favor: 20,
+                completed: false
+            }
+        ],
+        fantasy: [
+            {
+                id: `quest_fan_timber_${chap}`,
+                name: chap === 1 ? '尋求多餘木材' : '採集鐵樺硬木料',
+                name_en: chap === 1 ? 'Excess Timber Needed' : 'Gather Ironbark Timber',
+                name_ja: chap === 1 ? '余分な木材の調達' : 'アイアンバーク木材の収集',
+                desc: `據點篝火和【${loc}】工事建設需要充足的硬木儲備。`,
+                desc_en: `The base fire and structure near ${loc} need seasoned timber reserves.`,
+                desc_ja: `${loc}周辺の拠点と防壁建設には、十分な木材の備えが必要です。`,
+                target_item: 'wood',
+                target_count: 3 + chap,
+                reward_gold: 50 * chap,
+                reward_favor: 15,
+                completed: false
+            },
+            {
+                id: `quest_fan_scrap_${chap}`,
+                name: chap === 1 ? '收集金屬廢料' : '回收精鋼魔導零件',
+                name_en: chap === 1 ? 'Collect Metal Scrap' : 'Salvage Steel Mana Components',
+                name_ja: chap === 1 ? '金属スクラップの収集' : '魔導鋼材パーツの回収',
+                desc: '鐵匠希望能得到一些可以用來熔煉或修復護甲的廢料。',
+                desc_en: 'The blacksmith needs scrap materials for forging and repairs.',
+                desc_ja: '鍛冶屋は製錬や防具修理に使用できるスクラップを求めています。',
+                target_item: 'scrap',
+                target_count: 2 + chap,
+                reward_gold: 60 * chap,
+                reward_favor: 20,
+                completed: false
+            },
+            {
+                id: `quest_fan_herb_${chap}`,
+                name: chap === 1 ? '採集野生草藥' : '採掘月見回魂草',
+                name_en: chap === 1 ? 'Gather Wild Herbs' : 'Gather Moon-Bloom Herbs',
+                name_ja: chap === 1 ? '野生の薬草の採集' : '月見草の採集',
+                desc: '醫師需要野生草藥來調配野外生存抗毒解藥或生命藥水。',
+                desc_en: 'The medic needs wild herbs to brew survival healing potions.',
+                desc_ja: '医師は野外生存用の抗毒解毒剤や生命ポーションを調合するための薬草を必要としています。',
+                target_item: 'herb',
+                target_count: 2 + chap,
+                reward_gold: 65 * chap,
+                reward_favor: 15,
+                completed: false
+            }
+        ]
+    };
+
+    return questPools[genreType] || questPools.fantasy;
 }
 
 function showDialogueLog(text) {
@@ -2707,6 +2932,12 @@ let activeNpcModalTab = 'dialogue';
 let lastNpcDialogueTopic = '';
 
 function openNpcModal(npcKey, initialTab = 'dialogue') {
+    if (typeof isPlayerDeadOrGameOver === 'function' && isPlayerDeadOrGameOver()) {
+        if (typeof showNotification === 'function') {
+            showNotification('☠️ 角色已陷入濒死/阵亡，无法与人物进行交互！', 'warning');
+        }
+        return;
+    }
     ensureCampStateExists();
     const npc = playerState.npc_state[npcKey];
     if (!npc) return;
@@ -2714,7 +2945,7 @@ function openNpcModal(npcKey, initialTab = 'dialogue') {
     // Open modal
     const modal = dom.campNpcModal;
     if (!modal) return;
-    modal.classList.remove('hidden');
+    openModal(modal);
 
     // Store active NPC key on modal element for reference
     modal.dataset.npcKey = npcKey;
@@ -4707,9 +4938,15 @@ function ensureEnvironmentStateExists() {
             corpse: { looted: false, buried: false, burned: false, autopsied: false, read_diary: false },
             chest: { inspected: false, disarmed: false, unlocked: false, looted: false, broken: false },
             altar: { prayed: false, studied: false, meditated: false, desecrated: false },
-            fire: { cooked: false, water_drawn: false, fortified: false, stoked: false }
+            fire: { cooked: false, water_drawn: false, fortified: false, stoked: false },
+            herbs: { harvested: false, identified: false },
+            tracks: { investigated: false, trapped: false },
+            stream: { drank: false, washed: false }
         };
     }
+    if (!playerState.environment_state.herbs) playerState.environment_state.herbs = { harvested: false, identified: false };
+    if (!playerState.environment_state.tracks) playerState.environment_state.tracks = { investigated: false, trapped: false };
+    if (!playerState.environment_state.stream) playerState.environment_state.stream = { drank: false, washed: false };
 }
 
 const ENV_OBJECTS_CONFIG = {
@@ -5253,18 +5490,200 @@ const ENV_OBJECTS_CONFIG = {
                 }
             }
         ]
+    },
+    herbs: {
+        id: 'herbs',
+        icon: '🌿',
+        title: '奇特野生草藥叢 (Wild Medicinal Herbs)',
+        typeBadge: '荒野採集 / 生存草藥',
+        desc: '生長於岩縫與枯木根部的野生草藥植株，葉片散發清新的自然氣息。你可以採集藥材備用，或憑藉博學辨識其藥理毒性。',
+        statusRenderer: (state) => {
+            if (state.harvested) return '🌱 草藥已被小心採摘取走，僅留下根莖在微風中輕晃。';
+            if (state.identified) return '🔬 藥理毒性已辨析通透，可高效調配製藥。';
+            return '⏳ 藥草植株青翠繁茂，枝葉飽滿，正是採集良機。';
+        },
+        actions: [
+            {
+                id: 'harvest',
+                name: '🌿 採摘草藥 (Gather Herb)',
+                desc: '小心採集新鮮藥葉與根莖，獲得可用於急救解毒的生藥原料。',
+                type: 'NORMAL',
+                check: null,
+                canPerform: (s) => !s.harvested,
+                handler: (state) => {
+                    state.harvested = true;
+                    if (!playerState.inventory) playerState.inventory = [];
+                    playerState.inventory.push({
+                        id: 'wild_herb',
+                        name: '新鮮野生草藥',
+                        type: 'medicine',
+                        count: 2,
+                        desc: '野外岩縫採集的新鮮草藥，可用於應急止血或調配抗毒劑'
+                    });
+                    return {
+                        success: true,
+                        title: '採集草藥成功！',
+                        text: '你小心摘取藥草，獲得「新鮮野生草藥 x2」，已妥善收納於行囊。',
+                        tag: '+草藥'
+                    };
+                }
+            },
+            {
+                id: 'identify',
+                name: '🔬 辨識藥理 (Identify Herbology)',
+                desc: '細查葉脈走向與氣味，辨別潛在毒性並提升利用率。',
+                type: 'INTELLIGENCE',
+                check: { dc: 11, attr: 'intelligence' },
+                canPerform: (s) => !s.identified,
+                handler: (state, roll) => {
+                    if (roll && !roll.isSuccess) {
+                        return {
+                            success: false,
+                            title: '藥理辨識失敗',
+                            rollText: `智力檢定：${roll.rawRoll} + ${roll.modifier} = ${roll.total} (DC 11)`,
+                            text: '你未能完全看透這簇植物的藥理毒性，需小心使用。',
+                            tag: '辨識失敗'
+                        };
+                    }
+                    state.identified = true;
+                    return {
+                        success: true,
+                        title: '藥理辨識成功！',
+                        rollText: roll ? `智力檢定成功：${roll.rawRoll} + ${roll.modifier} = ${roll.total} (DC 11)` : '',
+                        text: '確認此為優質清血回生草，藥效溫和，止血去腐效果翻倍！',
+                        tag: '藥理通曉'
+                    };
+                }
+            }
+        ]
+    },
+    tracks: {
+        id: 'tracks',
+        icon: '🐾',
+        title: '泥濘野獸足跡 (Muddy Beast Tracks)',
+        typeBadge: '荒野蹤跡 / 獵手線索',
+        desc: '濕泥中印著幾枚新鮮且深陷的爪痕，周邊灌木有折枝與蹭毛痕跡。你可以順藤摸瓜探明危險，或在獸徑設伏。',
+        statusRenderer: (state) => {
+            if (state.investigated) return '🐾 足跡朝向前路密林蔓延，已被標記在地圖上。';
+            if (state.trapped) return '🪤 已在獸徑上架設隱蔽套索陷阱。';
+            return '⏳ 爪印邊緣泥漿尚未乾涸，表明目標不久前剛穿過此地。';
+        },
+        actions: [
+            {
+                id: 'track',
+                name: '🐾 追蹤源頭 (Track Footprints)',
+                desc: '辨識足跡深淺與走向，評估前方潛伏的野獸威脅與隱藏小徑。',
+                type: 'DEXTERITY',
+                check: { dc: 10, attr: 'dexterity' },
+                canPerform: (s) => !s.investigated,
+                handler: (state, roll) => {
+                    state.investigated = true;
+                    if (playerState.player_status && typeof playerState.player_status.exp !== 'undefined') playerState.player_status.exp += 15;
+                    return {
+                        success: true,
+                        title: '野獸蹤跡判讀完畢！',
+                        rollText: roll ? `敏捷檢定：${roll.rawRoll} + ${roll.modifier} = ${roll.total} (DC 10)` : '',
+                        text: '從足跡步幅推斷，前方有一隻中型掠食野獸盤踞在石窟，你已掌握其巡弋死角與繞行捷徑！',
+                        tag: '+探查情報'
+                    };
+                }
+            },
+            {
+                id: 'trap',
+                name: '🪤 設伏布阱 (Set Snare Trap)',
+                desc: '利用堅韌枝條與麻繩在必經獸徑架設簡易捕獵套索。',
+                type: 'NORMAL',
+                check: null,
+                canPerform: (s) => !s.trapped,
+                handler: (state) => {
+                    state.trapped = true;
+                    if (!playerState.inventory) playerState.inventory = [];
+                    playerState.inventory.push({
+                        id: 'cured_meat',
+                        name: '風乾野味肉乾',
+                        type: 'food',
+                        count: 1,
+                        desc: '在獸徑設伏捕獲並處理的肉食'
+                    });
+                    return {
+                        success: true,
+                        title: '陷阱架設完畢！',
+                        text: '你偽裝好絆繩與套索，收穫了獵物邊角肉料，獲得「風乾野味肉乾 x1」！',
+                        tag: '+口糧儲備'
+                    };
+                }
+            }
+        ]
+    },
+    stream: {
+        id: 'stream',
+        icon: '💧',
+        title: '清冽山林溪流 (Crystal Forest Stream)',
+        typeBadge: '自然水源 / 生存補給',
+        desc: '清澈見底的活水順著卵石河床緩緩流淌，水氣清涼沁脾。你可以痛飲取水，或清洗護理旅途中沾染的污濁與傷口。',
+        statusRenderer: (state) => {
+            if (state.drank && state.washed) return '💧 已暢飲並清理傷口，活水依舊潺潺流淌。';
+            if (state.drank) return '💧 已補充充足飲水，水囊皆已裝滿。';
+            return '⏳ 活水甘甜清澈，波光粼粼。';
+        },
+        actions: [
+            {
+                id: 'drink',
+                name: '💧 汲水痛飲 (Drink Pure Water)',
+                desc: '捧起甘冽溪水痛飲解渴，並灌滿隨身水囊。',
+                type: 'NORMAL',
+                check: null,
+                canPerform: (s) => !s.drank,
+                handler: (state) => {
+                    state.drank = true;
+                    const thirstBar = playerState.player_status?.status_bars?.find(b => b.type === 'thirst' || b.name.includes('水') || b.name.includes('渴'));
+                    if (thirstBar) thirstBar.value = Math.min(thirstBar.max_value || 100, (thirstBar.value || 0) + 40);
+                    return {
+                        success: true,
+                        title: '暢飲活水！',
+                        text: '甘冽山泉驅散了喉間焦渴，水分大幅恢復 +40，隨身水袋已注滿！',
+                        tag: '+水分充盈'
+                    };
+                }
+            },
+            {
+                id: 'wash',
+                name: '🫧 清創清洗 (Wash & Cleanse)',
+                desc: '借清涼活水沖洗皮肉擦傷與泥垢，防止創口感染。',
+                type: 'NORMAL',
+                check: null,
+                canPerform: (s) => !s.washed,
+                handler: (state) => {
+                    state.washed = true;
+                    const hpBar = playerState.player_status?.status_bars?.find(b => b.type === 'hp' || b.name.includes('生命'));
+                    if (hpBar) hpBar.value = Math.min(hpBar.max_value || 100, (hpBar.value || 0) + 15);
+                    return {
+                        success: true,
+                        title: '清洗傷口完畢！',
+                        text: '你細緻地清理了創口周邊的碎石與污跡，傷勢得到妥善緩和，生命值 +15！',
+                        tag: '+創口護理'
+                    };
+                }
+            }
+        ]
     }
 };
 
 function openEnvironmentModal(targetType = 'corpse') {
+    if (typeof isPlayerDeadOrGameOver === 'function' && isPlayerDeadOrGameOver()) {
+        if (typeof showNotification === 'function') {
+            showNotification('☠️ 角色已陷入濒死/阵亡，境地交互已全面锁定！', 'warning');
+        }
+        return;
+    }
     ensureEnvironmentStateExists();
     currentEnvTargetType = targetType;
     const modal = dom.environmentInteractionModal;
     if (!modal) return;
-    modal.classList.remove('hidden');
+    openModal(modal);
 
     // Switch tabs
-    setupEnvironmentModalTabs();
+    setupEnvironmentModalTabs(targetType);
     switchEnvironmentTarget(targetType);
 
     // Bind close buttons
@@ -5272,25 +5691,43 @@ function openEnvironmentModal(targetType = 'corpse') {
     if (dom.envModalCancelBtn) dom.envModalCancelBtn.onclick = () => closeModal(modal);
 }
 
-function setupEnvironmentModalTabs() {
-    const tabMap = [
-        { btn: dom.envTabCorpseBtn, target: 'corpse' },
-        { btn: dom.envTabChestBtn, target: 'chest' },
-        { btn: dom.envTabAltarBtn, target: 'altar' },
-        { btn: dom.envTabFireBtn, target: 'fire' }
-    ];
+function setupEnvironmentModalTabs(activeTarget = 'corpse') {
+    const container = document.getElementById('env-modal-tabs-container') || (dom.envTabCorpseBtn ? dom.envTabCorpseBtn.parentElement : null);
+    if (!container) return;
 
-    tabMap.forEach(item => {
-        if (item.btn) {
-            item.btn.onclick = () => switchEnvironmentTarget(item.target);
-        }
-    });
+    // Get available environment targets for current scene
+    const sceneItems = typeof getDynamicSceneInteractables === 'function' ? getDynamicSceneInteractables() : [];
+    let availableKeys = sceneItems.filter(i => i.isEnv && i.id && i.id.startsWith('env_')).map(i => i.id.replace('env_', ''));
+    if (availableKeys.length === 0) {
+        availableKeys = ['corpse', 'chest', 'altar', 'fire', 'herbs', 'tracks', 'stream'];
+    }
+    if (!availableKeys.includes(activeTarget)) {
+        availableKeys.unshift(activeTarget);
+    }
+
+    container.innerHTML = availableKeys.map(key => {
+        const conf = ENV_OBJECTS_CONFIG[key] || { icon: '📦', title: key };
+        const shortName = conf.title ? conf.title.split(' ')[0] : key;
+        const isCurrent = key === activeTarget;
+        const cls = isCurrent
+            ? 'flex-1 py-1.5 px-2 rounded-lg bg-primary text-white font-bold transition-all flex items-center justify-center gap-1 shadow cursor-pointer text-[11px]'
+            : 'flex-1 py-1.5 px-2 rounded-lg text-slate-400 hover:text-white font-bold transition-all flex items-center justify-center gap-1 cursor-pointer text-[11px] bg-slate-800/40 hover:bg-slate-800';
+        return `
+            <button type="button" class="${cls}" onclick="switchEnvironmentTarget('${key}')">
+                <span>${conf.icon || '📦'}</span> <span>${shortName}</span>
+            </button>
+        `;
+    }).join('');
 }
 
 function switchEnvironmentTarget(targetType) {
     currentEnvTargetType = targetType;
     const config = ENV_OBJECTS_CONFIG[targetType] || ENV_OBJECTS_CONFIG.corpse;
-    const envState = playerState.environment_state[targetType] || {};
+    if (!playerState.environment_state) ensureEnvironmentStateExists();
+    if (!playerState.environment_state[targetType]) playerState.environment_state[targetType] = {};
+    const envState = playerState.environment_state[targetType];
+
+    setupEnvironmentModalTabs(targetType);
 
     // Update Tab Styles
     const tabMap = {
@@ -5483,104 +5920,385 @@ function advanceStoryWithEnvironmentAction(targetType) {
 }
 
 // =========================================================================
-// --- SCENE INTERACTABLES BAR (主界面場景物件與NPC快捷藥丸欄) ---
+// --- SCENE INTERACTABLES BAR (主界面場景物件與NPC快捷藥丸欄 - 動態劇本環境感知) ---
 // =========================================================================
+function isPlayerDeadOrGameOver() {
+    if (!playerState) return false;
+    if (playerState.is_dead || playerState.is_game_over) return true;
+    const hpBar = playerState.player_status?.status_bars?.find(b => b.name.includes('生命') || b.name.toLowerCase().includes('health') || b.type === 'hp');
+    if (hpBar && hpBar.value <= 0) {
+        playerState.is_dead = true;
+        return true;
+    }
+    return false;
+}
+
+function lockAllFeaturesOnDeath() {
+    if (!playerState || (!playerState.is_dead && !playerState.is_game_over)) return;
+
+    // 1. 強制關閉所有可能開啟中的交互型模態視窗
+    const modalsToClose = [
+        dom.campModal,
+        dom.campNpcModal,
+        dom.environmentInteractionModal,
+        dom.shopModal,
+        dom.lootModal,
+        dom.shelterModal,
+        dom.companionProfileModal,
+        document.getElementById('move-location-modal'),
+        document.getElementById('interact-modal'),
+        document.getElementById('survive-modal'),
+        document.getElementById('item-detail-modal'),
+        document.getElementById('quest-detail-modal'),
+        document.getElementById('camp-controls-panel')
+    ];
+    modalsToClose.forEach(m => {
+        if (m && !m.classList.contains('hidden')) {
+            closeModal(m);
+        }
+    });
+
+    // 2. 隱藏並鎖死自訂行動輸入框
+    if (dom.customActionForm) {
+        dom.customActionForm.classList.add('hidden');
+    }
+    if (dom.customActionInput) {
+        dom.customActionInput.disabled = true;
+        dom.customActionInput.value = '';
+        dom.customActionInput.placeholder = '☠️ 英雄已陣亡，所有指令與操作已全面鎖定...';
+    }
+    const customSubmitBtn = document.querySelector('#custom-action-form button[type="submit"]');
+    if (customSubmitBtn) customSubmitBtn.disabled = true;
+
+    if (dom.customActionToggleBtn) {
+        dom.customActionToggleBtn.classList.add('pointer-events-none', 'opacity-40');
+    }
+    if (dom.capsuleBtnCustom) {
+        dom.capsuleBtnCustom.classList.add('pointer-events-none', 'opacity-40');
+    }
+
+    // 3. 鎖死營地休整按鈕
+    const respiteBtn = document.getElementById('respite-action-btn');
+    if (respiteBtn) {
+        respiteBtn.disabled = true;
+        respiteBtn.classList.add('opacity-40', 'pointer-events-none');
+    }
+
+    // 4. 更新境地即時交互欄為完全鎖定提示
+    if (dom.sceneInteractablesBar) {
+        dom.sceneInteractablesBar.innerHTML = `
+            <div class="w-full py-2 px-3 rounded-xl bg-rose-950/80 border border-rose-800/80 text-rose-300 text-xs flex items-center justify-between font-mono select-none shadow-[0_0_15px_rgba(225,29,72,0.3)]">
+                <span class="flex items-center gap-2 font-bold"><i class="ph-bold ph-skull text-rose-400 text-base animate-pulse"></i> 角色已陣亡/瀕死，境地即時交互已全面鎖死</span>
+                <span class="text-[10px] text-rose-300 font-black bg-rose-900/60 px-2 py-0.5 rounded border border-rose-700/60">LOCKED</span>
+            </div>
+        `;
+    }
+}
+
+function getDynamicSceneInteractables() {
+    if (!playerState) return [];
+
+    // 1. 死亡/終局檢驗
+    if (isPlayerDeadOrGameOver()) {
+        return [];
+    }
+
+    const items = [];
+    const npcStates = playerState.npc_state || {};
+    const envStates = playerState.environment_state || {};
+    const ws = playerState.world_state || {};
+    const loc = (ws.location || ws.current_location || '').toLowerCase();
+    const zoneType = (playerState.zone_type || ws.zone_type || '').toLowerCase();
+    const genre = typeof getActiveGameGenre === 'function' ? getActiveGameGenre() : '西幻冒險';
+    const lastStory = (adventureLog && adventureLog.length > 0 ? (adventureLog[adventureLog.length - 1] || '') : '').toLowerCase();
+
+    // 2. 戰鬥狀態感知
+    const inCombat = isInCombat || (combatTarget && combatTarget.hp > 0) || pendingCombatEncounter || ws.flags?.in_combat || ws.flags?.chase_active;
+    if (inCombat) {
+        if (npcStates.companion?.recruited && !npcStates.companion?.is_dead) {
+            const compProf = getNpcWorldviewProfile('companion', genre);
+            items.push({
+                id: 'comp_tactical',
+                icon: '⚔️',
+                name: `${compProf.shortName} · 戰術掩護`,
+                tag: '戰術協同',
+                isCombatNpc: true,
+                onClick: () => {
+                    showNotification(`⚔️ ${compProf.shortName} 正在為你尋找夾角牽制敵方，尋找破綻！`, 'info');
+                }
+            });
+        }
+        items.push({
+            id: 'combat_cover',
+            icon: '🛡️',
+            name: '就地翻倒掩體據守',
+            tag: '戰術防禦',
+            isEnv: true,
+            onClick: () => {
+                if (typeof processPlayerChoice === 'function') {
+                    processPlayerChoice('利用現場障礙與掩體進行戰術防禦與隱蔽');
+                }
+            }
+        });
+        items.push({
+            id: 'combat_distract',
+            icon: '💥',
+            name: '就地取物干擾敵陣',
+            tag: '戰術牽制',
+            isEnv: true,
+            onClick: () => {
+                if (typeof processPlayerChoice === 'function') {
+                    processPlayerChoice('投擲石塊或掀翻環境物件干擾強敵視線');
+                }
+            }
+        });
+        return items;
+    }
+
+    // 3. 環境與安全聚落判斷
+    const isSafeHub = zoneType === 'safe' || zoneType === 'hub' || zoneType === 'town' || 
+        ['城', '鎮', '村', '聚落', '工坊', '據點', '公會', '驛站', '港', '避風', '酒館', '神殿', '市集', '庇護所', '避難所', '基地', '哨站', 'town', 'city', 'village', 'haven', 'camp', 'outpost', 'sanctuary', 'tavern', 'inn']
+        .some(k => loc.includes(k));
+
+    // A. 隨行同伴
+    const compProf = getNpcWorldviewProfile('companion', genre);
+    if (npcStates.companion?.recruited && !npcStates.companion?.is_dead) {
+        items.push({
+            id: 'npc_companion',
+            icon: compProf.avatar,
+            name: compProf.recruitedName,
+            tag: '隨行中',
+            isHostile: false,
+            isDead: false,
+            onClick: () => openNpcModal('companion', 'dialogue')
+        });
+    } else if (!npcStates.companion?.recruited && !npcStates.companion?.is_dead) {
+        const compMentions = [compProf.unrecruitedName.toLowerCase(), compProf.shortName.toLowerCase(), '同伴', '同行者', '美少女', '少女', '旅人'];
+        if (compMentions.some(m => lastStory.includes(m))) {
+            items.push({
+                id: 'npc_companion',
+                icon: compProf.avatar,
+                name: compProf.unrecruitedName,
+                tag: `${npcStates.companion?.favor || 0}% · 偶遇`,
+                isHostile: false,
+                isDead: false,
+                onClick: () => openNpcModal('companion', 'dialogue')
+            });
+        }
+    }
+
+    // B. 城鎮/據點 NPC：鐵匠、醫師、線人、委託人（僅在安全據點或劇情明確提及時才出現！）
+    const bsProf = getNpcWorldviewProfile('blacksmith', genre);
+    const medProf = getNpcWorldviewProfile('medic', genre);
+    const infoProf = getNpcWorldviewProfile('informant', genre);
+    const questProf = getNpcWorldviewProfile('quest_giver', genre);
+
+    if (isSafeHub || lastStory.includes('鐵匠') || lastStory.includes('鍛造') || loc.includes('工坊') || loc.includes('鐵匠')) {
+        if (!npcStates.blacksmith?.is_dead) {
+            items.push({
+                id: 'npc_blacksmith',
+                icon: bsProf.avatar,
+                name: bsProf.name,
+                tag: npcStates.blacksmith?.is_hostile ? '仇視' : `${npcStates.blacksmith?.favor || 20}%`,
+                isHostile: npcStates.blacksmith?.is_hostile,
+                isDead: false,
+                onClick: () => openNpcModal('blacksmith', 'dialogue')
+            });
+        }
+    }
+
+    if (isSafeHub || lastStory.includes('醫') || lastStory.includes('草藥師') || lastStory.includes('診所') || loc.includes('醫')) {
+        if (!npcStates.medic?.is_dead) {
+            items.push({
+                id: 'npc_medic',
+                icon: medProf.avatar,
+                name: medProf.name,
+                tag: npcStates.medic?.is_hostile ? '仇視' : `${npcStates.medic?.favor || 20}%`,
+                isHostile: npcStates.medic?.is_hostile,
+                isDead: false,
+                onClick: () => openNpcModal('medic', 'dialogue')
+            });
+        }
+    }
+
+    if (isSafeHub || lastStory.includes('情報') || lastStory.includes('暗線') || lastStory.includes('線人') || lastStory.includes('酒館') || loc.includes('酒館')) {
+        if (!npcStates.informant?.is_dead) {
+            items.push({
+                id: 'npc_informant',
+                icon: infoProf.avatar,
+                name: infoProf.name,
+                tag: npcStates.informant?.is_hostile ? '仇視' : `${npcStates.informant?.favor || 15}%`,
+                isHostile: npcStates.informant?.is_hostile,
+                isDead: false,
+                onClick: () => openNpcModal('informant', 'dialogue')
+            });
+        }
+    }
+
+    if (isSafeHub || lastStory.includes('委託') || lastStory.includes('公會') || lastStory.includes('懸賞') || loc.includes('公會')) {
+        items.push({
+            id: 'npc_quest_giver',
+            icon: questProf.avatar || '📋',
+            name: questProf.name || '據點委託人',
+            tag: '委託發布',
+            isHostile: false,
+            isDead: false,
+            onClick: () => openNpcModal('quest_giver', 'quest')
+        });
+    }
+
+    // C. 動態劇情 NPC (由後端 AI 劇情產生的角色)
+    if (playerState.current_scene_npcs && Array.isArray(playerState.current_scene_npcs)) {
+        playerState.current_scene_npcs.forEach(npc => {
+            if (npc && npc.name) {
+                items.push({
+                    id: `dyn_npc_${npc.id || npc.name}`,
+                    icon: npc.avatar || '👤',
+                    name: npc.name,
+                    tag: npc.role || '劇情人物',
+                    isDynamicNpc: true,
+                    onClick: () => {
+                        if (typeof showDialogueLog === 'function') {
+                            showDialogueLog(`💬 你與「${npc.name}」進行交涉交談：\n“${npc.dialogue || npc.desc || '旅行者，有何指教？'}”`);
+                        }
+                        showNotification(`💬 正與場景人物【${npc.name}】交談中`, 'info');
+                    }
+                });
+            }
+        });
+    }
+
+    // D. 契合環境地貌的可交互物件
+    const isUnderground = loc.includes('洞') || loc.includes('地下') || loc.includes('地牢') || loc.includes('墓') || loc.includes('暗道') || loc.includes('牢') || loc.includes('石室') || zoneType === 'maze';
+    const isForestOrWild = loc.includes('森') || loc.includes('林') || loc.includes('野') || loc.includes('山') || loc.includes('嶺') || loc.includes('谷') || loc.includes('島') || loc.includes('荒') || zoneType === 'wild';
+    const isWater = loc.includes('水') || loc.includes('海') || loc.includes('湖') || loc.includes('溪') || loc.includes('河') || loc.includes('瀑');
+
+    // 1) 罹難者遺骸：只在地下城、古戰場、遺跡荒野出現，且未安葬/焚化
+    if (isUnderground || loc.includes('遺蹟') || loc.includes('遺跡') || loc.includes('戰場') || loc.includes('廢墟') || loc.includes('殘骸')) {
+        const corpseState = envStates.corpse || {};
+        if (!corpseState.buried && !corpseState.burned) {
+            items.push({
+                id: 'env_corpse',
+                icon: '💀',
+                name: '罹難者遺骸',
+                tag: corpseState.looted ? '已空' : '搜刮/安葬',
+                isEnv: true,
+                onClick: () => openEnvironmentModal('corpse')
+            });
+        }
+    }
+
+    // 2) 暗箱/寶箱：密室、地牢、藏寶庫
+    if (isUnderground || loc.includes('遺蹟') || loc.includes('遺跡') || loc.includes('密室') || loc.includes('庫') || loc.includes('堡') || loc.includes('暗箱')) {
+        const chestState = envStates.chest || {};
+        items.push({
+            id: 'env_chest',
+            icon: '📦',
+            name: '鎖閉暗箱',
+            tag: chestState.looted ? '已空' : (chestState.unlocked ? '已解鎖' : '撬鎖/排查'),
+            isEnv: true,
+            onClick: () => openEnvironmentModal('chest')
+        });
+    }
+
+    // 3) 神龕/祭壇：聖殿、神殿、古老遺跡
+    if (loc.includes('神') || loc.includes('殿') || loc.includes('廟') || loc.includes('壇') || loc.includes('聖') || loc.includes('祠') || loc.includes('遺蹟') || loc.includes('遺跡') || isSafeHub) {
+        const altarState = envStates.altar || {};
+        items.push({
+            id: 'env_altar',
+            icon: '⛩️',
+            name: '古老神龕',
+            tag: altarState.prayed ? '已受庇護' : (altarState.desecrated ? '已毀壞' : '祈願/銘文'),
+            isEnv: true,
+            onClick: () => openEnvironmentModal('altar')
+        });
+    }
+
+    // 4) 野生草藥：森林、山地、曠野
+    if (isForestOrWild && !isUnderground) {
+        const herbState = envStates.herbs || {};
+        items.push({
+            id: 'env_herbs',
+            icon: '🌿',
+            name: '野生草藥叢',
+            tag: herbState.harvested ? '已採摘' : '採集/辨毒',
+            isEnv: true,
+            onClick: () => openEnvironmentModal('herbs')
+        });
+    }
+
+    // 5) 野獸足跡：荒野獵道
+    if (isForestOrWild && !isSafeHub) {
+        const trackState = envStates.tracks || {};
+        items.push({
+            id: 'env_tracks',
+            icon: '🐾',
+            name: '泥濘野獸足跡',
+            tag: trackState.investigated ? '已判讀' : '追蹤/設阱',
+            isEnv: true,
+            onClick: () => openEnvironmentModal('tracks')
+        });
+    }
+
+    // 6) 溪流活水：水系地形
+    if (isWater) {
+        const streamState = envStates.stream || {};
+        items.push({
+            id: 'env_stream',
+            icon: '💧',
+            name: '清冽山林溪流',
+            tag: streamState.drank ? '已取水' : '汲水/清洗',
+            isEnv: true,
+            onClick: () => openEnvironmentModal('stream')
+        });
+    }
+
+    // 7) 避風營火：僅當點燃營火、或身處營地/安全聚落時才存在
+    const campState = playerState.camp_state || {};
+    if (campState.campfire_lit || isSafeHub || loc.includes('營地') || loc.includes('营地')) {
+        const fireState = envStates.fire || {};
+        items.push({
+            id: 'env_fire',
+            icon: '🔥',
+            name: '避風營火',
+            tag: fireState.cooked ? '已烹飪' : '烹飪/添柴',
+            isEnv: true,
+            onClick: () => openEnvironmentModal('fire')
+        });
+    }
+
+    return items;
+}
+
 function renderSceneInteractables() {
     const bar = dom.sceneInteractablesBar;
     if (!bar) return;
     ensureCampStateExists();
     ensureEnvironmentStateExists();
 
-    const npcStates = playerState.npc_state || {};
-    const envStates = playerState.environment_state || {};
+    if (isPlayerDeadOrGameOver()) {
+        lockAllFeaturesOnDeath();
+        return;
+    }
 
-    const genre = getActiveGameGenre();
-    const bsProf = getNpcWorldviewProfile('blacksmith', genre);
-    const medProf = getNpcWorldviewProfile('medic', genre);
-    const infoProf = getNpcWorldviewProfile('informant', genre);
-    const compProf = getNpcWorldviewProfile('companion', genre);
-    const isCompRecruited = Boolean(npcStates.companion?.recruited);
-    const compDisplayName = isCompRecruited ? compProf.recruitedName : compProf.unrecruitedName;
-    const compTag = npcStates.companion?.is_dead ? '陣亡' : (isCompRecruited ? '隨行中' : (npcStates.companion?.favor ? `未結伴 · ${npcStates.companion.favor}%` : '未結伴'));
+    const items = getDynamicSceneInteractables();
 
-    const items = [
-        // NPCs
-        {
-            id: 'npc_blacksmith',
-            icon: bsProf.avatar,
-            name: bsProf.name,
-            tag: npcStates.blacksmith?.is_dead ? '陣亡' : `${npcStates.blacksmith?.favor || 20}%`,
-            isHostile: npcStates.blacksmith?.is_hostile,
-            isDead: npcStates.blacksmith?.is_dead,
-            onClick: () => openNpcModal('blacksmith', 'dialogue')
-        },
-        {
-            id: 'npc_medic',
-            icon: medProf.avatar,
-            name: medProf.name,
-            tag: npcStates.medic?.is_dead ? '陣亡' : `${npcStates.medic?.favor || 20}%`,
-            isHostile: npcStates.medic?.is_hostile,
-            isDead: npcStates.medic?.is_dead,
-            onClick: () => openNpcModal('medic', 'dialogue')
-        },
-        {
-            id: 'npc_informant',
-            icon: infoProf.avatar,
-            name: infoProf.name,
-            tag: npcStates.informant?.is_dead ? '陣亡' : `${npcStates.informant?.favor || 15}%`,
-            isHostile: npcStates.informant?.is_hostile,
-            isDead: npcStates.informant?.is_dead,
-            onClick: () => openNpcModal('informant', 'dialogue')
-        },
-        {
-            id: 'npc_companion',
-            icon: compProf.avatar,
-            name: compDisplayName,
-            tag: compTag,
-            isHostile: npcStates.companion?.is_hostile,
-            isDead: npcStates.companion?.is_dead,
-            onClick: () => openNpcModal('companion', 'dialogue')
-        },
-        // Environmental Interactables
-        {
-            id: 'env_corpse',
-            icon: '💀',
-            name: '罹難者遺骸',
-            tag: envStates.corpse?.buried ? '已安葬' : (envStates.corpse?.looted ? '已搜刮' : '搜刮/安葬'),
-            isEnv: true,
-            onClick: () => openEnvironmentModal('corpse')
-        },
-        {
-            id: 'env_chest',
-            icon: '📦',
-            name: '鎖閉暗箱',
-            tag: envStates.chest?.looted ? '已空' : (envStates.chest?.unlocked ? '已解鎖' : '撬鎖/排查'),
-            isEnv: true,
-            onClick: () => openEnvironmentModal('chest')
-        },
-        {
-            id: 'env_altar',
-            icon: '⛩️',
-            name: '古老神龕',
-            tag: envStates.altar?.prayed ? '已受庇護' : (envStates.altar?.desecrated ? '已毀壞' : '祈願/銘文'),
-            isEnv: true,
-            onClick: () => openEnvironmentModal('altar')
-        },
-        {
-            id: 'env_fire',
-            icon: '🔥',
-            name: '避風營火',
-            tag: envStates.fire?.cooked ? '已烹飪' : '烹飪/修整',
-            isEnv: true,
-            onClick: () => openEnvironmentModal('fire')
-        }
-    ];
+    if (!items || items.length === 0) {
+        bar.innerHTML = `
+            <div class="text-[11px] text-slate-500 italic px-2 py-1 flex items-center gap-1 select-none">
+                <i class="ph-bold ph-compass"></i> 四周寂靜荒涼，暫無可交互的人物或特定環境物件。
+            </div>
+        `;
+        return;
+    }
 
     bar.innerHTML = items.map((item, idx) => {
         let badgeBg = 'bg-slate-900/90 text-slate-200 border-white/10 hover:border-amber-500/50 hover:bg-slate-850';
         if (item.isDead) badgeBg = 'bg-stone-900 text-stone-500 line-through border-stone-800';
         else if (item.isHostile) badgeBg = 'bg-rose-950 text-rose-300 border-rose-600/50 animate-pulse';
         else if (item.isEnv) badgeBg = 'bg-amber-950/30 text-amber-200 border-amber-500/30 hover:border-amber-400 hover:bg-amber-900/50';
+        else if (item.isCombatNpc) badgeBg = 'bg-red-950/40 text-red-200 border-red-500/40 hover:border-red-400';
+        else if (item.isDynamicNpc) badgeBg = 'bg-indigo-950/40 text-indigo-200 border-indigo-500/40 hover:border-indigo-400';
 
         return `
             <button type="button" id="interactable-pill-${idx}" class="px-2.5 py-1 rounded-full border text-[11px] font-bold transition-all shadow-sm flex items-center gap-1.5 cursor-pointer whitespace-nowrap flex-shrink-0 select-none ${badgeBg}">
@@ -5594,7 +6312,7 @@ function renderSceneInteractables() {
     // Attach click handlers
     items.forEach((item, idx) => {
         const el = document.getElementById(`interactable-pill-${idx}`);
-        if (el) el.onclick = item.onClick;
+        if (el && item.onClick) el.onclick = item.onClick;
     });
 }
 
@@ -7089,23 +7807,326 @@ function applySurvivalTurnDecay() {
     }
 }
 
-function checkSurvivalActionAllowed() {
-    if (isInCombat) {
-        showNotification(isChinese(currentLang) ? tZh('🚨 戰鬥進行中，無法進行露營或調整住所！') : '🚨 In combat! Cannot set camp or adjust shelter.', 'error');
-        return false;
+function evaluateCampEnvironment(state) {
+    const curPlayer = state || playerState;
+    if (!curPlayer) {
+        return {
+            isSafe: false,
+            dangerLevel: 'extreme',
+            dangerReason: '状态未就绪',
+            canCamp: false,
+            campBlockReason: '无法读取当前冒险状态',
+            canSleep: false,
+            sleepBlockReason: '冒险状态异常',
+            sleepHazardWarning: '',
+            canFire: false,
+            fireBlockReason: '冒险状态异常',
+            canChop: false,
+            chopBlockReason: '冒险状态异常',
+            canForage: false,
+            forageBlockReason: '冒险状态异常',
+            canCook: false,
+            cookBlockReason: '冒险状态异常',
+            canUpgrade: false,
+            upgradeBlockReason: '冒险状态异常',
+            canRestBanter: false,
+            banterBlockReason: '冒险状态异常',
+            canHealWounds: false,
+            healBlockReason: '冒险状态异常',
+            activeHazards: []
+        };
     }
-    if (playerState && playerState.explore_state) {
-        const zone = playerState.explore_state.zone_type;
-        if (zone === 'maze') {
-            showNotification(isChinese(currentLang) ? tZh('🌀 迷宮深處危機四伏，在此處安營等於自尋死路！') : '🌀 The maze is too dangerous to set camp or shelter.', 'error');
-            return false;
-        }
+
+    const ws = curPlayer.world_state || {};
+    const flags = ws.flags || {};
+    const loc = (ws.location || ws.current_location || '').toLowerCase();
+    const weather = (ws.weather || ws.climate || '').toLowerCase();
+    const envDesc = (ws.environment || ws.danger || '').toLowerCase();
+    const debuffs = (curPlayer.player_status?.debuffs || []).map(d => typeof d === 'string' ? d.toLowerCase() : (d.name || '').toLowerCase());
+    
+    // Check recent adventure log text for active environmental threats
+    const recentLog = (typeof adventureLog !== 'undefined' && Array.isArray(adventureLog) && adventureLog.length > 0) 
+        ? adventureLog.slice(-4).join(' ').toLowerCase() 
+        : '';
+
+    const inCombat = !!(isInCombat || pendingCombatEncounter || (combatTarget && combatTarget.hp > 0) || flags.in_combat || flags.combat_active || ws.current_state === 'COMBAT');
+    const isChasing = !!(flags.chase_active || flags.escape_active || flags.pursued);
+    const disableRestFlag = !!(flags.disable_rest || ws.allow_rest === false);
+    const inMaze = !!(curPlayer.explore_state?.zone_type === 'maze' || loc.includes('迷宫') || loc.includes('maze'));
+    
+    // 1. Extreme Crisis / Combat Lockout
+    if (inCombat) {
+        return {
+            isSafe: false,
+            dangerLevel: 'combat',
+            dangerReason: '🚨 战斗交战中！敌众迫在眉睫，严禁扎营休整与安顿装备',
+            canCamp: false,
+            campBlockReason: '战斗交战中，无法安顿装备或休整！',
+            canSleep: false,
+            sleepBlockReason: '交战中无法入眠',
+            sleepHazardWarning: '',
+            canFire: false,
+            fireBlockReason: '交战中无法生火',
+            canChop: false,
+            chopBlockReason: '交战中无法伐木',
+            canForage: false,
+            forageBlockReason: '交战中无法觅食',
+            canCook: false,
+            cookBlockReason: '交战中无法烹饪',
+            canUpgrade: false,
+            upgradeBlockReason: '交战中无法加固庇护所',
+            canRestBanter: false,
+            banterBlockReason: '交战中无法促膝长谈',
+            canHealWounds: false,
+            healBlockReason: '交战状态请在主界面使用战斗道具或技能',
+            activeHazards: ['交火与敌袭迫在眉睫']
+        };
+    }
+
+    if (isChasing) {
+        return {
+            isSafe: false,
+            dangerLevel: 'extreme',
+            dangerReason: '🏃 追击/逃亡中！身后有致命威胁逼近，无法停步安营',
+            canCamp: false,
+            campBlockReason: '紧急逃亡与撤离阶段，停步扎营必遭包围捕杀！',
+            canSleep: false,
+            sleepBlockReason: '正在遭受搜捕追杀，停留休眠必死无疑',
+            sleepHazardWarning: '',
+            canFire: false,
+            fireBlockReason: '生火火光与烟雾将暴露行踪',
+            canChop: false,
+            chopBlockReason: '逃跑途中无法伐木',
+            canForage: false,
+            forageBlockReason: '逃跑途中无法停步采集',
+            canCook: false,
+            cookBlockReason: '逃亡中无法开火做饭',
+            canUpgrade: false,
+            upgradeBlockReason: '逃亡中无法搭建工事',
+            canRestBanter: false,
+            banterBlockReason: '急速奔逃中无法长谈',
+            canHealWounds: false,
+            healBlockReason: '奔袭颠簸中无法静心包扎',
+            activeHazards: ['敌军紧急搜捕追杀中']
+        };
+    }
+
+    // 2. Terrain & Environment Hazard Analysis
+    const activeHazards = [];
+    const isFreezing = weather.includes('雪') || weather.includes('寒') || weather.includes('冰') || loc.includes('雪') || loc.includes('冰') || loc.includes('极地') || envDesc.includes('寒') || recentLog.includes('暴风雪') || recentLog.includes('严寒') || debuffs.some(d => d.includes('寒') || d.includes('失温'));
+    if (isFreezing) activeHazards.push('❄️ 极寒低温/暴雪风霜');
+
+    const isToxic = loc.includes('毒') || loc.includes('瘴') || loc.includes('辐射') || loc.includes('腐蚀') || envDesc.includes('毒') || envDesc.includes('辐射') || recentLog.includes('毒瘴') || recentLog.includes('辐射') || debuffs.some(d => d.includes('毒') || d.includes('辐射'));
+    if (isToxic) activeHazards.push('☣️ 毒气瘴气/生化辐射');
+
+    const isUndergroundOrCave = loc.includes('洞') || loc.includes('地牢') || loc.includes('地下') || loc.includes('矿坑') || loc.includes('墓') || loc.includes('牢') || loc.includes('牢房') || loc.includes('下水道') || loc.includes('石室') || inMaze;
+    if (isUndergroundOrCave) activeHazards.push('🕳️ 地下密封/洞窟石室');
+
+    const isWaterOrCliff = loc.includes('水下') || loc.includes('深海') || loc.includes('悬崖') || loc.includes('绝壁') || loc.includes('空中') || loc.includes('绳索');
+    if (isWaterOrCliff) activeHazards.push('🌊 险恶地形（水下/绝壁悬崖）');
+
+    const isStormy = weather.includes('暴雨') || weather.includes('台风') || weather.includes('飓风') || weather.includes('雷暴') || envDesc.includes('暴雨') || recentLog.includes('狂风暴雨');
+    if (isStormy) activeHazards.push('🌧️ 狂风骤雨/暴风肆虐');
+
+    const isLava = loc.includes('熔岩') || loc.includes('火山') || loc.includes('火海') || envDesc.includes('熔岩');
+    if (isLava) activeHazards.push('🔥 极热熔岩/烈焰热浪');
+
+    // 3. Shelter & Fire Protection Status
+    const shelterLevel = curPlayer.camp_state?.shelter_level || curPlayer.shelter_state?.shelter_level || 0;
+    const isFireLit = !!(curPlayer.camp_state?.campfire_lit || curPlayer.shelter_state?.campfire_lit);
+    const isSafeZone = curPlayer.zone_type === 'safe' || curPlayer.explore_state?.zone_type === 'safe' || loc.includes('旅馆') || loc.includes('聚落') || loc.includes('村') || loc.includes('城') || loc.includes('要塞') || loc.includes('安全区') || shelterLevel >= 3;
+
+    // 4. Feature specific gating
+    let canCamp = true;
+    let campBlockReason = '';
+    if (isWaterOrCliff) {
+        canCamp = false;
+        campBlockReason = '身处水下深潜或峭壁绝境，无平整干燥地面安营！';
+    } else if (inMaze && !isSafeZone) {
+        canCamp = false;
+        campBlockReason = '迷宫深处机关重重四面埋伏，在此安营无异于自投罗网！';
+    } else if (disableRestFlag) {
+        canCamp = false;
+        campBlockReason = '当前剧情局势紧迫，受任务环境制约无法就地休整！';
+    }
+
+    let canSleep = canCamp;
+    let sleepBlockReason = '';
+    let sleepHazardWarning = '';
+    if (!canCamp) {
+        canSleep = false;
+        sleepBlockReason = campBlockReason;
+    } else if (isToxic && shelterLevel < 2) {
+        canSleep = false;
+        sleepBlockReason = '周围弥漫致命毒瘴且无防毒密封掩体，休眠将导致重度窒息毒毙！';
+    } else if (isFreezing && !isFireLit && shelterLevel < 2) {
+        sleepHazardWarning = '极寒暴雪肆虐且未点燃营火，在此休眠将遭受严重失温冻伤伤害！';
+    } else if (!isSafeZone && shelterLevel === 0 && (ws.danger_level || 1) >= 3) {
+        canSleep = false;
+        sleepBlockReason = '周围凶兽游弋且无任何防御掩体，在此入睡将遭到致命夜袭！';
+    }
+
+    let canFire = true;
+    let fireBlockReason = '';
+    if (loc.includes('水下') || loc.includes('深海')) {
+        canFire = false;
+        fireBlockReason = '水下浸泡环境中无法点燃明火！';
+    } else if (isStormy && shelterLevel < 1) {
+        canFire = false;
+        fireBlockReason = '狂风骤雨导致火种瞬间浇灭，需先搭建遮雨避难所方能生火！';
+    } else if (loc.includes('瓦斯') || envDesc.includes('可燃气体') || recentLog.includes('可燃瓦斯')) {
+        canFire = false;
+        fireBlockReason = '周遭弥漫高浓度可燃气体，点火将引发剧烈爆炸！';
+    }
+
+    let canChop = true;
+    let chopBlockReason = '';
+    if (isUndergroundOrCave) {
+        chopBlockReason = '地下石室、矿坑与地牢深处缺乏树木林木，无法伐木！';
+        canChop = false;
+    } else if (loc.includes('沙漠') || loc.includes('荒漠') || loc.includes('戈壁')) {
+        chopBlockReason = '黄沙戈壁寸草不生，缺乏可伐柴木！';
+        canChop = false;
+    } else if (isLava) {
+        chopBlockReason = '熔岩焦土树木已化为焦炭灰烬，无法砍柴！';
+        canChop = false;
+    } else if (isWaterOrCliff) {
+        chopBlockReason = '绝壁险地或水中无法伐木！';
+        canChop = false;
+    }
+
+    let canForage = true;
+    let forageBlockReason = '';
+    if (isToxic) {
+        forageBlockReason = '水源植被受重度毒化或辐射污染，采集物不可饮用！';
+        canForage = false;
+    } else if (isLava) {
+        forageBlockReason = '焦土灼热干枯，无地表纯净水源或野果！';
+        canForage = false;
+    } else if (loc.includes('荒漠') || loc.includes('沙漠')) {
+        forageBlockReason = '干旱沙漠地表水源枯竭，无法采摘野果！';
+        canForage = false;
+    } else if (loc.includes('石室') || loc.includes('密室') || loc.includes('地牢牢房')) {
+        forageBlockReason = '人工封闭石室无天然活水与野生浆果！';
+        canForage = false;
+    }
+
+    let canCook = true;
+    let cookBlockReason = '';
+    if (!isFireLit && shelterLevel < 2 && !isSafeZone) {
+        cookBlockReason = '未点燃营火且无炉灶设施，无法烹制熟食！';
+        canCook = false;
+    } else if (isStormy && shelterLevel < 1) {
+        cookBlockReason = '暴雨倾盆无法露天架锅烹饪，需避雨掩体！';
+        canCook = false;
+    }
+
+    let canUpgrade = true;
+    let upgradeBlockReason = '';
+    if (isWaterOrCliff) {
+        upgradeBlockReason = '险恶地形无法建造或加固营地庇护所！';
+        canUpgrade = false;
+    } else if (inMaze && !isSafeZone) {
+        upgradeBlockReason = '迷宫变幻莫测，无法修筑据点工事！';
+        canUpgrade = false;
+    }
+
+    let canRestBanter = true;
+    let banterBlockReason = '';
+    const compState = curPlayer.npc_state?.companion;
+    if (!compState || !compState.recruited) {
+        banterBlockReason = '当前尚无结识同行之同伴，可独坐整装沉思';
+        canRestBanter = false;
+    } else if (!canCamp) {
+        banterBlockReason = '环境危急万分，无法从容闲谈！';
+        canRestBanter = false;
+    }
+
+    let canHealWounds = true;
+    let healBlockReason = '';
+    if (isStormy && shelterLevel < 1) {
+        healBlockReason = '暴风雨露天淋漓，泥泞污浊接触伤口将导致感染，需避雨掩体！';
+        canHealWounds = false;
+    } else if (isToxic && shelterLevel < 2) {
+        healBlockReason = '毒瘴直接渗入伤口将加速溃烂，需在封闭庇护所或脱离毒区后包扎！';
+        canHealWounds = false;
+    }
+
+    return {
+        isSafe: isSafeZone,
+        dangerLevel: isSafeZone ? 'safe' : (activeHazards.length > 0 ? 'hostile' : 'wild'),
+        dangerReason: isSafeZone ? '🟢 避风安全区域，适宜休整与安顿' : (activeHazards.length > 0 ? `⚠️ 恶劣环境：${activeHazards.join('、')}` : '🟡 荒野开阔地，需提防野外风险'),
+        canCamp,
+        campBlockReason,
+        canSleep,
+        sleepBlockReason,
+        sleepHazardWarning,
+        canFire,
+        fireBlockReason,
+        canChop,
+        chopBlockReason,
+        canForage,
+        forageBlockReason,
+        canCook,
+        cookBlockReason,
+        canUpgrade,
+        upgradeBlockReason,
+        canRestBanter,
+        banterBlockReason,
+        canHealWounds,
+        healBlockReason,
+        activeHazards
+    };
+}
+window.evaluateCampEnvironment = evaluateCampEnvironment;
+
+function checkSurvivalActionAllowed() {
+    const env = evaluateCampEnvironment(playerState);
+    if (!env.canCamp) {
+        showNotification(`🚫 环境危急（${env.campBlockReason}），无法设立营地或休整！`, 'error');
+        return false;
     }
     return true;
 }
 
 async function handleCampAPIAction(actionType) {
-    if (!checkSurvivalActionAllowed()) return;
+    const env = evaluateCampEnvironment(playerState);
+
+    // Strict Environmental and Contextual Validation
+    if (actionType === 'sleep' || actionType === 'rest') {
+        if (!env.canCamp) {
+            showNotification(`🚫 无法休整：${env.campBlockReason}`, 'error');
+            return;
+        }
+        if (!env.canSleep) {
+            showNotification(`🚫 无法入眠：${env.sleepBlockReason}`, 'error');
+            return;
+        }
+        if (env.sleepHazardWarning) {
+            showNotification(`⚠️ 环境严酷警告：${env.sleepHazardWarning}`, 'warning');
+        }
+    } else if (actionType === 'stoke_fire') {
+        if (!env.canFire) {
+            showNotification(`🚫 无法生火：${env.fireBlockReason}`, 'error');
+            return;
+        }
+    } else if (actionType === 'chop_wood') {
+        if (!env.canChop) {
+            showNotification(`🚫 无法伐木：${env.chopBlockReason}`, 'error');
+            return;
+        }
+    } else if (actionType === 'forage_food_water') {
+        if (!env.canForage) {
+            showNotification(`🚫 无法采集：${env.forageBlockReason}`, 'error');
+            return;
+        }
+    } else if (actionType === 'upgrade_shelter') {
+        if (!env.canUpgrade) {
+            showNotification(`🚫 无法加固避难所：${env.upgradeBlockReason}`, 'error');
+            return;
+        }
+    }
+
     ensureSurvivalStateExists();
     ensureCampStateExists();
 
@@ -7149,29 +8170,23 @@ async function handleCampAPIAction(actionType) {
             }
         }
 
-        // Central SSOT update for all UI components
+        // Central SSOT update for all UI components - does NOT force story advancement!
         syncGameState(playerState);
         updateCampUI();
+        if (typeof updateStoryRespiteModal === 'function') {
+            updateStoryRespiteModal();
+        }
         showDialogueLog(data.message);
         showNotification(data.message, data.ambushed ? 'warning' : 'success');
+        if (typeof adventureLog !== 'undefined' && Array.isArray(adventureLog)) {
+            adventureLog.push(`<span class="${data.ambushed ? 'text-rose-400' : 'text-amber-300'} font-semibold">${data.message}</span>`);
+            if (typeof renderAdventureLog === 'function') renderAdventureLog();
+        }
 
         if (actionType === 'sleep' || actionType === 'rest') {
             triggerVisualEffect(data.ambushed ? 'danger_flash' : 'heal_glow');
-            closeModal(dom.campModal);
-
-            // Construct Rest Narrative prompt for AI GM
-            let narrativeAction = '';
-            if (data.ambushed) {
-                narrativeAction = `[System Action: Player slept in camp. An ambush occurred during the night! Ambush damage sustained. Trigger combat encounter immediately with "start_combat" in JSON.]`;
-            } else {
-                narrativeAction = `[System Action: Player rested peacefully in camp (Day ${playerState.camp_state?.days || 1}). Advanced time and refreshed vitals.]`;
-            }
-            setTimeout(() => processPlayerChoice(narrativeAction), 800);
         } else if (actionType === 'upgrade_shelter') {
             triggerVisualEffect('level_up_glow');
-            const systemAction = `[System: Player upgraded shelter to Lv${playerState.camp_state?.shelter_level || 1}].`;
-            setTimeout(() => processPlayerChoice(systemAction), 800);
-            closeModal(dom.shelterModal);
         } else if (actionType === 'stoke_fire') {
             triggerVisualEffect('magic_border');
         } else if (actionType === 'chop_wood' || actionType === 'forage_food_water') {
@@ -7283,9 +8298,15 @@ function registerSurvivalEventListeners() {
     // 4. Cook Meal
     if (dom.campCookBtn) {
         dom.campCookBtn.addEventListener('click', () => {
+            const env = evaluateCampEnvironment(playerState);
+            if (!env.canCook) {
+                showNotification(`🚫 环境受限无法烹饪：${env.cookBlockReason}`, 'warning');
+                return;
+            }
+
             ensureSurvivalStateExists();
             const state = playerState.shelter_state;
-            if (!state.campfire_lit) {
+            if (!state.campfire_lit && !env.isSafe) {
                 showNotification(isChinese(currentLang) ? tZh('🔥 需要先點燃篝火才能烹飪熱食！') : '🔥 Need to light the campfire first before cooking!', 'warning');
                 return;
             }
@@ -7329,14 +8350,14 @@ function registerSurvivalEventListeners() {
             inv.splice(foodIndex, 1);
 
             const status = playerState.player_status;
-            const hpBar = status.status_bars.find(b => b.type === 'hp');
-            const hungerBar = status.status_bars.find(b => b.type === 'hunger');
+            const hpBar = status.status_bars.find(b => b.type === 'hp' || b.name === 'HP' || b.name === '生命值');
+            const hungerBar = status.status_bars.find(b => b.type === 'hunger' || b.name === '饱腹度');
 
             const itemEffectPercent = typeof item === 'object' ? (item.effect_percent || 0.2) : 0.2;
             const doubledRecovery = Math.round((hungerBar?.max_value || 100) * itemEffectPercent * 2.0);
 
             if (hungerBar) {
-                hungerBar.value = Math.min(hungerBar.max_value, hungerBar.value + doubledRecovery);
+                hungerBar.value = Math.min(hungerBar.max_value || 100, (hungerBar.value || 0) + doubledRecovery);
             }
             if (playerState.world_state) {
                 playerState.world_state.hunger = Math.min(100, (playerState.world_state.hunger || 0) + doubledRecovery);
@@ -7344,20 +8365,41 @@ function registerSurvivalEventListeners() {
             
             // Minor HP bonus from warm cooked food
             if (hpBar) {
-                hpBar.value = Math.min(hpBar.max_value, hpBar.value + 5);
+                hpBar.value = Math.min(hpBar.max_value || 100, (hpBar.value || 0) + 5);
             }
 
             const itemName = typeof item === 'object' ? item.name : item;
-            const msg = isChinese(currentLang) ? tZh(`🍳 你烹飪並享用了 [${itemName}]，飽腹度恢復了 ${doubledRecovery}！`) : `🍳 You cooked and ate [${itemName}], recovering ${doubledRecovery} Hunger!`;
+            const msg = isChinese(currentLang) ? tZh(`🍳 在营地烹饪并享用了【${itemName}】，饱腹度恢复了 ${doubledRecovery}，体温回升（生命 +5）！`) : `🍳 You cooked and ate [${itemName}], recovering ${doubledRecovery} Hunger and +5 HP!`;
 
             showNotification(msg, 'success');
+            showDialogueLog(msg);
             triggerVisualEffect('heal_glow');
+            if (typeof adventureLog !== 'undefined' && Array.isArray(adventureLog)) {
+                adventureLog.push(`<span class="text-emerald-300 font-semibold">${msg}</span>`);
+                if (typeof renderAdventureLog === 'function') renderAdventureLog();
+            }
             syncGameState(playerState);
+            if (typeof updateStoryRespiteModal === 'function') {
+                updateStoryRespiteModal();
+            }
+            // NO processPlayerChoice - user stays in control of story progression!
+        });
+    }
 
-            // Notify AI GM
-            const systemAction = `[System: Player cooked and ate ${itemName} at the campfire, recovering double effect: +${doubledRecovery} Hunger, +5 HP.]`;
-            setTimeout(() => processPlayerChoice(systemAction), 1000);
-            closeModal(dom.campModal);
+    // 0. Settle Equipment Action
+    const settleEquipBtn = document.getElementById('camp-settle-equip-btn');
+    if (settleEquipBtn) {
+        settleEquipBtn.addEventListener('click', () => {
+            const env = evaluateCampEnvironment(playerState);
+            if (!env.canCamp) {
+                showNotification(`🚫 环境危急（${env.campBlockReason}），无法从容安顿装备！`, 'warning');
+                return;
+            }
+            if (dom.hudModal) {
+                renderPlayerHUD();
+                openModal(dom.hudModal);
+            }
+            showNotification('🛡️ 已就地展开随身行囊与装备，可从容检视与安顿！', 'info');
         });
     }
 
@@ -9302,6 +10344,19 @@ function syncEmbeddedHUD() {
 // =================== 視窗特效區 (Anime.js) ===================
 
 const openModal = (modal) => {
+    if (!modal) return;
+
+    // 死亡/終局全功能界面防護攔截
+    if (typeof isPlayerDeadOrGameOver === 'function' && isPlayerDeadOrGameOver()) {
+        const allowedWhenDead = ['settings-modal', 'character-preview-modal', 'game-modal', 'transaction-log-modal', 'achievement-modal'];
+        if (!allowedWhenDead.includes(modal.id)) {
+            if (typeof showNotification === 'function') {
+                showNotification('☠️ 角色已陷入濒死/阵亡，所有游戏交互界面已全面锁定！', 'warning');
+            }
+            return;
+        }
+    }
+
     if (modal) {
         modal.classList.remove('hidden');
         const content = modal.querySelector('.modal-content');
@@ -10462,6 +11517,13 @@ ${pacingPrompt}
                 factSheet.push(...gameUpdate.new_facts);
             }
 
+            if (gameUpdate.scene_npcs) {
+                playerState.current_scene_npcs = gameUpdate.scene_npcs;
+            }
+            if (gameUpdate.scene_interactables) {
+                playerState.scene_interactables = gameUpdate.scene_interactables;
+            }
+
             playerState.is_dead = gameUpdate.is_dead || false;
             playerState.is_game_over = gameUpdate.is_game_over || false;
 
@@ -10471,6 +11533,10 @@ ${pacingPrompt}
                     playerState.is_dead = true;
                     adventureLog.push(i18nData[currentLang]['game.gameOverMessage']);
                 }
+            }
+
+            if (playerState.is_dead || playerState.is_game_over) {
+                lockAllFeaturesOnDeath();
             }
 
             playerState.last_choices = gameUpdate.choices || [];
@@ -11825,21 +12891,61 @@ function updateStoryRespiteModal() {
         playerState.shelter_state = { shelter_level: 0, shelter_location: 'None', wood_stock: 0, campfire_lit: false };
     }
 
+    const env = typeof evaluateCampEnvironment === 'function' ? evaluateCampEnvironment(playerState) : { isSafe: false, canCamp: true, canSleep: true, canFire: true, canChop: true, canForage: true, canCook: true, canUpgrade: true, canRestBanter: true, canHealWounds: true, activeHazards: [] };
+
     const locEl = document.getElementById('respite-current-location');
     if (locEl) {
-        locEl.textContent = playerState.world_state?.location || playerState.world_state?.current_location || '荒野露營地';
+        locEl.textContent = playerState.world_state?.location || playerState.world_state?.current_location || '荒野露营地';
     }
     const timeEl = document.getElementById('respite-current-time');
     if (timeEl) {
         timeEl.textContent = playerState.world_state?.time || `第 ${playerState.camp_state?.days || 1} 天`;
     }
 
+    // Environmental Safety Badge & Hazard Description
+    const safetyBadge = document.getElementById('respite-env-safety-badge');
+    if (safetyBadge) {
+        if (env.isSafe) {
+            safetyBadge.textContent = '🟢 避风安全区';
+            safetyBadge.className = 'px-2 py-0.5 rounded text-[10px] font-bold font-mono bg-emerald-900/60 text-emerald-300 border border-emerald-500/30';
+        } else if (env.dangerLevel === 'combat') {
+            safetyBadge.textContent = '⛔ 战斗危局';
+            safetyBadge.className = 'px-2 py-0.5 rounded text-[10px] font-bold font-mono bg-red-900/80 text-red-200 border border-red-500/50';
+        } else if (env.dangerLevel === 'hostile' || !env.canCamp) {
+            safetyBadge.textContent = '🔴 恶劣险境';
+            safetyBadge.className = 'px-2 py-0.5 rounded text-[10px] font-bold font-mono bg-rose-900/60 text-rose-300 border border-rose-500/40';
+        } else {
+            safetyBadge.textContent = '🟡 荒野开阔地';
+            safetyBadge.className = 'px-2 py-0.5 rounded text-[10px] font-bold font-mono bg-amber-900/60 text-amber-300 border border-amber-500/40';
+        }
+    }
+
+    const hazardDesc = document.getElementById('respite-env-hazard-desc');
+    if (hazardDesc) {
+        if (env.activeHazards.length > 0) {
+            hazardDesc.textContent = `当前威胁：${env.activeHazards.join(' | ')}。功能受环境真实限制。`;
+        } else {
+            hazardDesc.textContent = env.dangerReason || '当前地带天候平稳，可进行基础休整。';
+        }
+    }
+
+    const lockAlert = document.getElementById('respite-env-lock-alert');
+    const lockText = document.getElementById('respite-env-lock-text');
+    if (lockAlert && lockText) {
+        if (!env.canCamp) {
+            lockAlert.classList.remove('hidden');
+            lockText.textContent = env.campBlockReason;
+        } else {
+            lockAlert.classList.add('hidden');
+        }
+    }
+
     const hpBar = playerState?.player_status?.status_bars?.find(b => b.type === 'hp' || b.name === 'HP' || b.name === '生命值');
     const spBar = playerState?.player_status?.status_bars?.find(b => b.type === 'sp' || b.name === 'SP' || b.name === '精力' || b.name === '體力');
     const hpValEl = document.getElementById('respite-hp-val');
-    if (hpValEl && hpBar) hpValEl.textContent = `${hpBar.value}/${hpBar.max}`;
+    if (hpValEl && hpBar) hpValEl.textContent = `${hpBar.value}/${hpBar.max || 100}`;
     const spValEl = document.getElementById('respite-sp-val');
-    if (spValEl && spBar) spValEl.textContent = `${spBar.value}/${spBar.max}`;
+    if (spValEl && spBar) spValEl.textContent = `${spBar.value}/${spBar.max || 100}`;
     
     const hungerValEl = document.getElementById('respite-hunger-val');
     if (hungerValEl) hungerValEl.textContent = `${playerState.world_state?.hunger ?? 100}/100`;
@@ -11853,10 +12959,10 @@ function updateStoryRespiteModal() {
     if (debuffBanner && debuffText) {
         if (activeDebuffs.length > 0) {
             debuffBanner.classList.remove('hidden');
-            debuffText.textContent = `身患創傷減益：${activeDebuffs.map(d => typeof d === 'string' ? d : d.name).join('、')}`;
+            debuffText.textContent = `身患创伤：${activeDebuffs.map(d => typeof d === 'string' ? d : d.name).join('、')}`;
         } else if ((playerState?.world_state?.hunger ?? 100) <= 20 || (playerState?.world_state?.hydration ?? 100) <= 20) {
             debuffBanner.classList.remove('hidden');
-            debuffText.textContent = '極度飢渴虛脫狀態！';
+            debuffText.textContent = '极度饥渴虚脱状态！';
         } else {
             debuffBanner.classList.add('hidden');
         }
@@ -11867,10 +12973,10 @@ function updateStoryRespiteModal() {
     if (compBadge) {
         const compState = playerState.npc_state?.companion;
         if (compState && compState.recruited) {
-            compBadge.textContent = `同伴同行中 (好感 ${compState.favor || 50}%)`;
+            compBadge.textContent = `同伴同行 (好感 ${compState.favor || 50}%)`;
             compBadge.className = 'text-[9px] px-1.5 py-0.2 rounded bg-indigo-600/40 text-indigo-200 font-mono';
         } else {
-            compBadge.textContent = '聚落可結識';
+            compBadge.textContent = '独行探索中';
             compBadge.className = 'text-[9px] px-1.5 py-0.2 rounded bg-slate-700/60 text-slate-300 font-mono';
         }
     }
@@ -11879,14 +12985,80 @@ function updateStoryRespiteModal() {
     const fireStatus = document.getElementById('camp-fire-status');
     if (fireStatus) {
         const isLit = !!(playerState.camp_state?.campfire_lit || playerState.shelter_state?.campfire_lit);
-        fireStatus.textContent = isLit ? 'ON (燃燒中)' : 'OFF';
+        fireStatus.textContent = isLit ? 'ON (燃烧中)' : 'OFF';
         fireStatus.className = isLit 
             ? 'text-xs font-bold px-2 py-0.5 rounded bg-amber-600/40 text-amber-200 border border-amber-500/50' 
             : 'text-xs font-bold px-2 py-0.5 rounded bg-slate-800 text-slate-400 border border-white/10';
     }
+
+    // === Gating and Reflecting Restrictions on Action Buttons ===
+    const setBtnState = (btn, allowed, lockReason) => {
+        if (!btn) return;
+        if (!allowed) {
+            btn.disabled = true;
+            btn.classList.add('opacity-40', 'cursor-not-allowed');
+            btn.classList.remove('hover:bg-orange-900/50', 'hover:bg-amber-900/35', 'hover:bg-indigo-900/35', 'hover:bg-emerald-900/35', 'hover:bg-purple-900/35', 'hover:bg-sky-900/35');
+            btn.setAttribute('title', lockReason || '当前环境或剧本限制不可用');
+        } else {
+            btn.disabled = false;
+            btn.classList.remove('opacity-40', 'cursor-not-allowed');
+            btn.removeAttribute('title');
+        }
+    };
+
+    // 0. Settle Equip Btn
+    const settleEquipBtn = document.getElementById('camp-settle-equip-btn');
+    setBtnState(settleEquipBtn, env.canCamp, env.campBlockReason);
+
+    // 1. Sleep Btn
+    const sleepBtn = document.getElementById('camp-sleep-btn');
+    setBtnState(sleepBtn, env.canSleep, env.sleepBlockReason);
+    const sleepBadge = document.getElementById('camp-sleep-status-badge');
+    if (sleepBadge) {
+        if (!env.canSleep) {
+            sleepBadge.textContent = '🚫 无法入眠';
+            sleepBadge.className = 'text-[9px] px-1.5 py-0.2 rounded bg-red-900/60 text-red-200 font-mono';
+        } else if (env.sleepHazardWarning) {
+            sleepBadge.textContent = '⚠️ 极寒休眠受创';
+            sleepBadge.className = 'text-[9px] px-1.5 py-0.2 rounded bg-amber-900/60 text-amber-200 font-mono';
+        } else {
+            sleepBadge.textContent = '时间推进 +1 天';
+            sleepBadge.className = 'text-[9px] px-1.5 py-0.2 rounded bg-orange-600/40 text-orange-300 font-mono';
+        }
+    }
+
+    // 2. Fire Btn
+    const fireBtn = document.getElementById('camp-fire-btn');
+    setBtnState(fireBtn, env.canFire, env.fireBlockReason);
+
+    // 3. Companion Banter Btn
+    const compBtn = document.getElementById('camp-companion-btn');
+    setBtnState(compBtn, env.canRestBanter, env.banterBlockReason);
+
+    // 4. Heal / Tend Wounds Btn
+    const healBtn = document.getElementById('camp-heal-btn');
+    setBtnState(healBtn, env.canHealWounds, env.healBlockReason);
+
+    // 5. Cook Btn
+    const cookBtn = document.getElementById('camp-cook-btn');
+    setBtnState(cookBtn, env.canCook, env.cookBlockReason);
+
+    // 6. Chop Wood Btn
+    const chopBtn = document.getElementById('camp-chop-wood-btn');
+    setBtnState(chopBtn, env.canChop, env.chopBlockReason);
+
+    // 7. Forage Btn
+    const forageBtn = document.getElementById('camp-forage-btn');
+    setBtnState(forageBtn, env.canForage, env.forageBlockReason);
 }
 
 function openStoryRespiteModal() {
+    if (typeof isPlayerDeadOrGameOver === 'function' && isPlayerDeadOrGameOver()) {
+        if (typeof showNotification === 'function') {
+            showNotification('☠️ 角色已陷入濒死/阵亡，无法进行营地休整！', 'warning');
+        }
+        return;
+    }
     updateStoryRespiteModal();
     if (dom.campModal) {
         openModal(dom.campModal);
@@ -11895,32 +13067,102 @@ function openStoryRespiteModal() {
 
 function interactCampfireCompanion() {
     if (isProcessingAction) return;
-    if (isInCombat) {
-        showNotification('戰鬥中無法促膝長談！', 'error');
+    const env = typeof evaluateCampEnvironment === 'function' ? evaluateCampEnvironment(playerState) : { canRestBanter: true };
+    if (!env.canRestBanter) {
+        showNotification(env.banterBlockReason || '当前环境危机四伏，无法促膝长谈！', 'warning');
         return;
     }
-    closeModal(dom.campModal);
-    triggerVisualEffect('magic_border');
 
     const compState = playerState?.npc_state?.companion;
-    let narrativeAction = '';
-    if (compState && compState.recruited) {
-        narrativeAction = `【夥伴圍爐夜話】圍坐在溫暖的營火旁，與同行同伴促膝長談，分享旅途中的乾糧與水囊。聊起各自的過往、心中的牽掛與對前路的擔憂。（請在劇本中生動描繪兩人之間的真摯對話、細膩微表情與情誼升溫的日常細節，增加彼此信任好感）`;
-    } else {
-        narrativeAction = `【營火獨思與整裝】獨自坐在夜色營火旁，烤熱粗糙的乾糧，撥弄著躍動的火星。整理行囊筆記，回想著走過的險途，期盼在未來的冒險聚落中能遇見生死相託的同行夥伴。（請在劇本中刻畫出旅途孤獨感與營火帶來的微光暖意）`;
+    if (!compState || !compState.recruited) {
+        showNotification('当前无随行同伴，你独坐在营火旁整理思绪与行囊。', 'info');
+        return;
     }
-    setTimeout(() => processPlayerChoice(narrativeAction), 300);
+
+    // Check if player has edible rations to share
+    const inv = playerState.player_status?.inventory || [];
+    const foodIdx = inv.findIndex(i => {
+        const name = (typeof i === 'object' ? i.name : i || '').toLowerCase();
+        return name.includes('肉') || name.includes('粮') || name.includes('面包') || name.includes('果') || name.includes('food') || name.includes('ration');
+    });
+
+    let shareText = '';
+    if (foodIdx > -1) {
+        const item = inv.splice(foodIdx, 1)[0];
+        const itemName = typeof item === 'object' ? item.name : item;
+        compState.favor = Math.min(100, (compState.favor || 50) + 4);
+        shareText = `，并拿出随身的【${itemName}】一同分食，对方感激地展露了难得的微笑（好感 +4%）`;
+    } else {
+        compState.favor = Math.min(100, (compState.favor || 50) + 2);
+        shareText = '，倾听彼此的过往与抱负（好感 +2%）';
+    }
+
+    const compName = compState.name || '同伴';
+    const msg = `💬 你与「${compName}」围坐在温暖的营火旁促膝长谈${shareText}。彼此信任与羁绊进一步加深！`;
+    
+    showNotification(msg, 'success');
+    showDialogueLog(msg);
+    triggerVisualEffect('magic_border');
+    if (typeof adventureLog !== 'undefined' && Array.isArray(adventureLog)) {
+        adventureLog.push(`<span class="text-indigo-300 font-semibold">${msg}</span>`);
+        if (typeof renderAdventureLog === 'function') renderAdventureLog();
+    }
+    syncGameState(playerState);
+    updateStoryRespiteModal();
+    // Does NOT automatically advance story or call processPlayerChoice!
 }
 
 function interactCampfireHeal() {
     if (isProcessingAction) return;
-    if (isInCombat) {
-        showNotification('戰鬥中無法靜心調息包紮！', 'error');
+    const env = typeof evaluateCampEnvironment === 'function' ? evaluateCampEnvironment(playerState) : { canHealWounds: true };
+    if (!env.canHealWounds) {
+        showNotification(env.healBlockReason || '环境恶劣，无法进行包扎调理！', 'error');
         return;
     }
-    closeModal(dom.campModal);
 
-    // Relieve debuffs
+    const inv = playerState?.player_status?.inventory || [];
+    const debuffs = playerState?.player_status?.debuffs || [];
+    
+    // Check if player has medicine/bandage items
+    const medKeywords = ['草药', '绷带', '药剂', '急救包', '解毒剂', '抗体', 'herb', 'bandage', 'potion', 'medicine', 'first_aid', 'antidote'];
+    const medIdx = inv.findIndex(i => {
+        const name = (typeof i === 'object' ? i.name : i || '').toLowerCase();
+        return medKeywords.some(kw => name.includes(kw));
+    });
+
+    const isSevereDebuff = debuffs.some(d => {
+        const dStr = (typeof d === 'string' ? d : d.name || '').toLowerCase();
+        return dStr.includes('毒') || dStr.includes('辐射') || dStr.includes('骨折') || dStr.includes('诅咒') || dStr.includes('失温');
+    });
+
+    if (isSevereDebuff && medIdx === -1) {
+        // Player has severe debuff but no medical supplies
+        const hpBar = playerState.player_status?.status_bars?.find(b => b.type === 'hp' || b.name === 'HP' || b.name === '生命值');
+        const spBar = playerState.player_status?.status_bars?.find(b => b.type === 'sp' || b.name === 'SP' || b.name === '精力' || b.name === '體力');
+        if (hpBar) hpBar.value = Math.min(hpBar.max || 100, (hpBar.value || 0) + 10);
+        if (spBar) spBar.value = Math.min(spBar.max || 100, (spBar.value || 0) + 15);
+        
+        const msg = `⚠️ 你用温水清洗了表层擦伤（生命 +10，精力 +15）。但背包中缺乏专用草药绷带或解毒剂，无法根除重度创伤（${debuffs.map(d => typeof d === 'string' ? d : d.name).join('、')}）！`;
+        showNotification(msg, 'warning');
+        showDialogueLog(msg);
+        triggerVisualEffect('heal_glow');
+        if (typeof adventureLog !== 'undefined' && Array.isArray(adventureLog)) {
+            adventureLog.push(`<span class="text-amber-400 font-semibold">${msg}</span>`);
+            if (typeof renderAdventureLog === 'function') renderAdventureLog();
+        }
+        syncGameState(playerState);
+        updateStoryRespiteModal();
+        return;
+    }
+
+    // Has medicine or only mild fatigue/abrasion
+    let medUsedText = '';
+    if (medIdx > -1) {
+        const medItem = inv.splice(medIdx, 1)[0];
+        const medName = typeof medItem === 'object' ? medItem.name : medItem;
+        medUsedText = `消耗随身医疗品【${medName}】，`;
+    }
+
     if (playerState?.player_status) {
         playerState.player_status.debuffs = [];
         const hpBar = playerState.player_status.status_bars?.find(b => b.type === 'hp' || b.name === 'HP' || b.name === '生命值');
@@ -11928,25 +13170,52 @@ function interactCampfireHeal() {
         const spBar = playerState.player_status.status_bars?.find(b => b.type === 'sp' || b.name === 'SP' || b.name === '精力' || b.name === '體力');
         if (spBar) spBar.value = Math.min(spBar.max || 100, (spBar.value || 0) + 20);
     }
-    syncGameState(playerState);
-    triggerVisualEffect('heal_glow');
-    showNotification('🩹 調理包紮完畢，清洗傷口並平復身心！生命 +25，精力 +20。', 'success');
 
-    const narrativeAction = `【調息理傷與包紮】在營火邊架起鐵鍋燒熱開水，細心清洗撕裂的傷痕與塵土，敷上隨身草藥並以乾淨布條包紮止血，靜坐調息調理體內氣血。（請在劇本中詳細描繪療傷時的刺痛與逐漸平復的暖意，清除負面傷痛狀態）`;
-    setTimeout(() => processPlayerChoice(narrativeAction), 400);
+    const msg = `🩹 ${medUsedText}调理包扎完毕，清创止血平复身心！清除了身患的创伤负面状态（生命 +25，精力 +20）。`;
+    showNotification(msg, 'success');
+    showDialogueLog(msg);
+    triggerVisualEffect('heal_glow');
+    if (typeof adventureLog !== 'undefined' && Array.isArray(adventureLog)) {
+        adventureLog.push(`<span class="text-emerald-300 font-semibold">${msg}</span>`);
+        if (typeof renderAdventureLog === 'function') renderAdventureLog();
+    }
+    syncGameState(playerState);
+    updateStoryRespiteModal();
+    // Does NOT automatically advance story or call processPlayerChoice!
 }
 
 function interactCampfireLore() {
     if (isProcessingAction) return;
-    if (isInCombat) {
-        showNotification('戰鬥中無法翻閱劇本筆記！', 'error');
+    const env = typeof evaluateCampEnvironment === 'function' ? evaluateCampEnvironment(playerState) : { canCamp: true };
+    if (!env.canCamp) {
+        showNotification(env.campBlockReason || '环境紧迫，无法翻阅情报！', 'warning');
         return;
     }
-    closeModal(dom.campModal);
-    triggerVisualEffect('level_up_glow');
 
-    const narrativeAction = `【梳理情報與任務】藉著營火微光翻看隨身筆記與世界線索地圖，仔細推敲當前境況、已知的流言傳聞與主支線懸賞，思索下一步最有價值的目標與探索破局之道。（請在劇本中深度梳理當前章節的劇情謎團與世界觀背景）`;
-    setTimeout(() => processPlayerChoice(narrativeAction), 300);
+    const quests = playerState?.player_status?.quests || [];
+    const intel = playerState?.world_state?.intel || [];
+    const activeQuests = quests.filter(q => !q.completed && !q.failed);
+    
+    let summary = '📜 【营火情报与装备盘点】\n';
+    summary += `当前境地：${playerState?.world_state?.location || '未知区域'}\n`;
+    if (activeQuests.length > 0) {
+        summary += `📌 正在追踪的目标（${activeQuests.length} 项）：\n` + activeQuests.slice(0, 3).map(q => `• ${q.title || q.name}`).join('\n') + '\n';
+    } else {
+        summary += '📌 暂无明确主线悬赏，可依据当前境况自主抉择下一步行动。\n';
+    }
+    if (intel.length > 0) {
+        summary += `💡 掌握的关键情报：${intel.slice(-2).map(i => typeof i === 'string' ? i : i.title).join('；')}\n`;
+    }
+    summary += '💡 提示：在营地中安顿好装备防具，随时从容应对危机。';
+    
+    showNotification('📜 你仔细翻看了随身地图与任务手札，思路变得清晰有条理！', 'info');
+    showDialogueLog(summary);
+    triggerVisualEffect('level_up_glow');
+    if (typeof adventureLog !== 'undefined' && Array.isArray(adventureLog)) {
+        adventureLog.push(`<span class="text-purple-300 font-medium">${summary.replace(/\n/g, '<br>')}</span>`);
+        if (typeof renderAdventureLog === 'function') renderAdventureLog();
+    }
+    // Does NOT automatically advance story or call processPlayerChoice!
 }
 
 function openCampControlsPanel() {
@@ -13575,9 +14844,53 @@ function renderQuestItem(quest, t) {
     // ---------------------------
 
     // ... (保留原本的死亡/結局/戰鬥勝利按鈕邏輯) ...
-    // 請將原有的 is_dead / is_game_over / combatTarget.hp <= 0 邏輯貼回這裡，為節省篇幅省略
-    if (playerState.is_dead) {
-        if (playerState.is_game_over) return;
+    if (playerState.is_dead || playerState.is_game_over) {
+        lockAllFeaturesOnDeath();
+
+        if (playerState.is_game_over) {
+            const gameOverCard = document.createElement('div');
+            gameOverCard.className = 'w-full text-center py-6 px-5 bg-gradient-to-b from-stone-950 via-red-950/70 to-black border-2 border-red-700/80 rounded-2xl text-red-100 shadow-[0_0_35px_rgba(225,29,72,0.6)] space-y-4 select-none';
+            gameOverCard.innerHTML = `
+                <div class="font-black text-2xl text-rose-500 flex items-center justify-center gap-3">
+                    <i class="ph-bold ph-skull text-3xl animate-pulse"></i>
+                    <span>【☠️ 英雄末路 · 征途终结】</span>
+                </div>
+                <p class="text-sm text-rose-200/90 max-w-md mx-auto leading-relaxed">
+                    你的肉身与执念在严酷的风雪与绝境中湮灭，这一场壮烈而坎坷的冒险画上了不可挽回的休止符。所有行动与界面功能均已锁死。
+                </p>
+                <div class="p-3 bg-black/60 border border-red-900/50 rounded-xl text-xs text-stone-300 font-mono flex items-center justify-center gap-4">
+                    <span>状态：<strong class="text-rose-400">已长眠陨落 (GAME OVER)</strong></span>
+                    <span>模式：<strong class="text-amber-400">界面已全锁死</strong></span>
+                </div>
+                <div class="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
+                    <button type="button" id="gameover-restart-btn" class="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-gradient-to-r from-red-600 to-rose-700 hover:from-red-500 hover:to-rose-600 text-white font-bold text-sm shadow-lg flex items-center justify-center gap-2 cursor-pointer transition-all transform hover:scale-105 active:scale-95">
+                        <i class="ph-bold ph-arrow-counter-clockwise"></i> 开启全新征途 (Restart Game)
+                    </button>
+                    <button type="button" id="gameover-load-btn" class="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-sm border border-white/10 shadow flex items-center justify-center gap-2 cursor-pointer transition-all transform hover:scale-105 active:scale-95">
+                        <i class="ph-bold ph-folder-open"></i> 读取往昔存档 (Load Save)
+                    </button>
+                </div>
+            `;
+            dom.choicesContainer.appendChild(gameOverCard);
+
+            const restartBtn = document.getElementById('gameover-restart-btn');
+            if (restartBtn) {
+                restartBtn.onclick = () => {
+                    if (typeof resetGame === 'function') resetGame();
+                    else location.reload();
+                };
+            }
+            const loadBtn = document.getElementById('gameover-load-btn');
+            if (loadBtn) {
+                loadBtn.onclick = () => {
+                    if (dom.saveLoadModal) {
+                        dom.saveLoadModal.classList.remove('hidden');
+                        if (typeof updateSaveSlotsUI === 'function') updateSaveSlotsUI();
+                    }
+                };
+            }
+            return;
+        }
 
         const defeatBanner = document.createElement('div');
         defeatBanner.className = 'w-full text-center py-3.5 px-4 bg-red-950/80 border-2 border-red-600 rounded-xl text-red-200 mb-4 shadow-[0_0_25px_rgba(225,29,72,0.6)] animate-pulse';
@@ -13879,8 +15192,12 @@ function renderQuestItem(quest, t) {
                                    !playerState.world_state?.flags?.in_combat &&
                                    mode === '自由';
 
-        // 若处于避风安界/安全聚落且剧情/模式允许休整，直接在剧本选项末尾追加专属日常剧情选项
-        if (isSafe && restAllowedByStory) {
+        const campEnv = typeof evaluateCampEnvironment === 'function' 
+            ? evaluateCampEnvironment(playerState) 
+            : { isSafe, canCamp: true, canSleep: isSafe, canRestBanter: isSafe, dangerLevel: 'wild' };
+
+        // 若处于避风安界/安全聚落且剧情/模式允许休整且环境适宜，直接在剧本选项末尾追加专属日常剧情选项
+        if (isSafe && restAllowedByStory && campEnv.canSleep) {
             // 1. 就地休整
             const safeSleepBtn = document.createElement('button');
             safeSleepBtn.className = 'choice-button w-full text-left bg-orange-950/40 hover:bg-orange-900/60 border border-orange-500/40 text-orange-200 hover:text-white transition-all duration-200 font-semibold py-2 px-3 sm:py-2.5 sm:px-3.5 rounded-lg shadow-sm flex items-center justify-between group cursor-pointer';
@@ -13897,7 +15214,9 @@ function renderQuestItem(quest, t) {
                 <i class="ph-bold ph-bed text-orange-400 text-base group-hover:translate-x-0.5 transition-transform"></i>
             `;
             dom.choicesContainer.appendChild(safeSleepBtn);
+        }
 
+        if (isSafe && restAllowedByStory && campEnv.canRestBanter) {
             // 2. 围炉夜话
             const safeBanterBtn = document.createElement('button');
             safeBanterBtn.className = 'choice-button w-full text-left bg-indigo-950/40 hover:bg-indigo-900/60 border border-indigo-500/40 text-indigo-200 hover:text-white transition-all duration-200 font-semibold py-2 px-3 sm:py-2.5 sm:px-3.5 rounded-lg shadow-sm flex items-center justify-between group cursor-pointer';
@@ -13923,19 +15242,35 @@ function renderQuestItem(quest, t) {
         const currentLoc = playerState.world_state?.location || playerState.world_state?.current_location || '荒野露营地';
         const statusSpan = document.createElement('div');
         statusSpan.className = 'text-slate-400 flex items-center gap-1.5 text-[11px] truncate max-w-full';
-        statusSpan.innerHTML = `<span>🏕️ 境地：</span><span class="text-amber-300 font-semibold truncate">${currentLoc}</span>${isSafe ? '<span class="px-1.5 py-0.2 rounded bg-emerald-900/60 text-emerald-300 border border-emerald-500/30 text-[9px] font-mono">避风安界</span>' : '<span class="px-1.5 py-0.2 rounded bg-slate-800 text-slate-400 border border-white/10 text-[9px] font-mono">荒野行途</span>'}`;
+        
+        let envBadge = '<span class="px-1.5 py-0.2 rounded bg-slate-800 text-slate-400 border border-white/10 text-[9px] font-mono">荒野行途</span>';
+        if (isSafe) {
+            envBadge = '<span class="px-1.5 py-0.2 rounded bg-emerald-900/60 text-emerald-300 border border-emerald-500/30 text-[9px] font-mono">避风安界</span>';
+        } else if (campEnv.dangerLevel === 'hostile' || !campEnv.canCamp) {
+            envBadge = '<span class="px-1.5 py-0.2 rounded bg-rose-900/60 text-rose-300 border border-rose-500/30 text-[9px] font-mono">恶劣险境</span>';
+        }
+        statusSpan.innerHTML = `<span>🏕️ 境地：</span><span class="text-amber-300 font-semibold truncate">${currentLoc}</span>${envBadge}`;
         respiteContainer.appendChild(statusSpan);
 
         const respiteActionBtn = document.createElement('button');
         respiteActionBtn.type = 'button';
-        respiteActionBtn.className = 'w-full sm:w-auto px-3 py-1.5 rounded-lg border border-orange-500/40 bg-orange-950/40 hover:bg-orange-900/60 text-orange-200 hover:text-white font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer text-xs active:scale-95';
-        respiteActionBtn.innerHTML = `<span>⛺ 境地休整与安顿装备</span><i class="ph-bold ph-caret-right text-orange-400"></i>`;
-        respiteActionBtn.onclick = (e) => {
-            e.stopPropagation();
-            if (typeof openStoryRespiteModal === 'function') {
-                openStoryRespiteModal();
-            }
-        };
+        if (!campEnv.canCamp) {
+            respiteActionBtn.className = 'w-full sm:w-auto px-3 py-1.5 rounded-lg border border-red-900/40 bg-red-950/30 text-slate-400 font-bold flex items-center justify-center gap-1.5 text-xs cursor-not-allowed opacity-60';
+            respiteActionBtn.innerHTML = `<span>🚫 险恶受限：无法休整</span><i class="ph-bold ph-lock text-rose-400"></i>`;
+            respiteActionBtn.onclick = (e) => {
+                e.stopPropagation();
+                showNotification(`🚫 环境危急（${campEnv.campBlockReason}），无法设立营地或从容休整！`, 'warning');
+            };
+        } else {
+            respiteActionBtn.className = 'w-full sm:w-auto px-3 py-1.5 rounded-lg border border-orange-500/40 bg-orange-950/40 hover:bg-orange-900/60 text-orange-200 hover:text-white font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer text-xs active:scale-95';
+            respiteActionBtn.innerHTML = `<span>⛺ 营地休整与安顿装备</span><i class="ph-bold ph-caret-right text-orange-400"></i>`;
+            respiteActionBtn.onclick = (e) => {
+                e.stopPropagation();
+                if (typeof openStoryRespiteModal === 'function') {
+                    openStoryRespiteModal();
+                }
+            };
+        }
         respiteContainer.appendChild(respiteActionBtn);
         dom.choicesContainer.appendChild(respiteContainer);
     }
@@ -14606,6 +15941,28 @@ async function processPlayerChoice(choice, selectedChoiceObject = null) {
     const t = i18nData[currentLang];
     if (!choice || isProcessingAction) return;
 
+    // 死亡与终局拦截锁定防线
+    if (playerState && playerState.is_game_over) {
+        showNotification('☠️ 英雄征途已然终焉，无法再执行冒险行动。请重新开启全新征途或读取存档。', 'warning');
+        lockAllFeaturesOnDeath();
+        return;
+    }
+
+    if (playerState && playerState.is_dead) {
+        const allowedDeathChoices = [
+            'RESURRECT_BY_GODDESS',
+            'DEFEAT_CAPTURED',
+            'DEFEAT_DARK_PACT',
+            'DEFEAT_COMPANION_RESCUE',
+            'ACCEPT_FATE'
+        ];
+        if (!allowedDeathChoices.includes(choice)) {
+            showNotification('☠️ 角色当前处于战败濒死状态，请选择命途走向或接受命运！', 'warning');
+            lockAllFeaturesOnDeath();
+            return;
+        }
+    }
+
    // ★★★ 1. 新增：控制是否要在日誌顯示這行動作的開關
     let shouldLogAction = true;
 
@@ -14776,23 +16133,17 @@ async function processPlayerChoice(choice, selectedChoiceObject = null) {
     }
     else if (choice === 'ACCEPT_FATE') {
         playerState.is_game_over = true;
-        
-        document.getElementById('custom-action-input').disabled = true;
-        document.getElementById('custom-action-input').placeholder = t['form.customAction.placeholder_gameover'];
-        const submitBtn = document.querySelector('#custom-action-form button[type="submit"]');
-        if(submitBtn) submitBtn.disabled = true;
+        playerState.is_dead = true;
+        lockAllFeaturesOnDeath();
 
         renderChoices([]); 
         
-        adventureLog.push(`<div class="text-center text-gray-300 my-6 p-6 border-2 border-red-900/80 rounded-2xl bg-black/80 shadow-[0_0_30px_rgba(225,29,72,0.4)]">
-            <div class="text-3xl mb-2">⚰️</div>
+        adventureLog.push(`<div class="text-center text-gray-300 my-6 p-6 border-2 border-red-900/80 rounded-2xl bg-black/80 shadow-[0_0_30px_rgba(225,29,72,0.4)] select-none">
+            <div class="text-3xl mb-2 animate-bounce">⚰️</div>
             <p class="text-2xl font-black text-red-400 mb-2">${t['game.fate.title'] || '英雄长眠 · 征途终焉'}</p>
-            <p class="text-sm text-slate-300 leading-relaxed max-w-md mx-auto">${t['game.fate.desc'] || '你的身躯倒在异乡严苛的冰冷泥泞中，传奇至此落幕。'}</p>
+            <p class="text-sm text-slate-300 leading-relaxed max-w-md mx-auto">${t['game.fate.desc'] || '你的身躯倒在异乡严苛的冰冷泥泞中，传奇至此落幕。所有交互功能均已全面锁死。'}</p>
             <div class="mt-4 pt-4 border-t border-slate-700/60 flex flex-col items-center justify-center gap-3">
                 <span class="text-xs text-slate-400 font-mono">存活回合数：${actionCount} 步 · 最终等级：Lv.${playerState.player_status?.level || 1}</span>
-                <button onclick="location.reload()" class="bg-gradient-to-r from-red-800 to-rose-700 hover:from-red-700 hover:to-rose-600 text-white font-bold py-2.5 px-6 rounded-lg shadow-lg border border-red-500 transition-all transform hover:scale-105">
-                    🔄 开启全新征途 (Restart)
-                </button>
             </div>
         </div>`);
         renderAdventureLog();
@@ -15702,6 +17053,13 @@ const sanitizeArrayFromAI = (arr) => {
             playerState.active_companion = gameUpdate.world_state.active_companion;
         }
 
+        if (gameUpdate.scene_npcs) {
+            playerState.current_scene_npcs = gameUpdate.scene_npcs;
+        }
+        if (gameUpdate.scene_interactables) {
+            playerState.scene_interactables = gameUpdate.scene_interactables;
+        }
+
         playerState.is_dead = gameUpdate.is_dead || false;
         playerState.is_game_over = gameUpdate.is_game_over || false;
 
@@ -15718,6 +17076,10 @@ const sanitizeArrayFromAI = (arr) => {
                 playerState.is_dead = true;
                 adventureLog.push(i18nData[currentLang]['game.gameOverMessage']); // 顯示紅色警告框
             }
+        }
+
+        if (playerState.is_dead || playerState.is_game_over) {
+            lockAllFeaturesOnDeath();
         }
 
         playerState.last_choices = gameUpdate.choices || [];
@@ -16225,6 +17587,12 @@ if ((combatTarget.hp <= 0 || gameUpdate.is_monster_dead) && playerState.player_s
         }
 
         if (gameUpdate.updated_equipment) Object.assign(playerState.player_status.equipment, gameUpdate.updated_equipment);
+        if (gameUpdate.scene_npcs) {
+            playerState.current_scene_npcs = gameUpdate.scene_npcs;
+        }
+        if (gameUpdate.scene_interactables) {
+            playerState.scene_interactables = gameUpdate.scene_interactables;
+        }
         if (gameUpdate.is_dead) {
             playerState.is_dead = true;
         }
@@ -16244,6 +17612,10 @@ if ((combatTarget.hp <= 0 || gameUpdate.is_monster_dead) && playerState.player_s
                 playerState.is_dead = true;
                 adventureLog.push(i18nData[currentLang]['game.gameOverMessage']);
             }
+        }
+
+        if (playerState.is_dead || playerState.is_game_over) {
+            lockAllFeaturesOnDeath();
         }
 
         playerState.last_choices = [];
